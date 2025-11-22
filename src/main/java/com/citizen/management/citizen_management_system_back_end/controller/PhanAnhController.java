@@ -1,6 +1,7 @@
 package com.citizen.management.citizen_management_system_back_end.controller;
 
 import com.citizen.management.citizen_management_system_back_end.dto.*;
+import com.citizen.management.citizen_management_system_back_end.entity.LichSuPhanAnh;
 import com.citizen.management.citizen_management_system_back_end.entity.PhanAnh;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
 import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
@@ -73,5 +74,21 @@ public class PhanAnhController {
         List<PhanAnh> danhSach = phanAnhService.layDanhSachPhanAnhCuaToi(nguoiGui);
 
         return ResponseEntity.ok(danhSach);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PhanAnh> layChiTiet(@PathVariable String id) {
+        return ResponseEntity.ok(phanAnhService.layChiTietPhanAnh(id));
+    }
+
+    @GetMapping("/{id}/lich-su")
+    public ResponseEntity<List<LichSuPhanAnh>> layLichSu(@PathVariable String id) {
+        return ResponseEntity.ok(phanAnhService.layLichSuPhanAnh(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PhanAnh>> layTatCa() {
+        //Temp
+        return ResponseEntity.ok(phanAnhService.layTatCaPhanAnh());
     }
 }

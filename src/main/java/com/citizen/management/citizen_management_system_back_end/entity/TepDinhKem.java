@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "tep_dinh_kem")
 @Getter
@@ -21,6 +23,7 @@ public class TepDinhKem {
     private String tenFileGoc;
 
     //Quan he
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_phan_anh", referencedColumnName = "ma_phan_anh")
     private PhanAnh phanAnh;

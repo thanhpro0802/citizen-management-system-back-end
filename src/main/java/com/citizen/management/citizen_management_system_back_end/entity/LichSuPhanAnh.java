@@ -2,6 +2,7 @@ package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumHanhDong;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThai;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,10 +33,12 @@ public class LichSuPhanAnh {
     private EnumTrangThai trangThaiMoi;
 
     //Quan he
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_phan_anh", referencedColumnName = "ma_phan_anh")
     private PhanAnh phanAnh;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_tai_khoan_thuc_hien", referencedColumnName = "ma_tai_khoan")
     private TaiKhoan taiKhoanThucHien;

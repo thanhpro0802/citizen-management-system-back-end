@@ -1,17 +1,11 @@
 package com.citizen.management.citizen_management_system_back_end.service.impl;
 
 import com.citizen.management.citizen_management_system_back_end.dto.*;
-import com.citizen.management.citizen_management_system_back_end.entity.LichSuPhanAnh;
-import com.citizen.management.citizen_management_system_back_end.entity.PhanAnh;
-import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
-import com.citizen.management.citizen_management_system_back_end.entity.TepDinhKem;
+import com.citizen.management.citizen_management_system_back_end.entity.*;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumHanhDong;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThai;
-import com.citizen.management.citizen_management_system_back_end.repository.LichSuPhanAnhRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.PhanAnhRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.TepDinhKemRepository;
+import com.citizen.management.citizen_management_system_back_end.repository.*;
 import com.citizen.management.citizen_management_system_back_end.service.IPhanAnhService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +23,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     private final LichSuPhanAnhRepository lichSuRepository;
     private final TaiKhoanRepository taiKhoanRepository;
     private final TepDinhKemRepository tepDinhKemRepository;
+    private final ThongBaoReposity thongBaoReposity;
 
     @Override
     @Transactional
@@ -56,6 +51,22 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         ls.setNoiDung(request.getNoiDung());
 
         lichSuRepository.save(ls);
+
+        //3.Xu ly file dinh kem
+        if (request.getDanhSachFileUrl() != null && !request.getDanhSachFileUrl().isEmpty()) {
+            List<TepDinhKem> listTep = new ArrayList<>();
+
+            for (String url : request.getDanhSachFileUrl()) {
+                TepDinhKem tep = new TepDinhKem();
+                tep.setPhanAnh(paDaLuu);
+                tep.setUrl(url);
+                tep.setTenFileGoc("Anh_dinh_kem_cong_dan"); //Temp co dinh
+                listTep.add(tep);
+            }
+
+            //Luu file vao tep_dinh_kem
+            tepDinhKemRepository.saveAll(listTep);
+        }
 
         return paDaLuu;
     }
@@ -149,8 +160,16 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         lichSuRepository.save(ls);
 
-        //Todo: NotificationService de gui Email/SMS cho cong dan
-        //notificationService.send(pa.getNguoiGui(), "Phản ánh của bạn đã được trả lời.");
+        //4.Tao thong bao cho cong dan
+        ThongBao tb = new ThongBao();
+        tb.setNguoiNhan(pa.getNguoiGui()); // Gui cho nguoi tao phan anh
+        tb.setNoiDung("Phản ánh: '" + pa.getTieuDe() + "' của bạn đã có kết quả xử lý.");
+        tb.setThoiGian(new Date());
+        tb.setDaXem(false);
+
+        tb.setMaPhanAnhLienQuan(pa.getMaPhanAnh());
+
+        thongBaoReposity.save(tb);
 
         return paDaCapNhat;
     }
@@ -181,5 +200,22 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     public List<PhanAnh> layDanhSachPhanAnhCuaToi(TaiKhoan nguoiGui) {
         return phanAnhRepository.findAllByNguoiGui(nguoiGui); // Lay danh sach
+    }
+
+    @Override
+    public PhanAnh layChiTietPhanAnh(String id) {
+        return phanAnhRepository.findById(id).orElseThrow(() -> new RuntimeException("Khong tim thay Phan anh"));
+    }
+
+    @Override
+    public List<LichSuPhanAnh> layLichSuPhanAnh(String maPhanAnh) {
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phản ánh"));
+        return lichSuRepository.findByPhanAnhOrderByThoiGianDesc(pa);
+    }
+
+    @Override
+    public List<PhanAnh> layTatCaPhanAnh() {
+        return phanAnhRepository.findAll();
     }
 }

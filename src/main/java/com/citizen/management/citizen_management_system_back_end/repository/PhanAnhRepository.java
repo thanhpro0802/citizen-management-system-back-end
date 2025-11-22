@@ -9,4 +9,5 @@ import java.util.List;
 public interface PhanAnhRepository extends JpaRepository<PhanAnh,String> {
     // SELECT * FROM phan_anh WHERE ma_tai_khoan_gui = ?
     List<PhanAnh> findAllByNguoiGui(TaiKhoan nguoiGui);
+    List<PhanAnh> findAllByOrderByMaPhanAnhDesc();
 }
