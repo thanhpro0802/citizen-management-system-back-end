@@ -10,10 +10,15 @@ import java.util.List;
 public interface IPhanAnhService {
     PhanAnh guiPhanAnh(GuiPhanAnhRequest request, TaiKhoan nguoiGui);
 
+    PhanAnh phanCongXuLy(String maPhanAnh, PhanCongRequest request, TaiKhoan nguoiPhanCong);
+
+    void capNhatXuLyNoiBo(String maPhanAnh, XuLyNoiBoRequest request, TaiKhoan canBoXuLy);
+
     List<PhanAnh> layDanhSachPhanAnhCuaToi(TaiKhoan nguoiGui);
 
     PhanAnh layChiTietPhanAnh(String id);
 
     List<LichSuPhanAnh> layLichSuPhanAnh(String maPhanAnh);
 
+    List<PhanAnh> layTatCaPhanAnh();
 }

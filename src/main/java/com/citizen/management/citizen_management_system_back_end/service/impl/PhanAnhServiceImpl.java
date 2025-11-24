@@ -71,7 +71,74 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         return paDaLuu;
     }
 
-  
+    @Override
+    @Transactional
+    public PhanAnh phanCongXuLy(String maPhanAnh, PhanCongRequest request, TaiKhoan nguoiPhanCong) {
+        //1.Tim can bo nhan viec
+        TaiKhoan canBoDuocGiao = taiKhoanRepository.findById(request.getMaCanBoPhuTrach()).orElseThrow(() -> new EntityNotFoundException("Khong tim thay can bo voi ma: " + request.getMaCanBoPhuTrach()));
+
+        //2.Tim phan anh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh voi ma: " + maPhanAnh));
+
+        //3.Cap nhat thong tin
+        pa.setCanBoPhuTrach(canBoDuocGiao);
+        pa.setThoiHanXuLy(request.getThoiHanXuLy());
+        pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
+
+        //4.Luu
+        PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
+
+        //5.Tao lich su nhan viec
+        LichSuPhanAnh ls = new LichSuPhanAnh();
+        ls.setPhanAnh(paDaCapNhat);
+        ls.setTaiKhoanThucHien(nguoiPhanCong);
+        ls.setThoiGian(new Date());
+        ls.setHanhDong(EnumHanhDong.PHAN_CONG);
+        ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
+        //Ghi chu
+        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getTenDangNhap());
+
+        lichSuRepository.save(ls);
+        return paDaCapNhat;
+    }
+
+    @Override
+    @Transactional
+    public void capNhatXuLyNoiBo(String maPhanAnh, XuLyNoiBoRequest request, TaiKhoan canBoXuLy) {
+        //1.Tim phan anh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
+
+        if (pa.getTrangThaiHienTai() == EnumTrangThai.CHO) {
+            pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
+            phanAnhRepository.save(pa);
+        }
+
+        //2.Tao lich su ghi nhan viec xu ly noi bo
+        LichSuPhanAnh ls = new LichSuPhanAnh();
+        ls.setPhanAnh(pa);
+        ls.setTaiKhoanThucHien(canBoXuLy);
+        ls.setThoiGian(new Date());
+        ls.setHanhDong(EnumHanhDong.XU_LY);
+        ls.setNoiDung(request.getNoiDungCapNhat());
+        ls.setTrangThaiMoi(pa.getTrangThaiHienTai());
+
+        lichSuRepository.save(ls);
+
+        //3.Xu ly file dinh kem
+        if (request.getDanhSachFileUrl() != null && !request.getDanhSachFileUrl().isEmpty()) {
+            List<TepDinhKem> tepMoiList = new ArrayList<>();
+            for (String fileUrl : request.getDanhSachFileUrl()) {
+                TepDinhKem tep = new TepDinhKem();
+                tep.setPhanAnh(pa);
+                tep.setUrl(fileUrl);
+                tep.setTenFileGoc("File_tu_can_bo_xu_ly.jpg"); //FE xu ly sau
+                tepMoiList.add(tep);
+            }
+            //Luu tat ca file vao CSDL
+            tepDinhKemRepository.saveAll(tepMoiList);
+        }
+    }
+
     @Override
     public List<PhanAnh> layDanhSachPhanAnhCuaToi(TaiKhoan nguoiGui) {
         return phanAnhRepository.findAllByNguoiGui(nguoiGui); // Lay danh sach
@@ -89,5 +156,8 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         return lichSuRepository.findByPhanAnhOrderByThoiGianDesc(pa);
     }
 
-
+    @Override
+    public List<PhanAnh> layTatCaPhanAnh() {
+        return phanAnhRepository.findAll();
+    }
 }

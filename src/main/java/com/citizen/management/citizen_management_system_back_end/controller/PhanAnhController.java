@@ -31,6 +31,24 @@ public class PhanAnhController {
         return new ResponseEntity<>(paMoi, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}/phan-cong")
+    public ResponseEntity<PhanAnh> phanCongXuLy(@PathVariable String id, @RequestBody PhanCongRequest request) {
+        //Temp
+        TaiKhoan nguoiPhanCong = taiKhoanRepository.findById("canbo123").orElseThrow(() -> new EntityNotFoundException("Khong tim thay tai khoan test 'canbo123'. Them vao CSDL di."));
+        PhanAnh paCapNhat = phanAnhService.phanCongXuLy(id, request, nguoiPhanCong);
+
+        return ResponseEntity.ok(paCapNhat);
+    }
+
+    @PostMapping("/{id}/xu-ly-noi-bo")
+    public ResponseEntity<Void> capNhatXuLyNoiBo(@PathVariable String id, @RequestBody XuLyNoiBoRequest request) {
+        //Temp
+        TaiKhoan canBoXuLy = taiKhoanRepository.findById("canbo123").orElseThrow(() -> new EntityNotFoundException("Khong tim thay tai khoan 'canbo123'. Them vao CSDL di."));
+        phanAnhService.capNhatXuLyNoiBo(id, request, canBoXuLy);
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/cua-toi")
     public ResponseEntity<List<PhanAnh>> layDanhSachCuaToi() {
         //Temp
@@ -50,4 +68,9 @@ public class PhanAnhController {
         return ResponseEntity.ok(phanAnhService.layLichSuPhanAnh(id));
     }
 
+    @GetMapping
+    public ResponseEntity<List<PhanAnh>> layTatCa() {
+        //Temp
+        return ResponseEntity.ok(phanAnhService.layTatCaPhanAnh());
+    }
 }
