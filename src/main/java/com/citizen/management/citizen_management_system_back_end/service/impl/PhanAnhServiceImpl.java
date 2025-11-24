@@ -140,6 +140,64 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     }
 
     @Override
+    @Transactional
+    public PhanAnh phanHoiCongDan(String maPhanAnh, PhanHoiRequest request, TaiKhoan canBoPhanHoi) {
+        //1.Tim phan anh
+        PhanAnh pa = phanAnhRepository.findById((maPhanAnh)).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
+
+        //2.Cap nhat trang thai
+        pa.setTrangThaiHienTai(EnumTrangThai.DA_XU_LY);
+        PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
+
+        //3.Tao lich su ghi nhan phan hoi
+        LichSuPhanAnh ls = new LichSuPhanAnh();
+        ls.setPhanAnh(paDaCapNhat);
+        ls.setTaiKhoanThucHien(canBoPhanHoi);
+        ls.setThoiGian(new Date());
+        ls.setHanhDong(EnumHanhDong.PHAN_HOI);
+        ls.setNoiDung(request.getNoiDungPhanHoi());
+        ls.setTrangThaiMoi(EnumTrangThai.DA_XU_LY);
+
+        lichSuRepository.save(ls);
+
+        //4.Tao thong bao cho cong dan
+        ThongBao tb = new ThongBao();
+        tb.setNguoiNhan(pa.getNguoiGui()); // Gui cho nguoi tao phan anh
+        tb.setNoiDung("Phản ánh: '" + pa.getTieuDe() + "' của bạn đã có kết quả xử lý.");
+        tb.setThoiGian(new Date());
+        tb.setDaXem(false);
+
+        tb.setMaPhanAnhLienQuan(pa.getMaPhanAnh());
+
+        thongBaoReposity.save(tb);
+
+        return paDaCapNhat;
+    }
+
+    @Override
+    @Transactional
+    public PhanAnh danhGiaPhanHoi(String maPhanAnh, DanhGiaRequest request, TaiKhoan nguoiDanhGia) {
+        //1.TIm phan anh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong thay Phan anh: " + maPhanAnh));
+
+        //2.Kiem tra bao mat
+        if (!pa.getNguoiGui().getMaTaiKhoan().equals(nguoiDanhGia.getMaTaiKhoan())) {
+            throw new RuntimeException("Ban khong co quyen danh gia phan anh nay!");
+        }
+
+        //3.Dam bao chi danh gia khi da xu ly xong
+        if (pa.getTrangThaiHienTai() != EnumTrangThai.DA_XU_LY) {
+            throw new RuntimeException("Phan anh nay chua xu ly xong!");
+        }
+
+        //4.Cap nhat danh gia
+        pa.setDanhGiaHaiLong(request.getDanhGiaHaiLong());
+        pa.setGopY(request.getGopY());
+
+        return phanAnhRepository.save(pa);
+    }
+
+    @Override
     public List<PhanAnh> layDanhSachPhanAnhCuaToi(TaiKhoan nguoiGui) {
         return phanAnhRepository.findAllByNguoiGui(nguoiGui); // Lay danh sach
     }

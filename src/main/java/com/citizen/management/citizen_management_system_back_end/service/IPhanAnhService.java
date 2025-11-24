@@ -14,6 +14,10 @@ public interface IPhanAnhService {
 
     void capNhatXuLyNoiBo(String maPhanAnh, XuLyNoiBoRequest request, TaiKhoan canBoXuLy);
 
+    PhanAnh phanHoiCongDan(String maPhanAnh, PhanHoiRequest request, TaiKhoan canBoPhanHoi);
+
+    PhanAnh danhGiaPhanHoi(String maPhanAnh, DanhGiaRequest request, TaiKhoan nguoiDanhGia);
+
     List<PhanAnh> layDanhSachPhanAnhCuaToi(TaiKhoan nguoiGui);
 
     PhanAnh layChiTietPhanAnh(String id);
