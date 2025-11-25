@@ -31,6 +31,7 @@ public class PhanAnh {
     @Column(name = "linh_vuc")
     private String linhVuc;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "muc_do_khan_cap")
     private EnumMucDoKhanCap mucDoKhanCap;
 
