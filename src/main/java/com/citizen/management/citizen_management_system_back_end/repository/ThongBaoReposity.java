@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ThongBaoReposity extends JpaRepository<ThongBao, String> {
+public interface ThongBaoRepository extends JpaRepository<ThongBao, String> {
     //Lay danh sach thong bao cua user, moi nhat len dau
     List<ThongBao> findAllByNguoiNhanOrderByThoiGianDesc(TaiKhoan nguoiNhan);
 }
