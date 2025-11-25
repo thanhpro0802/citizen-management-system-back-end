@@ -25,6 +25,7 @@ public class PhanAnh {
     private String tieuDe;
 
     @Column(name = "trang_thai_hien_tai")
+    @Enumerated(EnumType.STRING)
     private EnumTrangThai trangThaiHienTai;
 
     @Column(name = "linh_vuc")
