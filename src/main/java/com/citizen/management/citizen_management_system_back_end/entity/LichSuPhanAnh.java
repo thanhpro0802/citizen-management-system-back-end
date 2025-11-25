@@ -31,6 +31,7 @@ public class LichSuPhanAnh {
     private String noiDung;
 
     @Column(name = "trang_thai_moi")
+    @Enumerated(EnumType.STRING)
     private EnumTrangThai trangThaiMoi;
 
     //Quan he
