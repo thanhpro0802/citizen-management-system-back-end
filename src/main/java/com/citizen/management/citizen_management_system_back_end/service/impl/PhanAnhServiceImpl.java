@@ -178,7 +178,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Transactional
     public PhanAnh danhGiaPhanHoi(String maPhanAnh, DanhGiaRequest request, TaiKhoan nguoiDanhGia) {
         //1.TIm phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong thay Phan anh: " + maPhanAnh));
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
 
         //2.Kiem tra bao mat
         if (!pa.getNguoiGui().getMaTaiKhoan().equals(nguoiDanhGia.getMaTaiKhoan())) {
