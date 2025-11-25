@@ -15,9 +15,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Tắt CSRF (Cross-Site Request Forgery)
-                // (Vì chúng ta đang dùng API, không dùng form HTML truyền thống)
-                .csrf(AbstractHttpConfigurer::disable)
+                // 1. Bật CSRF (Cross-Site Request Forgery) protection mặc định.
+                // Nếu bạn sử dụng session/cookie-based authentication hoặc phục vụ client browser, hãy giữ CSRF protection.
+                // Nếu bạn chỉ dùng stateless token-based authentication (ví dụ JWT), có thể disable CSRF cho các endpoint đó như sau:
+                // .csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/phan-anh"))
 
                 // 2. Cấu hình phân quyền (Authorization)
                 .authorizeHttpRequests(authorize -> authorize
