@@ -26,10 +26,11 @@ public class SecurityConfig {
                         // 2.1. Cho phép (permit) API gửi phản ánh
                         .requestMatchers(HttpMethod.POST, "/api/v1/phan-anh").permitAll()
 
-                        // 2.2. (Tạm thời) Cho phép tất cả các API khác để test
-                        // TODO: Sau này bạn sẽ xóa dòng này và cấu hình chi tiết hơn
-                        .anyRequest().permitAll()
-                );
+                        // 2.2. Yêu cầu xác thực cho tất cả các API khác
+                        .anyRequest().authenticated()
+                )
+                // 3. Kích hoạt HTTP Basic Authentication cho phát triển/test
+                .httpBasic();
 
         return http.build();
     }
