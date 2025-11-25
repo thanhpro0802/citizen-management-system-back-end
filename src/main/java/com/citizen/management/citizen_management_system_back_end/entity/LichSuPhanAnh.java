@@ -23,6 +23,7 @@ public class LichSuPhanAnh {
     @Column(name = "thoi_gian")
     private Date thoiGian;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "hanh_dong")
     private EnumHanhDong hanhDong;
 
