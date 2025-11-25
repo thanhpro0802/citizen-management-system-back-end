@@ -50,7 +50,7 @@ public class TaiKhoan {
     private List<PhanAnh> phanAnhDaXuLy;
 
     // Quan hệ 1:N với LichSuPhanAnh (Một tài khoản thực hiện nhiều lịch sử)
-    // 'mappedBy = "nguoiThucHien"' trỏ đến thuộc tính 'nguoiThucHien' trong class LichSuPhanAnh
+    // 'mappedBy = "taiKhoanThucHien"' trỏ đến thuộc tính 'taiKhoanThucHien' trong class LichSuPhanAnh
     @JsonIgnore
     @OneToMany(mappedBy = "taiKhoanThucHien", fetch = FetchType.LAZY)
     private List<LichSuPhanAnh> lichSuDaThucHien;

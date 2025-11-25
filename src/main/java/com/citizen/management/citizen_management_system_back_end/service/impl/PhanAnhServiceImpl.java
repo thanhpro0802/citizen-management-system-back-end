@@ -23,7 +23,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     private final LichSuPhanAnhRepository lichSuRepository;
     private final TaiKhoanRepository taiKhoanRepository;
     private final TepDinhKemRepository tepDinhKemRepository;
-    private final ThongBaoReposity thongBaoReposity;
+    private final ThongBaoRepository thongBaoRepository;
 
     @Override
     @Transactional

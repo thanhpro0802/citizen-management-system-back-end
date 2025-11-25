@@ -24,12 +24,14 @@ public class PhanAnh {
     @Column(name = "tieu_de")
     private String tieuDe;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "trang_thai_hien_tai")
     private EnumTrangThai trangThaiHienTai;
 
     @Column(name = "linh_vuc")
     private String linhVuc;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "muc_do_khan_cap")
     private EnumMucDoKhanCap mucDoKhanCap;
 

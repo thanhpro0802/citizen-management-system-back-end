@@ -23,12 +23,14 @@ public class LichSuPhanAnh {
     @Column(name = "thoi_gian")
     private Date thoiGian;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "hanh_dong")
     private EnumHanhDong hanhDong;
 
     @Column(name = "noi_dung")
     private String noiDung;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "trang_thai_moi")
     private EnumTrangThai trangThaiMoi;
 
