@@ -169,7 +169,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         tb.setMaPhanAnhLienQuan(pa.getMaPhanAnh());
 
-        thongBaoReposity.save(tb);
+        thongBaoRepository.save(tb);
 
         return paDaCapNhat;
     }
