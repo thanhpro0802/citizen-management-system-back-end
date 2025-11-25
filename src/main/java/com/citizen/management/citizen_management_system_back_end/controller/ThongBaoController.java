@@ -5,7 +5,6 @@ import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan
 import com.citizen.management.citizen_management_system_back_end.entity.ThongBao;
 import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.ThongBaoReposity;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
