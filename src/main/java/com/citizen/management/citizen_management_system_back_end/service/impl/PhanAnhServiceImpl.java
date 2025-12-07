@@ -1,6 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.service.impl;
 
-import com.citizen.management.citizen_management_system_back_end.dto.*;
+import com.citizen.management.citizen_management_system_back_end.dto.request.*;
 import com.citizen.management.citizen_management_system_back_end.entity.*;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumHanhDong;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
@@ -23,7 +23,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     private final LichSuPhanAnhRepository lichSuRepository;
     private final TaiKhoanRepository taiKhoanRepository;
     private final TepDinhKemRepository tepDinhKemRepository;
-    private final ThongBaoReposity thongBaoRepository;
+    private final ThongBaoRepository thongBaoRepository;
 
     @Override
     @Transactional
