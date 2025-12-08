@@ -1,6 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.service.impl;
 
-import com.citizen.management.citizen_management_system_back_end.dto.*;
+import com.citizen.management.citizen_management_system_back_end.dto.request.*;
 import com.citizen.management.citizen_management_system_back_end.entity.*;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumHanhDong;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;

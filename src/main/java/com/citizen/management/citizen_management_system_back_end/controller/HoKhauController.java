@@ -5,54 +5,67 @@ import com.citizen.management.citizen_management_system_back_end.dto.NhapHoReque
 import com.citizen.management.citizen_management_system_back_end.dto.TachHoRequest;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus; // Import thêm
+import org.springframework.http.ResponseEntity; // Import thêm
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/ho-khau")
+@RequiredArgsConstructor
 public class HoKhauController {
-    @Autowired
-    private HoKhauService hoKhauService;
+    
+    private final HoKhauService hoKhauService;
 
+    // 1. Thêm mới: Trả về 201 Created
     @PostMapping
-    public HoKhau themMoi(@RequestBody HoKhau hoKhau) {
-        return hoKhauService.taoMoi(hoKhau);
+    public ResponseEntity<HoKhau> themMoi(@RequestBody HoKhau hoKhau) {
+        HoKhau ketQua = hoKhauService.taoMoi(hoKhau);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ketQua);
     }
 
+    // 2. Cập nhật: Trả về 200 OK
     @PutMapping("/{id}")
-    public HoKhau sua(@PathVariable Long id, @RequestBody HoKhau hoKhau) {
-        return hoKhauService.capNhat(id, hoKhau);
+    public ResponseEntity<HoKhau> sua(@PathVariable Long id, @RequestBody HoKhau hoKhau) {
+        return ResponseEntity.ok(hoKhauService.capNhat(id, hoKhau));
     }
 
+    // 3. Xóa: Trả về 204 No Content
     @DeleteMapping("/{id}")
-    public void xoa(@PathVariable Long id) {
+    public ResponseEntity<Void> xoa(@PathVariable Long id) {
         hoKhauService.xoa(id);
+        return ResponseEntity.noContent().build();
     }
 
+    // 4. Xem danh sách: Trả về 200 OK
     @GetMapping
-    public List<HoKhau> xemDanhSach() {
-        return hoKhauService.layTatCa();
+    public ResponseEntity<List<HoKhau>> xemDanhSach() {
+        return ResponseEntity.ok(hoKhauService.layTatCa());
     }
 
+    // 5. Xem chi tiết: Trả về 200 OK 
+    // (Lưu ý: Nếu service trả về Optional thì dùng .map(...).orElse(...), nếu trả về object thì dùng .ok() và để ExceptionHandler lo phần lỗi 404)
     @GetMapping("/{id}")
-    public HoKhau xemChiTiet(@PathVariable Long id) {
-        return hoKhauService.layTheoId(id);
+    public ResponseEntity<HoKhau> xemChiTiet(@PathVariable Long id) {
+        return ResponseEntity.ok(hoKhauService.layTheoId(id));
     }
+
+    // --- Các nghiệp vụ đặc thù (Tách, Nhập, Đổi chủ hộ) ---
 
     @PostMapping("/{id}/tach-ho")
-    public HoKhau tachHo(@PathVariable Long id, @RequestBody TachHoRequest request) {
-        return hoKhauService.tachHo(id, request);
+    public ResponseEntity<HoKhau> tachHo(@PathVariable Long id, @RequestBody TachHoRequest request) {
+        return ResponseEntity.ok(hoKhauService.tachHo(id, request));
     }
 
     @PostMapping("/{id}/nhap-ho")
-    public HoKhau nhapHo(@PathVariable Long id, @RequestBody NhapHoRequest request) {
-        return hoKhauService.nhapHo(id, request);
+    public ResponseEntity<HoKhau> nhapHo(@PathVariable Long id, @RequestBody NhapHoRequest request) {
+        return ResponseEntity.ok(hoKhauService.nhapHo(id, request));
     }
 
     @PutMapping("/{id}/doi-chu-ho")
-    public HoKhau doiChuHo(@PathVariable Long id, @RequestBody DoiChuHoRequest request) {
-        return hoKhauService.doiChuHo(id, request);
+    public ResponseEntity<HoKhau> doiChuHo(@PathVariable Long id, @RequestBody DoiChuHoRequest request) {
+        return ResponseEntity.ok(hoKhauService.doiChuHo(id, request));
     }
 }

@@ -9,7 +9,7 @@ public class NhapHoRequest {
     // Danh sách nhân khẩu nhập vào
     private List<Long> idNhanKhauNhapVao;
 
-    public Collection<Long> getIdNhanKhauNhapVao() {
+    public List<Long> getIdNhanKhauNhapVao() {
         return idNhanKhauNhapVao;
     }
 
@@ -21,5 +21,8 @@ public class NhapHoRequest {
         this.idHoNhapVao = idHoNhapVao;
     }
 
+    public void setIdNhanKhauNhapVao(List<Long> idNhanKhauNhapVao) {
+        this.idNhanKhauNhapVao = idNhanKhauNhapVao;
+    }
     // getters và setters
 }
