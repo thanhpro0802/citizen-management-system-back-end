@@ -7,21 +7,18 @@ import com.citizen.management.citizen_management_system_back_end.model.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.model.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class HoKhauServiceImpl implements HoKhauService {
 
-    @Autowired
-    private HoKhauRepository hoKhauRepository;
-
-    @Autowired
-    private NhanKhauRepository nhanKhauRepository;
-
+    private final HoKhauRepository hoKhauRepository;
+    private final NhanKhauRepository nhanKhauRepository;
     @Override
     public HoKhau taoMoi(HoKhau hoKhau) {
         return hoKhauRepository.save(hoKhau);
