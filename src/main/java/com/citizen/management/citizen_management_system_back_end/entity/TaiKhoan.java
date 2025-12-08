@@ -15,7 +15,7 @@ import java.util.List;
 public class TaiKhoan {
 
     @Id
-    // @GeneratedValue // Bỏ qua nếu bạn muốn tự gán mã như 'user123'
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_tai_khoan")
     private String maTaiKhoan;
 
