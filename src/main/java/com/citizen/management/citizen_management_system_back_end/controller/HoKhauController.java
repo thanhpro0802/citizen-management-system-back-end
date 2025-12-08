@@ -42,7 +42,8 @@ public class HoKhauController {
     // 4. Xem danh sách: Trả về 200 OK
     @GetMapping
     public ResponseEntity<List<HoKhau>> xemDanhSach() {
-        return ResponseEntity.ok(hoKhauService.layTatCa());
+        List<HoKhau> ds = hoKhauService.layTatCa();
+        return ResponseEntity.ok(ds); // 200 OK
     }
 
     // 5. Xem chi tiết: Trả về 200 OK 
