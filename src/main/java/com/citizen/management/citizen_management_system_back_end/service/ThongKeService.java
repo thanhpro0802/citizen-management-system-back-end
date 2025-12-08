@@ -7,5 +7,8 @@ public interface ThongKeService {
     Map<String, Object> thongKeHoKhau(String phuong);
     Map<String, Object> thongKeNhanKhau(String gioiTinh);
 
+    Map<String, Long> thongKeTuoi();
     Map<String, Long> thongKeGioiTinh();
+    Map<String, Long> thongKeQueQuan();
+    Map<String, Long> thongKeDanToc();
 }

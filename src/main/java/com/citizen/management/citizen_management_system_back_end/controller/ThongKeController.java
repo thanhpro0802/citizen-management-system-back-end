@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @CrossOrigin("*")
@@ -30,9 +32,23 @@ public class ThongKeController {
         return ResponseEntity.ok(thongKeService.thongKeNhanKhau(gioiTinh));
     }
 
+    @GetMapping("/Tuoi")
+    public ResponseEntity<Map<String, Long>> getThongKeTuoi() {
+        return ResponseEntity.ok(thongKeService.thongKeTuoi());
+    }
+    
     @GetMapping("/GioiTinh")
     public ResponseEntity<Map<String, Long>> getThongKeGioiTinh() {
         return ResponseEntity.ok(thongKeService.thongKeGioiTinh());
     }
-    
+
+    @GetMapping("/QueQuan")
+    public ResponseEntity<Map<String, Long>> getThongKeQueQuan() {
+        return ResponseEntity.ok(thongKeService.thongKeQueQuan());
+    }
+
+    @GetMapping("/DanToc")
+    public ResponseEntity<Map<String, Long>> getThongKeDanToc() {
+        return ResponseEntity.ok(thongKeService.thongKeDanToc());
+    }
 }

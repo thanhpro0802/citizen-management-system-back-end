@@ -46,7 +46,11 @@ public class NhanKhauServiceImpl implements NhanKhauService {
                 .orElseThrow(() -> new ResourceNotFoundException("Khong ton tai nhan khau!"));
 
         nhanKhau.setHoTen(nhanKhauDto.getHoTen());
+        nhanKhau.setNgaySinh(nhanKhauDto.getNgaySinh());
         nhanKhau.setGioiTinh(nhanKhauDto.getGioiTinh());
+        nhanKhau.setQueQuan(nhanKhauDto.getQueQuan());
+        nhanKhau.setDanToc(nhanKhauDto.getDanToc());
+        
         NhanKhau updatedNhanKhau = nhanKhauRepository.save(nhanKhau);
         return NhanKhauMapper.mapToNhanKhauDto(updatedNhanKhau);
     }

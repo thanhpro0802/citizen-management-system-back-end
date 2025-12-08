@@ -8,7 +8,10 @@ public class NhanKhauMapper {
         return new NhanKhau(
                 nhanKhauDto.getId(),
                 nhanKhauDto.getHoTen(),
-                nhanKhauDto.getGioiTinh()
+                nhanKhauDto.getNgaySinh(),
+                nhanKhauDto.getGioiTinh(),
+                nhanKhauDto.getQueQuan(),
+                nhanKhauDto.getDanToc()
         );
     }
 
@@ -16,7 +19,10 @@ public class NhanKhauMapper {
         return new NhanKhauDto(
                 nhanKhau.getId(),
                 nhanKhau.getHoTen(),
-                nhanKhau.getGioiTinh()
+                nhanKhau.getNgaySinh(),
+                nhanKhau.getGioiTinh(),
+                nhanKhau.getQueQuan(),
+                nhanKhau.getDanToc()
         );
     }
 }
