@@ -21,5 +21,8 @@ public class NhapHoRequest {
         this.idHoNhapVao = idHoNhapVao;
     }
 
+    public void setIdNhanKhauNhapVao(List<Long> idNhanKhauNhapVao) {
+        this.idNhanKhauNhapVao = idNhanKhauNhapVao;
+    }
     // getters và setters
 }
