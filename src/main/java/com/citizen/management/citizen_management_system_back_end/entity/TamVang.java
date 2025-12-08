@@ -9,7 +9,6 @@ public class TamVang {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_tam_vang")
     private String maTamVang;
 
