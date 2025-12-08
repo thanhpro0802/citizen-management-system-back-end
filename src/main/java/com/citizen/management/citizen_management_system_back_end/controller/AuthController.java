@@ -5,6 +5,8 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.Reg
 import com.citizen.management.citizen_management_system_back_end.dto.response.JwtResponse;
 import com.citizen.management.citizen_management_system_back_end.service.AuthenticationService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
     
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+    
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -27,6 +31,7 @@ public class AuthController {
             JwtResponse response = authenticationService.registerUser(registerRequest);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
+            logger.error("Registration failed for user {}: {}", registerRequest.getUsername(), e.getMessage());
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -39,6 +44,7 @@ public class AuthController {
             JwtResponse response = authenticationService.loginUser(loginRequest);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
+            logger.error("Login failed for user {}: {}", loginRequest.getUsername(), e.getMessage());
             Map<String, String> error = new HashMap<>();
             error.put("message", "Invalid username or password");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);

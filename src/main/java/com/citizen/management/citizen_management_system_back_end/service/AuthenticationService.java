@@ -52,25 +52,17 @@ public class AuthenticationService {
         taiKhoan.setVaiTro(registerRequest.getVaiTro());
 
         // Save user to database
-        taiKhoanRepository.save(taiKhoan);
+        taiKhoan = taiKhoanRepository.save(taiKhoan);
 
-        // Authenticate the newly registered user
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        registerRequest.getUsername(),
-                        registerRequest.getPassword()
-                )
-        );
+        // Build UserDetails from the saved user
+        UserDetailsImpl userDetails = UserDetailsImpl.build(taiKhoan);
 
+        // Create authentication object
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-
-        return new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles);
+        return createJwtResponse(authentication);
     }
 
     /**
@@ -87,8 +79,16 @@ public class AuthenticationService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        return createJwtResponse(authentication);
+    }
 
+    /**
+     * Helper method to create JWT response from authentication
+     * @param authentication the authentication object
+     * @return JwtResponse with token and user details
+     */
+    private JwtResponse createJwtResponse(Authentication authentication) {
+        String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
