@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 public class ThongBaoController {
-    private final ThongBaoRepository thongBaoReposity;
+    private final ThongBaoRepository thongBaoRepository;
     private final TaiKhoanRepository taiKhoanRepository;
 
     @GetMapping("/cua-toi")
@@ -24,14 +24,14 @@ public class ThongBaoController {
         //Temp
         TaiKhoan user = taiKhoanRepository.findById("user123").orElseThrow();
 
-        return ResponseEntity.ok(thongBaoReposity.findAllByNguoiNhanOrderByThoiGianDesc(user));
+        return ResponseEntity.ok(thongBaoRepository.findAllByNguoiNhanOrderByThoiGianDesc(user));
     }
 
     @PutMapping("/{id}/da-xem")
     public ResponseEntity<Void> danhDauDaXem(@PathVariable String id) {
-        ThongBao tb = thongBaoReposity.findById(id).orElseThrow(() -> new RuntimeException("Khong tim thay thong bao"));
+        ThongBao tb = thongBaoRepository.findById(id).orElseThrow(() -> new RuntimeException("Khong tim thay thong bao"));
         tb.setDaXem(true);
-        thongBaoReposity.save(tb);
+        thongBaoRepository.save(tb);
 
         return ResponseEntity.ok().build();
     }
