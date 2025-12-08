@@ -26,11 +26,13 @@ public class HoKhauServiceImpl implements HoKhauService {
     private final HoKhauRepository hoKhauRepository;
     private final NhanKhauRepository nhanKhauRepository;
     @Override
+    @Transactional
     public HoKhau taoMoi(HoKhau hoKhau) {
         return hoKhauRepository.save(hoKhau);
     }
 
     @Override
+    @Transactional
     public HoKhau capNhat(Long id, HoKhau hoKhauSua) {
         Optional<HoKhau> optional = hoKhauRepository.findById(id);
         if (optional.isPresent()) {
@@ -46,6 +48,7 @@ public class HoKhauServiceImpl implements HoKhauService {
     }
 
     @Override
+    @Transactional
     public void xoa(Long id) {
         hoKhauRepository.deleteById(id);
     }

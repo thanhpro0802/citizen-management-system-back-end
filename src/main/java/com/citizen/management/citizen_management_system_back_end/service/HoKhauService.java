@@ -15,5 +15,4 @@ public interface HoKhauService {
     public HoKhau tachHo(Long idHoCu, TachHoRequest request);
     public HoKhau nhapHo(Long idHoNhapVao, NhapHoRequest request);
     public HoKhau doiChuHo(Long idHoKhau, DoiChuHoRequest request);
-    // Nghiệp vụ nâng cao sẽ bổ sung sau: tách hộ, nhập hộ, đổi chủ hộ
 }
