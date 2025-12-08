@@ -1,42 +1,146 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.Date;
 
 @Entity
+@Table(name = "nhan_khau")
 public class NhanKhau {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "ma_nhan_khau")
+    private String maNhanKhau;
+
+    @Column(name = "ho_ten")
     private String hoTen;
-    private String cccd;
+
+    @Column(name = "ngay_sinh")
+    private Date ngaySinh;
+
+    @Column(name = "gioi_tinh")
     private String gioiTinh;
-    private String ngaySinh;
+
+    @Column(name = "so_cccd", unique = true)
+    private String soCCCD;
+
+    @Column(name = "que_quan")
+    private String queQuan;
+
+    @Column(name = "dan_toc")
+    private String danToc;
+
+    @Column(name = "quan_he_voi_chu_ho")
     private String quanHeVoiChuHo;
 
-    @ManyToOne
-    @JoinColumn(name = "hokhau_id")
+    @Column(name = "status")
+    private String status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ma_ho_khau")
     private HoKhau hoKhau;
 
+    @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
+    private List<TamTru> danhSachTamTru;
+
+    @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
+    private List<TamVang> danhSachTamVang;
+
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public String getMaNhanKhau() {
+        return maNhanKhau;
+    }
 
-    public String getHoTen() { return hoTen; }
-    public void setHoTen(String hoTen) { this.hoTen = hoTen; }
+    public void setMaNhanKhau(String maNhanKhau) {
+        this.maNhanKhau = maNhanKhau;
+    }
 
-    public String getCccd() { return cccd; }
-    public void setCccd(String cccd) { this.cccd = cccd; }
+    public String getHoTen() {
+        return hoTen;
+    }
 
-    public String getGioiTinh() { return gioiTinh; }
-    public void setGioiTinh(String gioiTinh) { this.gioiTinh = gioiTinh; }
+    public void setHoTen(String hoTen) {
+        this.hoTen = hoTen;
+    }
 
-    public String getNgaySinh() { return ngaySinh; }
-    public void setNgaySinh(String ngaySinh) { this.ngaySinh = ngaySinh; }
+    public Date getNgaySinh() {
+        return ngaySinh;
+    }
 
-    public String getQuanHeVoiChuHo() { return quanHeVoiChuHo; }
-    public void setQuanHeVoiChuHo(String quanHeVoiChuHo) { this.quanHeVoiChuHo = quanHeVoiChuHo; }
+    public void setNgaySinh(Date ngaySinh) {
+        this.ngaySinh = ngaySinh;
+    }
 
-    public HoKhau getHoKhau() { return hoKhau; }
-    public void setHoKhau(HoKhau hoKhau) { this.hoKhau = hoKhau; }
+    public String getGioiTinh() {
+        return gioiTinh;
+    }
+
+    public void setGioiTinh(String gioiTinh) {
+        this.gioiTinh = gioiTinh;
+    }
+
+    public String getSoCCCD() {
+        return soCCCD;
+    }
+
+    public void setSoCCCD(String soCCCD) {
+        this.soCCCD = soCCCD;
+    }
+
+    public String getQueQuan() {
+        return queQuan;
+    }
+
+    public void setQueQuan(String queQuan) {
+        this.queQuan = queQuan;
+    }
+
+    public String getDanToc() {
+        return danToc;
+    }
+
+    public void setDanToc(String danToc) {
+        this.danToc = danToc;
+    }
+
+    public String getQuanHeVoiChuHo() {
+        return quanHeVoiChuHo;
+    }
+
+    public void setQuanHeVoiChuHo(String quanHeVoiChuHo) {
+        this.quanHeVoiChuHo = quanHeVoiChuHo;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public HoKhau getHoKhau() {
+        return hoKhau;
+    }
+
+    public void setHoKhau(HoKhau hoKhau) {
+        this.hoKhau = hoKhau;
+    }
+
+    public List<TamTru> getDanhSachTamTru() {
+        return danhSachTamTru;
+    }
+
+    public void setDanhSachTamTru(List<TamTru> danhSachTamTru) {
+        this.danhSachTamTru = danhSachTamTru;
+    }
+
+    public List<TamVang> getDanhSachTamVang() {
+        return danhSachTamVang;
+    }
+
+    public void setDanhSachTamVang(List<TamVang> danhSachTamVang) {
+        this.danhSachTamVang = danhSachTamVang;
+    }
 }
