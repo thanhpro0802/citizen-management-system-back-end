@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+
 @CrossOrigin("*")
 @AllArgsConstructor
 @RestController
@@ -28,4 +29,10 @@ public class ThongKeController {
 
         return ResponseEntity.ok(thongKeService.thongKeNhanKhau(gioiTinh));
     }
+
+    @GetMapping("/GioiTinh")
+    public ResponseEntity<Map<String, Long>> getThongKeGioiTinh() {
+        return ResponseEntity.ok(thongKeService.thongKeGioiTinh());
+    }
+    
 }
