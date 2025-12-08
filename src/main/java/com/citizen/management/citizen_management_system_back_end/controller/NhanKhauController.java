@@ -2,6 +2,7 @@ package com.citizen.management.citizen_management_system_back_end.controller;
 
 import com.citizen.management.citizen_management_system_back_end.dto.*;
 import com.citizen.management.citizen_management_system_back_end.service.NhanKhauService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class NhanKhauController {
     private final NhanKhauService nhanKhauService;
 
     @PostMapping
-    public ResponseEntity<NhanKhauDto> create(@RequestBody NhanKhauDto dto) {
+    public ResponseEntity<NhanKhauDto> create(@Valid @RequestBody NhanKhauDto dto) {
         return ResponseEntity.ok(nhanKhauService.create(dto));
     }
 
@@ -25,7 +26,7 @@ public class NhanKhauController {
     }
 
     @PutMapping("/{ma}")
-    public ResponseEntity<NhanKhauDto> update(@PathVariable("ma") String ma, @RequestBody NhanKhauDto dto) {
+    public ResponseEntity<NhanKhauDto> update(@PathVariable("ma") String ma, @Valid @RequestBody NhanKhauDto dto) {
         return ResponseEntity.ok(nhanKhauService.update(ma, dto));
     }
 
@@ -66,14 +67,14 @@ public class NhanKhauController {
 
     // TamTru
     @PostMapping("/{ma}/tam-tru")
-    public ResponseEntity<TamTruDto> registerTamTru(@PathVariable("ma") String ma, @RequestBody TamTruDto dto) {
+    public ResponseEntity<TamTruDto> registerTamTru(@PathVariable("ma") String ma, @Valid @RequestBody TamTruDto dto) {
         dto.setMaNhanKhau(ma);
         return ResponseEntity.ok(nhanKhauService.registerTamTru(dto));
     }
 
     // TamVang
     @PostMapping("/{ma}/tam-vang")
-    public ResponseEntity<TamVangDto> registerTamVang(@PathVariable("ma") String ma, @RequestBody TamVangDto dto) {
+    public ResponseEntity<TamVangDto> registerTamVang(@PathVariable("ma") String ma, @Valid @RequestBody TamVangDto dto) {
         dto.setMaNhanKhau(ma);
         return ResponseEntity.ok(nhanKhauService.registerTamVang(dto));
     }
