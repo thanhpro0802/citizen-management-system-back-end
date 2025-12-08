@@ -15,6 +15,7 @@ import java.util.List;
 public class HoKhau {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_ho_khau")
     private String maHoKhau;
 
