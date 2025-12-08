@@ -1,4 +1,4 @@
-package com.citizen.management.citizen_management_system_back_end.service;
+package com.citizen.management.citizen_management_system_back_end.service.impl;
 
 import com.citizen.management.citizen_management_system_back_end.dto.DoiChuHoRequest;
 import com.citizen.management.citizen_management_system_back_end.dto.NhapHoRequest;
@@ -7,6 +7,7 @@ import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
+import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
