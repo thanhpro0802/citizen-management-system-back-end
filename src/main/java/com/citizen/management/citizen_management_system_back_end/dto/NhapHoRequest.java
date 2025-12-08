@@ -9,7 +9,7 @@ public class NhapHoRequest {
     // Danh sách nhân khẩu nhập vào
     private List<Long> idNhanKhauNhapVao;
 
-    public Collection<Long> getIdNhanKhauNhapVao() {
+    public List<Long> getIdNhanKhauNhapVao() {
         return idNhanKhauNhapVao;
     }
 
