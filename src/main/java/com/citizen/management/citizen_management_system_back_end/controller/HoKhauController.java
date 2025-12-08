@@ -7,11 +7,13 @@ import com.citizen.management.citizen_management_system_back_end.model.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/ho-khau")
+@CrossOrigin(origins = "http://localhost:3000")
 public class HoKhauController {
     @Autowired
     private HoKhauService hoKhauService;
