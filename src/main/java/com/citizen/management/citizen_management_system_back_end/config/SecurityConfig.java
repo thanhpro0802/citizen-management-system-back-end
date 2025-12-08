@@ -47,10 +47,9 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll() // Cho phép API đăng nhập
                         .requestMatchers("/api/test/**").permitAll()
-                        .requestMatchers("/api/nhankhau/**").permitAll() // Cho phép tất cả API nhân khẩu
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated() // Các API khác phải đăng nhập
                 );
 
         http.authenticationProvider(authenticationProvider());
