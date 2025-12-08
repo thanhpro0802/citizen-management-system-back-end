@@ -11,7 +11,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("api/DanhSachHoKhau")
+@RequestMapping("/api/DanhSachHoKhau")
 
 public class HoKhauController {
     private HoKhauService hoKhauService;
