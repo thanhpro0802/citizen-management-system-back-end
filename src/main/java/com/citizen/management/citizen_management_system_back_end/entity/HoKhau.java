@@ -1,4 +1,4 @@
-package com.citizen.management.citizen_management_system_back_end.model;
+package com.citizen.management.citizen_management_system_back_end.entity;
 
 import jakarta.persistence.*;
 import java.util.List;

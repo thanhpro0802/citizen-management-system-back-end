@@ -1,7 +1,5 @@
 package com.citizen.management.citizen_management_system_back_end.dto;
 
-import com.citizen.management.citizen_management_system_back_end.model.NhanKhau;
-
 import java.util.List;
 
 public class TachHoRequest {
