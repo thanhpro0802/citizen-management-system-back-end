@@ -13,6 +13,7 @@ import java.util.Date;
 public class NhanKhau {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_nhan_khau")
     private String maNhanKhau;
 
