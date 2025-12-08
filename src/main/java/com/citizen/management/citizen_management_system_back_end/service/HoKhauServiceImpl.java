@@ -64,7 +64,9 @@ public class HoKhauServiceImpl implements HoKhauService {
 
         // Tạo hộ khẩu mới
         HoKhau hoMoi = new HoKhau();
-        hoMoi.setTenChuHo(request.getIdChuHoMoi() + "(chủ mới)");
+        NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getIdChuHoMoi())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với ID: " + request.getIdChuHoMoi()));
+        hoMoi.setTenChuHo(chuHoMoi.getHoTen());
         hoMoi.setDiaChi(request.getDiaChiMoi());
 
         // Lấy danh sách đối tượng NhanKhau dựa vào id
