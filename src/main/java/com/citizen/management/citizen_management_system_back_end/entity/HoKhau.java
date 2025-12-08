@@ -61,5 +61,7 @@ public class HoKhau {
     public String getSoDienThoaiChuHo() { return soDienThoaiChuHo; }
     public void setSoDienThoaiChuHo(String soDienThoaiChuHo) { this.soDienThoaiChuHo = soDienThoaiChuHo; }
 
-    public List<NhanKhau> getDanhSachThanhVien() { return danhSachThanhVien; }
+    public List<NhanKhau> getDanhSachThanhVien() {
+        return new ArrayList<>(danhSachThanhVien);
+    }
 }
