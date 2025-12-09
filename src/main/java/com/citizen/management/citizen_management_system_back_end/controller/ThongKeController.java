@@ -5,49 +5,47 @@ import com.citizen.management.citizen_management_system_back_end.service.ThongKe
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @CrossOrigin("*")
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/ThongKe")
+@RequestMapping("/api/thong-ke")
 public class ThongKeController {
 
     private final ThongKeService thongKeService;
 
-    @GetMapping("/HoKhau")
+    @GetMapping("/ho-khau")
     public ResponseEntity<Map<String, Object>> getThongKeHoKhau(
             @RequestParam(required = false) String phuong) {
 
         return ResponseEntity.ok(thongKeService.thongKeHoKhau(phuong));
     }
 
-    @GetMapping("/NhanKhau")
+    @GetMapping("/nhan-khau")
     public ResponseEntity<Map<String, Object>> getThongKeNhanKhau(
             @RequestParam(required = false) String gioiTinh) {
 
         return ResponseEntity.ok(thongKeService.thongKeNhanKhau(gioiTinh));
     }
 
-    @GetMapping("/Tuoi")
-    public ResponseEntity<Map<String, Long>> getThongKeTuoi() {
+    @GetMapping("/do-tuoi")
+    public ResponseEntity<List<Map<String, Object>>> getThongKeTuoi() {
         return ResponseEntity.ok(thongKeService.thongKeTuoi());
     }
-    
-    @GetMapping("/GioiTinh")
-    public ResponseEntity<Map<String, Long>> getThongKeGioiTinh() {
+
+    @GetMapping("/gioi-tinh")
+    public ResponseEntity<List<Map<String, Object>>> getThongKeGioiTinh() {
         return ResponseEntity.ok(thongKeService.thongKeGioiTinh());
     }
 
-    @GetMapping("/QueQuan")
-    public ResponseEntity<Map<String, Long>> getThongKeQueQuan() {
+    @GetMapping("/que-quan")
+    public ResponseEntity<List<Map<String, Object>>> getThongKeQueQuan() {
         return ResponseEntity.ok(thongKeService.thongKeQueQuan());
     }
 
-    @GetMapping("/DanToc")
+    @GetMapping("/dan-toc")
     public ResponseEntity<Map<String, Long>> getThongKeDanToc() {
         return ResponseEntity.ok(thongKeService.thongKeDanToc());
     }

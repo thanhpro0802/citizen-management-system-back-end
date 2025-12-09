@@ -12,7 +12,7 @@ import java.util.List;
 @CrossOrigin("*")
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/DanhSachNhanKhau")
+@RequestMapping("/api/nhan-khau")
 
 public class NhanKhauController {
 
@@ -38,7 +38,7 @@ public class NhanKhauController {
 
     @PutMapping("{id}")
     public ResponseEntity<NhanKhauDto> updateNhanKhau(@PathVariable("id") Long nhanKhauId,
-                                                      @RequestBody NhanKhauDto nhanKhauDto) {
+            @RequestBody NhanKhauDto nhanKhauDto) {
         NhanKhauDto updatedNhanKhau = nhanKhauService.updateNhanKhau(nhanKhauId, nhanKhauDto);
         return ResponseEntity.ok(updatedNhanKhau);
     }

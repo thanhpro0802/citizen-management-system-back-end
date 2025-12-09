@@ -11,7 +11,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/DanhSachHoKhau")
+@RequestMapping("/api/ho-khau")
 
 public class HoKhauController {
     private HoKhauService hoKhauService;
@@ -40,7 +40,7 @@ public class HoKhauController {
     // Build Update API
     @PutMapping("{id}")
     public ResponseEntity<HoKhauDto> updateHoKhau(@PathVariable("id") Long hoKhauId,
-                                                  @RequestBody HoKhauDto hoKhauDto) {
+            @RequestBody HoKhauDto hoKhauDto) {
         HoKhauDto updatedHoKhau = hoKhauService.updateHoKhau(hoKhauId, hoKhauDto);
         return ResponseEntity.ok(updatedHoKhau);
     }

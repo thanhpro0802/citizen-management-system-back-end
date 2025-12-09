@@ -13,17 +13,18 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-
 
 @Service
 @AllArgsConstructor
 
 public class ThongKeServiceImpl implements ThongKeService {
     private final HoKhauService hoKhauService;
-    private final NhanKhauService nhanKhauService; 
+    private final NhanKhauService nhanKhauService;
     private final NhanKhauRepository nhanKhauRepository;
     private final ThongKeRepository thongKeRepository;
 
@@ -44,35 +45,46 @@ public class ThongKeServiceImpl implements ThongKeService {
     }
 
     @Override
-    public Map<String, Long> thongKeTuoi() {
+    public List<Map<String, Object>> thongKeTuoi() {
         List<NhanKhau> list = nhanKhauRepository.findAll();
 
-        Map<String, Long> result = new HashMap<>();
-
-        result.put("0-17", 0L);
-        result.put("18-35", 0L);
-        result.put("36-60", 0L);
-        result.put("60+", 0L);
+        Map<String, Long> raw = new LinkedHashMap<>();
+        raw.put("0-17", 0L);
+        raw.put("18-35", 0L);
+        raw.put("36-60", 0L);
+        raw.put("60+", 0L);
 
         LocalDate today = LocalDate.now();
 
         for (NhanKhau nk : list) {
-
             LocalDate birthDate = nk.getNgaySinh().toLocalDate();
-
             int age = Period.between(birthDate, today).getYears();
 
-            if (age <= 17) result.put("0-17", result.get("0-17") + 1);
-            else if (age <= 35) result.put("18-35", result.get("18-35") + 1);
-            else if (age <= 60) result.put("36-60", result.get("36-60") + 1);
-            else result.put("60+", result.get("60+") + 1);
+            if (age <= 17)
+                raw.put("0-17", raw.get("0-17") + 1);
+            else if (age <= 35)
+                raw.put("18-35", raw.get("18-35") + 1);
+            else if (age <= 60)
+                raw.put("36-60", raw.get("36-60") + 1);
+            else
+                raw.put("60+", raw.get("60+") + 1);
         }
 
-        return result;
+        List<Map<String, Object>> listNivo = new ArrayList<>();
+
+        raw.forEach((k, v) -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", k);
+            item.put("label", k);
+            item.put("value", v);
+            listNivo.add(item);
+        });
+
+        return listNivo;
     }
 
     @Override
-    public Map<String, Long> thongKeGioiTinh() {
+    public List<Map<String, Object>> thongKeGioiTinh() {
         Map<String, Long> result = new HashMap<>();
         var list = thongKeRepository.theoGioiTinh();
 
@@ -80,11 +92,21 @@ public class ThongKeServiceImpl implements ThongKeService {
             result.put(item.getKey(), item.getValue());
         }
 
-        return result;
+        List<Map<String, Object>> listNivo = new ArrayList<>();
+
+        result.forEach((k, v) -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", k);
+            item.put("label", k);
+            item.put("value", v);
+            listNivo.add(item);
+        });
+
+        return listNivo;
     }
 
     @Override
-    public Map<String, Long> thongKeQueQuan() {
+    public List<Map<String, Object>> thongKeQueQuan() {
         Map<String, Long> result = new HashMap<>();
         var list = thongKeRepository.theoQueQuan();
 
@@ -92,7 +114,17 @@ public class ThongKeServiceImpl implements ThongKeService {
             result.put(item.getKey(), item.getValue());
         }
 
-        return result;
+        List<Map<String, Object>> listNivo = new ArrayList<>();
+
+        result.forEach((k, v) -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", k);
+            item.put("label", k);
+            item.put("value", v);
+            listNivo.add(item);
+        });
+
+        return listNivo;
     }
 
     @Override
