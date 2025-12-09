@@ -16,9 +16,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        TaiKhoan user = taiKhoanRepository.findByTenDangNhap(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+    public UserDetails loadUserByUsername(String cccd) throws UsernameNotFoundException {
+        // SỬA: Gọi hàm findByCccd thay vì findByTenDangNhap
+        TaiKhoan user = taiKhoanRepository.findByCccd(cccd)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản với số CCCD: " + cccd));
 
         return UserDetailsImpl.build(user);
     }

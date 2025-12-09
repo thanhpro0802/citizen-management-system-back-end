@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, String> {
-    Optional<TaiKhoan> findByTenDangNhap(String tenDangNhap);
-    Boolean existsByTenDangNhap(String tenDangNhap);
+    // SỬA: Tìm theo cccd (khớp với field 'cccd' trong Entity TaiKhoan)
+    Optional<TaiKhoan> findByCccd(String cccd);
+
+    // SỬA: Kiểm tra tồn tại theo cccd
+    Boolean existsByCccd(String cccd);
 }

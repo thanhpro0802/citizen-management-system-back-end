@@ -47,6 +47,9 @@ public class NhanKhau {
     @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
     private List<TamVang> danhSachTamVang;
 
+    @OneToOne(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
+    private TaiKhoan taiKhoan;
+
     // Getters and Setters
     public String getMaNhanKhau() {
         return maNhanKhau;

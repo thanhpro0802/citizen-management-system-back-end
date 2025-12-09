@@ -3,7 +3,9 @@ package com.citizen.management.citizen_management_system_back_end.service;
 import com.citizen.management.citizen_management_system_back_end.dto.request.LoginRequest;
 import com.citizen.management.citizen_management_system_back_end.dto.request.RegisterRequest;
 import com.citizen.management.citizen_management_system_back_end.dto.response.JwtResponse;
+import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
 import com.citizen.management.citizen_management_system_back_end.security.jwt.JwtUtils;
 import com.citizen.management.citizen_management_system_back_end.security.services.UserDetailsImpl;
@@ -25,6 +27,9 @@ public class AuthenticationService {
     private TaiKhoanRepository taiKhoanRepository;
 
     @Autowired
+    private NhanKhauRepository nhanKhauRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -33,31 +38,34 @@ public class AuthenticationService {
     @Autowired
     private JwtUtils jwtUtils;
 
-    /**
-     * Register a new user
-     * @param registerRequest containing username, password, and role
-     * @return JwtResponse with token and user details
-     * @throws RuntimeException if username already exists
-     */
     public JwtResponse registerUser(RegisterRequest registerRequest) {
-        // Check if username already exists
-        if (taiKhoanRepository.existsByTenDangNhap(registerRequest.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+        // 1. Kiểm tra tồn tại tài khoản
+        if (taiKhoanRepository.existsByCccd(registerRequest.getCccd())) {
+            throw new RuntimeException("Tài khoản với số CCCD này đã tồn tại!");
         }
 
-        // Create new user account
+        // 2. Kiểm tra tồn tại công dân
+        NhanKhau congDan = nhanKhauRepository.findBySoCCCD(registerRequest.getCccd())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy dữ liệu công dân với số CCCD này!"));
+
+        // 3. Tạo tài khoản mới
         TaiKhoan taiKhoan = new TaiKhoan();
-        taiKhoan.setTenDangNhap(registerRequest.getUsername());
+        taiKhoan.setCccd(registerRequest.getCccd());
         taiKhoan.setMatKhau(passwordEncoder.encode(registerRequest.getPassword()));
+
+        // --- THÊM DÒNG NÀY: Lưu số điện thoại ---
+        taiKhoan.setSoDienThoai(registerRequest.getSoDienThoai());
+
         taiKhoan.setVaiTro(registerRequest.getVaiTro());
 
-        // Save user to database
+        // Link với NhanKhau
+        taiKhoan.setNhanKhau(congDan);
+
+        // Lưu vào DB
         taiKhoan = taiKhoanRepository.save(taiKhoan);
 
-        // Build UserDetails from the saved user
+        // Tự động đăng nhập luôn sau khi đăng ký
         UserDetailsImpl userDetails = UserDetailsImpl.build(taiKhoan);
-
-        // Create authentication object
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -65,15 +73,10 @@ public class AuthenticationService {
         return createJwtResponse(authentication);
     }
 
-    /**
-     * Authenticate user login
-     * @param loginRequest containing username and password
-     * @return JwtResponse with token and user details
-     */
     public JwtResponse loginUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginRequest.getCccd(),
                         loginRequest.getPassword()
                 )
         );
@@ -82,11 +85,6 @@ public class AuthenticationService {
         return createJwtResponse(authentication);
     }
 
-    /**
-     * Helper method to create JWT response from authentication
-     * @param authentication the authentication object
-     * @return JwtResponse with token and user details
-     */
     private JwtResponse createJwtResponse(Authentication authentication) {
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
