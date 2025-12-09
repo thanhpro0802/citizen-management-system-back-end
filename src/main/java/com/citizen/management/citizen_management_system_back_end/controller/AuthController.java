@@ -19,9 +19,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    
+
     @Autowired
     private AuthenticationService authenticationService;
 
@@ -31,7 +31,8 @@ public class AuthController {
             JwtResponse response = authenticationService.registerUser(registerRequest);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            logger.error("Registration failed for user {}: {}", registerRequest.getUsername(), e.getMessage());
+            // SỬA: Log theo CCCD
+            logger.error("Kích hoạt thất bại cho CCCD {}: {}", registerRequest.getCccd(), e.getMessage());
             Map<String, String> error = new HashMap<>();
             error.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -44,9 +45,11 @@ public class AuthController {
             JwtResponse response = authenticationService.loginUser(loginRequest);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            logger.error("Login failed for user {}: {}", loginRequest.getUsername(), e.getMessage());
+            // SỬA: Log theo CCCD
+            logger.error("Đăng nhập thất bại cho CCCD {}: {}", loginRequest.getCccd(), e.getMessage());
             Map<String, String> error = new HashMap<>();
-            error.put("message", "Invalid username or password");
+            // SỬA: Thông báo lỗi chính xác hơn
+            error.put("message", "Sai số CCCD hoặc mật khẩu");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
     }

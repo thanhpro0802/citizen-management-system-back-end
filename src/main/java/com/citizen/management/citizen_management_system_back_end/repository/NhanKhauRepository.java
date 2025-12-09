@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface NhanKhauRepository extends JpaRepository<NhanKhau, String>, JpaSpecificationExecutor<NhanKhau> {
+    // Giữ nguyên vì khớp với field 'soCCCD' trong Entity NhanKhau
     boolean existsBySoCCCD(String soCCCD);
+
     Optional<NhanKhau> findBySoCCCD(String soCCCD);
 }
