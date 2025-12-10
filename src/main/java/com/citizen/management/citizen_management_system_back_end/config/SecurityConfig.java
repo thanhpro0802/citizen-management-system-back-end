@@ -47,9 +47,19 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Cho phép tất cả mọi người truy cập Đăng nhập & Đăng ký
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/test/**").permitAll()
-                        .requestMatchers("/api/nhankhau/**").permitAll() // Cho phép tất cả API nhân khẩu
+
+                        // 2. KHU VỰC CẤM: Chỉ tài khoản CÁN BỘ mới được truy cập
+                        // Quản lý nhân khẩu, hộ khẩu
+                        .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
+                        // Các hành động xử lý phản ánh (Phân công, Xử lý nội bộ, Phản hồi)
+                        .requestMatchers("/api/v1/phan-anh/*/phan-cong",
+                                "/api/v1/phan-anh/*/xu-ly-noi-bo",
+                                "/api/v1/phan-anh/*/phan-hoi").hasAuthority("CAN_BO")
+
+                        // 3. Các API còn lại (Gửi phản ánh, xem danh sách...) chỉ cần Đã Đăng Nhập là được
+                        // (Không phân biệt Cán bộ hay Dân)
                         .anyRequest().authenticated()
                 );
 

@@ -13,7 +13,7 @@ import java.util.List;
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
     private String id;
-    private String username;
+    private String username; // Trong hệ thống này, username chính là CCCD
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
@@ -32,7 +32,7 @@ public class UserDetailsImpl implements UserDetails {
 
         return new UserDetailsImpl(
                 user.getMaTaiKhoan(),
-                user.getTenDangNhap(),
+                user.getCccd(), // SỬA: Lấy CCCD làm username
                 user.getMatKhau(),
                 authorities);
     }
@@ -43,7 +43,7 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public String getPassword() { return password; }
     @Override
-    public String getUsername() { return username; }
+    public String getUsername() { return username; } // Trả về CCCD
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }

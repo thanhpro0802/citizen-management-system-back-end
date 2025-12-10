@@ -95,8 +95,9 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.PHAN_CONG);
         ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
-        //Ghi chu
-        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getTenDangNhap());
+
+        // SỬA: Đổi getTenDangNhap() -> getCccd()
+        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getCccd());
 
         lichSuRepository.save(ls);
         return paDaCapNhat;
@@ -211,6 +212,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     public List<LichSuPhanAnh> layLichSuPhanAnh(String maPhanAnh) {
         PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phản ánh"));
+        // Đảm bảo method này tồn tại trong LichSuPhanAnhRepository
         return lichSuRepository.findByPhanAnhOrderByThoiGianDesc(pa);
     }
 
