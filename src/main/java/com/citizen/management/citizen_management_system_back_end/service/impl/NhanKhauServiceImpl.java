@@ -6,6 +6,10 @@ import com.citizen.management.citizen_management_system_back_end.dto.TamTruDto;
 import com.citizen.management.citizen_management_system_back_end.dto.TamVangDto;
 import com.citizen.management.citizen_management_system_back_end.entity.*;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
+import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
+import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
+import com.citizen.management.citizen_management_system_back_end.mapper.NhanKhauMapper;
+import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.TamTruRepository;
@@ -23,7 +27,6 @@ import jakarta.persistence.criteria.Predicate;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +53,9 @@ public class NhanKhauServiceImpl implements NhanKhauService {
             ent.setHoKhau(hk);
         }
         // Set default status if null
-        if (ent.getTrangThai() == null) ent.setTrangThai(EnumTrangThaiNhanKhau.THUONG_TRU);
-        
+        if (ent.getTrangThai() == null)
+            ent.setTrangThai(EnumTrangThaiNhanKhau.THUONG_TRU);
+
         try {
             nhanKhauRepository.save(ent);
         } catch (DataIntegrityViolationException e) {
@@ -65,8 +69,10 @@ public class NhanKhauServiceImpl implements NhanKhauService {
     }
 
     /**
-     * Cập nhật thông tin nhân khẩu. Lưu ý: Trường 'trangThai' không thể thay đổi thông qua phương thức này.
-     * Thay đổi trạng thái phải được thực hiện thông qua các phương thức chuyên biệt:
+     * Cập nhật thông tin nhân khẩu. Lưu ý: Trường 'trangThai' không thể thay đổi
+     * thông qua phương thức này.
+     * Thay đổi trạng thái phải được thực hiện thông qua các phương thức chuyên
+     * biệt:
      * - registerTamTru() để đặt trạng thái thành "TAM_TRU"
      * - registerTamVang() để đặt trạng thái thành "TAM_VANG"
      * - declareDeath() để đặt trạng thái thành "KHAI_TU"
@@ -79,7 +85,7 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         }
         NhanKhau ent = nhanKhauRepository.findById(maNhanKhau)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã " + maNhanKhau));
-        
+
         // Update allowed fields (status field is intentionally not updated here)
         ent.setHoTen(dto.getHoTen());
         ent.setNgaySinh(dto.getNgaySinh());
@@ -100,7 +106,7 @@ public class NhanKhauServiceImpl implements NhanKhauService {
             }
             ent.setSoCCCD(dto.getSoCCCD());
         }
-        
+
         try {
             nhanKhauRepository.save(ent);
         } catch (DataIntegrityViolationException e) {
@@ -141,8 +147,7 @@ public class NhanKhauServiceImpl implements NhanKhauService {
                 String like = "%" + criteria.getQ().toLowerCase() + "%";
                 preds.add(cb.or(
                         cb.like(cb.lower(root.get("hoTen")), like),
-                        cb.like(cb.lower(root.get("soCCCD")), like)
-                ));
+                        cb.like(cb.lower(root.get("soCCCD")), like)));
             }
             if (criteria.getGioiTinh() != null && !criteria.getGioiTinh().isBlank()) {
                 preds.add(cb.equal(root.get("gioiTinh"), criteria.getGioiTinh()));
@@ -189,17 +194,17 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         }
         NhanKhau nk = nhanKhauRepository.findById(dto.getMaNhanKhau())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã " + dto.getMaNhanKhau()));
-        
+
         // Kiểm tra xem đã có đăng ký tạm trú đang active không
-        boolean hasActiveTamTru = nk.getDanhSachTamTru() != null && 
-            nk.getDanhSachTamTru().stream()
-                .anyMatch(tt -> tt.getNgayKetThuc() == null || 
-                            tt.getNgayKetThuc().after(new java.util.Date()));
-        
+        boolean hasActiveTamTru = nk.getDanhSachTamTru() != null &&
+                nk.getDanhSachTamTru().stream()
+                        .anyMatch(tt -> tt.getNgayKetThuc() == null ||
+                                tt.getNgayKetThuc().after(new java.util.Date()));
+
         if (hasActiveTamTru) {
             throw new RuntimeException("Nhân khẩu đã có đăng ký tạm trú đang hoạt động");
         }
-        
+
         // Validate current status before allowing transition to TAM_TRU
         EnumTrangThaiNhanKhau trangThaiHienTai = nk.getTrangThai();
         if (EnumTrangThaiNhanKhau.TAM_VANG.equals(trangThaiHienTai)) {
@@ -208,11 +213,11 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         if (EnumTrangThaiNhanKhau.KHAI_TU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Không thể đăng ký tạm trú cho nhân khẩu đã khai tử");
         }
-        
+
         TamTru tt = new TamTru();
         BeanUtils.copyProperties(dto, tt);
         tt.setNhanKhau(nk);
-        
+
         // Update citizen status and save within the same transaction
         nk.setTrangThai(EnumTrangThaiNhanKhau.TAM_TRU);
         TamTru saved = tamTruRepository.save(tt);
@@ -232,17 +237,17 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         }
         NhanKhau nk = nhanKhauRepository.findById(dto.getMaNhanKhau())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã " + dto.getMaNhanKhau()));
-        
+
         // Kiểm tra xem đã có đăng ký tạm vắng đang active không
-        boolean hasActiveTamVang = nk.getDanhSachTamVang() != null && 
-            nk.getDanhSachTamVang().stream()
-                .anyMatch(tv -> tv.getNgayKetThuc() == null || 
-                            tv.getNgayKetThuc().after(new java.util.Date()));
-        
+        boolean hasActiveTamVang = nk.getDanhSachTamVang() != null &&
+                nk.getDanhSachTamVang().stream()
+                        .anyMatch(tv -> tv.getNgayKetThuc() == null ||
+                                tv.getNgayKetThuc().after(new java.util.Date()));
+
         if (hasActiveTamVang) {
             throw new RuntimeException("Nhân khẩu đã có đăng ký tạm vắng đang hoạt động");
         }
-        
+
         // Validate current status before allowing transition to TAM_VANG
         EnumTrangThaiNhanKhau trangThaiHienTai = nk.getTrangThai();
         if (EnumTrangThaiNhanKhau.TAM_TRU.equals(trangThaiHienTai)) {
@@ -251,11 +256,11 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         if (EnumTrangThaiNhanKhau.KHAI_TU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Không thể đăng ký tạm vắng cho nhân khẩu đã khai tử");
         }
-        
+
         TamVang tv = new TamVang();
         BeanUtils.copyProperties(dto, tv);
         tv.setNhanKhau(nk);
-        
+
         // Update citizen status and save within the same transaction
         nk.setTrangThai(EnumTrangThaiNhanKhau.TAM_VANG);
         TamVang saved = tamVangRepository.save(tv);
@@ -275,15 +280,16 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         }
         NhanKhau nk = nhanKhauRepository.findById(maNhanKhau)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã " + maNhanKhau));
-        
+
         // Validate current status before allowing death declaration
         EnumTrangThaiNhanKhau trangThaiHienTai = nk.getTrangThai();
         if (EnumTrangThaiNhanKhau.KHAI_TU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Nhân khẩu đã được khai tử trước đó");
         }
-        
+
         nk.setTrangThai(EnumTrangThaiNhanKhau.KHAI_TU);
-        // Depending on business requirements, the hoKhau field can be set to null or the individual can be removed from the household.
+        // Depending on business requirements, the hoKhau field can be set to null or
+        // the individual can be removed from the household.
         nhanKhauRepository.save(nk);
         return convertToDto(nk);
     }

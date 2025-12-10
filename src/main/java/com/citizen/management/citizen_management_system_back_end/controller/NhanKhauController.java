@@ -8,9 +8,11 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/nhan-khau")
-@RequiredArgsConstructor
+
 public class NhanKhauController {
 
     private final NhanKhauService nhanKhauService;
@@ -47,8 +49,7 @@ public class NhanKhauController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "maNhanKhau") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
-    ) {
+            @RequestParam(defaultValue = "asc") String sortDir) {
         SearchNhanKhauCriteria criteria = new SearchNhanKhauCriteria();
         criteria.setQ(q);
         criteria.setGioiTinh(gioiTinh);
@@ -74,7 +75,8 @@ public class NhanKhauController {
 
     // TamVang
     @PostMapping("/{ma}/tam-vang")
-    public ResponseEntity<TamVangDto> registerTamVang(@PathVariable("ma") String ma, @Valid @RequestBody TamVangDto dto) {
+    public ResponseEntity<TamVangDto> registerTamVang(@PathVariable("ma") String ma,
+            @Valid @RequestBody TamVangDto dto) {
         dto.setMaNhanKhau(ma);
         return ResponseEntity.ok(nhanKhauService.registerTamVang(dto));
     }

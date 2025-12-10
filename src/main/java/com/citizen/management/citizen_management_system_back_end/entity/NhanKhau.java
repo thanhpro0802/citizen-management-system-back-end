@@ -1,12 +1,13 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
+import java.sql.Date;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Date;
 
 @Entity
 @Table(name = "nhan_khau")

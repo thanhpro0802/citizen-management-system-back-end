@@ -35,21 +35,23 @@ public class HoKhau {
     @OneToMany(mappedBy = "hoKhau", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NhanKhau> danhSachThanhVien = new ArrayList<>();
 
-
     public List<NhanKhau> getDanhSachThanhVien() {
         return new ArrayList<>(danhSachThanhVien);
     }
+
     public void addThanhVien(NhanKhau nk) {
         if (!danhSachThanhVien.contains(nk)) {
             danhSachThanhVien.add(nk);
             nk.setHoKhau(this);
         }
     }
+
     public void removeThanhVien(NhanKhau nk) {
         if (danhSachThanhVien.remove(nk)) {
             nk.setHoKhau(null);
         }
     }
+
     public void setDanhSachThanhVien(List<NhanKhau> newList) {
         for (NhanKhau nk : new ArrayList<>(danhSachThanhVien)) {
             removeThanhVien(nk);

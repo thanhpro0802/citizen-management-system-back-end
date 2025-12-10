@@ -8,11 +8,20 @@ import java.util.List;
 
 public interface HoKhauService {
     HoKhau taoMoi(HoKhau hoKhau);
+
     HoKhau capNhat(String maHoKhau, HoKhau hoKhauSua); // dùng String cho id
+
     void xoa(String maHoKhau);
+
     List<HoKhau> layTatCa();
+
     HoKhau layTheoId(String maHoKhau);
+
     HoKhau tachHo(String maHoCu, TachHoRequest request);
+
     HoKhau nhapHo(String maHoNhapVao, NhapHoRequest request);
+
     HoKhau doiChuHo(String maHoKhau, DoiChuHoRequest request);
+
+    Long getCountHoKhau(String diaChi);
 }

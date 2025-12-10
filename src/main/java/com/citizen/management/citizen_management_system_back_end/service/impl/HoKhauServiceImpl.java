@@ -84,7 +84,8 @@ public class HoKhauServiceImpl implements HoKhauService {
         // Tạo hộ khẩu mới
         HoKhau hoMoi = new HoKhau();
         NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getMaNhanKhauChuHoMoi())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauChuHoMoi()));
+                .orElseThrow(() -> new RuntimeException(
+                        "Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauChuHoMoi()));
         hoMoi.setChuHo(chuHoMoi);
         hoMoi.setDiaChi(request.getDiaChiMoi());
         hoMoi.setNgayDangKy(null); // hoặc có thể lấy ngày hiện tại/new từ request
@@ -132,8 +133,16 @@ public class HoKhauServiceImpl implements HoKhauService {
         HoKhau hk = hoKhauRepository.findById(maHoKhau)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoKhau));
         NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getMaNhanKhauMoi())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauMoi()));
+                .orElseThrow(
+                        () -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauMoi()));
         hk.setChuHo(chuHoMoi);
         return hoKhauRepository.save(hk);
+    }
+
+    @Override
+    public Long getCountHoKhau(String diaChi) {
+        if (diaChi != null)
+            return hoKhauRepository.countByDiaChi(diaChi);
+        return hoKhauRepository.count();
     }
 }

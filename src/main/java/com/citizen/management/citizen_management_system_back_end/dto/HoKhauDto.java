@@ -1,0 +1,17 @@
+package com.citizen.management.citizen_management_system_back_end.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class HoKhauDto {
+    private Long id;
+    private Long idChuHo;
+    private String diaChi;
+}
