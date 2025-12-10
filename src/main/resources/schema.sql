@@ -1,7 +1,7 @@
 -- ===================================================================
 -- COMPLETE POSTGRES SQL FOR QUẢN LÝ NHÂN KHẨU
 -- Includes: ho_khau, nhan_khau, tam_tru, tam_vang
--- With status = UNKNOWN | THUONG_TRU | TAM_TRU | TAM_VANG | KHAI_TU
+-- With trang_thai = UNKNOWN | THUONG_TRU | TAM_TRU | TAM_VANG | KHAI_TU
 -- Trigger logic updated: does NOT override KHAI_TU
 -- ===================================================================
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS nhan_khau (
     que_quan TEXT,
     dan_toc VARCHAR(100),
     quan_he_voi_chu_ho VARCHAR(100),
-    status person_status DEFAULT 'UNKNOWN',
+    trang_thai person_status DEFAULT 'UNKNOWN',
     ma_ho_khau VARCHAR(100) REFERENCES ho_khau(ma_ho_khau) ON DELETE SET NULL,
     created_at timestamptz DEFAULT now()
 );
@@ -85,8 +85,8 @@ CREATE TABLE IF NOT EXISTS tam_vang (
 CREATE INDEX IF NOT EXISTS idx_tv_nk ON tam_vang(ma_nhan_khau);
 
 ----------------------------------------------------------
--- FUNCTION: Recalculate status for person
--- IMPORTANT: If person is KHAI_TU, DO NOT change status
+-- FUNCTION: Recalculate trang_thai for person
+-- IMPORTANT: If person is KHAI_TU, DO NOT change trang_thai
 ----------------------------------------------------------
 CREATE OR REPLACE FUNCTION fn_recalc_status_for_person(p_ma_nk VARCHAR)
 RETURNS VOID AS $$
@@ -96,8 +96,8 @@ DECLARE
     has_active_tt BOOLEAN;
     has_active_tv BOOLEAN;
 BEGIN
-    -- fetch current status
-    SELECT status INTO current_status FROM nhan_khau WHERE ma_nhan_khau = p_ma_nk;
+    -- fetch current trang_thai
+    SELECT trang_thai INTO current_status FROM nhan_khau WHERE ma_nhan_khau = p_ma_nk;
 
     -- Do not change if already KHAI_TU
     IF current_status = 'KHAI_TU' THEN
@@ -124,13 +124,13 @@ BEGIN
 
     -- Priority logic
     IF has_household THEN
-        UPDATE nhan_khau SET status = 'THUONG_TRU' WHERE ma_nhan_khau = p_ma_nk;
+        UPDATE nhan_khau SET trang_thai = 'THUONG_TRU' WHERE ma_nhan_khau = p_ma_nk;
     ELSIF has_active_tt THEN
-        UPDATE nhan_khau SET status = 'TAM_TRU' WHERE ma_nhan_khau = p_ma_nk;
+        UPDATE nhan_khau SET trang_thai = 'TAM_TRU' WHERE ma_nhan_khau = p_ma_nk;
     ELSIF has_active_tv THEN
-        UPDATE nhan_khau SET status = 'TAM_VANG' WHERE ma_nhan_khau = p_ma_nk;
+        UPDATE nhan_khau SET trang_thai = 'TAM_VANG' WHERE ma_nhan_khau = p_ma_nk;
     ELSE
-        UPDATE nhan_khau SET status = 'UNKNOWN' WHERE ma_nhan_khau = p_ma_nk;
+        UPDATE nhan_khau SET trang_thai = 'UNKNOWN' WHERE ma_nhan_khau = p_ma_nk;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
