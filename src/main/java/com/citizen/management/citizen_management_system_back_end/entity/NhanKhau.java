@@ -21,6 +21,10 @@ public class NhanKhau {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ma_ho_khau")
+    private HoKhau hoKhau;
+
     @Column(name = "hoTen")
     private String hoTen;
 

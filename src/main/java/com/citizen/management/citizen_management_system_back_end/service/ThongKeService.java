@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface ThongKeService {
 
-    Map<String, Object> thongKeHoKhau(String phuong);
+    Map<String, Object> thongKeHoKhau(String diaChi);
 
     Map<String, Object> thongKeNhanKhau(String gioiTinh);
 
@@ -16,4 +16,6 @@ public interface ThongKeService {
     List<Map<String, Object>> thongKeGioiTinh();
 
     List<Map<String, Object>> thongKeQueQuan();
+
+    List<Map<String, Object>> thongKeSoNguoi();
 }

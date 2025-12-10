@@ -3,9 +3,11 @@ package com.citizen.management.citizen_management_system_back_end.service.impl;
 import lombok.AllArgsConstructor;
 import com.citizen.management.citizen_management_system_back_end.dto.HoKhauDto;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
+import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.exception.ResourceNotFoundException;
 import com.citizen.management.citizen_management_system_back_end.mapper.HoKhauMapper;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
+import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,13 @@ import java.util.stream.Collectors;
 public class HoKhauServiceImpl implements HoKhauService {
 
     private HoKhauRepository hoKhauRepository;
+    private NhanKhauRepository nhanKhauRepository;
 
     @Override
     public HoKhauDto createHoKhau(HoKhauDto hoKhauDto) {
-        HoKhau hoKhau = HoKhauMapper.mapToHoKhau(hoKhauDto);
+        NhanKhau chuHo = nhanKhauRepository.findById(hoKhauDto.getIdChuHo())
+                .orElseThrow(() -> new ResourceNotFoundException("Khong ton tai nhan khau!"));
+        HoKhau hoKhau = HoKhauMapper.mapToHoKhau(hoKhauDto, chuHo);
         HoKhau savedHoKhau = hoKhauRepository.save(hoKhau);
         return HoKhauMapper.mapToHoKhauDto(savedHoKhau);
     }
@@ -45,7 +50,7 @@ public class HoKhauServiceImpl implements HoKhauService {
         HoKhau hoKhau = hoKhauRepository.findById(hoKhauId)
                 .orElseThrow(() -> new ResourceNotFoundException("Khong ton tai ho khau!"));
 
-        hoKhau.setPhuong(hoKhauDto.getPhuong());
+        hoKhau.setDiaChi(hoKhauDto.getDiaChi());
         HoKhau updatedHoKhau = hoKhauRepository.save(hoKhau);
         return HoKhauMapper.mapToHoKhauDto(updatedHoKhau);
     }
@@ -56,9 +61,9 @@ public class HoKhauServiceImpl implements HoKhauService {
     }
 
     @Override
-    public Long getCountHoKhau(String phuong) {
-        if (phuong != null)
-            return hoKhauRepository.countByPhuong(phuong);
+    public Long getCountHoKhau(String diaChi) {
+        if (diaChi != null)
+            return hoKhauRepository.countByDiaChi(diaChi);
         return hoKhauRepository.count();
     }
 }

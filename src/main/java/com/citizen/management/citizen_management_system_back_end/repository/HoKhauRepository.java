@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface HoKhauRepository extends JpaRepository<HoKhau, Long> {
 
-    Long countByPhuong(String phuong);
+    Long countByDiaChi(String diaChi);
 
-    
 }

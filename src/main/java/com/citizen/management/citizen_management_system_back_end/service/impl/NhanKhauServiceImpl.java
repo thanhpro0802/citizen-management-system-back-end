@@ -2,9 +2,11 @@ package com.citizen.management.citizen_management_system_back_end.service.impl;
 
 import lombok.AllArgsConstructor;
 import com.citizen.management.citizen_management_system_back_end.dto.NhanKhauDto;
+import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.exception.ResourceNotFoundException;
 import com.citizen.management.citizen_management_system_back_end.mapper.NhanKhauMapper;
+import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.service.NhanKhauService;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 public class NhanKhauServiceImpl implements NhanKhauService {
 
+    private HoKhauRepository hoKhauRepository;
     private NhanKhauRepository nhanKhauRepository;
 
     @Override
@@ -45,12 +48,16 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         NhanKhau nhanKhau = nhanKhauRepository.findById(nhanKhauId)
                 .orElseThrow(() -> new ResourceNotFoundException("Khong ton tai nhan khau!"));
 
+        HoKhau hoKhau = hoKhauRepository.findById(nhanKhauDto.getIdHoKhau())
+                .orElseThrow(() -> new ResourceNotFoundException("Khong ton tai ho khau!"));
+
+        nhanKhau.setHoKhau(hoKhau);
         nhanKhau.setHoTen(nhanKhauDto.getHoTen());
         nhanKhau.setNgaySinh(nhanKhauDto.getNgaySinh());
         nhanKhau.setGioiTinh(nhanKhauDto.getGioiTinh());
         nhanKhau.setQueQuan(nhanKhauDto.getQueQuan());
         nhanKhau.setDanToc(nhanKhauDto.getDanToc());
-        
+
         NhanKhau updatedNhanKhau = nhanKhauRepository.save(nhanKhau);
         return NhanKhauMapper.mapToNhanKhauDto(updatedNhanKhau);
     }

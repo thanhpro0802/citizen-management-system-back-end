@@ -30,6 +30,7 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -75,6 +76,18 @@
 			<optional>true</optional>
 		</dependency>
 
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>11.3.0</version>
+		</dependency>
+
+        <dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+			<version>11.3.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -103,6 +116,19 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>11.3.0</version>
+
+				<configuration>
+					<url>jdbc:postgresql://localhost:5432/cms</url>
+					<user>postgres</user>
+					<password>admina</password>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

@@ -12,5 +12,6 @@ import lombok.Setter;
 
 public class HoKhauDto {
     private Long id;
-    private String phuong;
+    private Long idChuHo;
+    private String diaChi;
 }

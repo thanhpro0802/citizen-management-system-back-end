@@ -49,4 +49,9 @@ public class ThongKeController {
     public ResponseEntity<Map<String, Long>> getThongKeDanToc() {
         return ResponseEntity.ok(thongKeService.thongKeDanToc());
     }
+
+    @GetMapping("/so-nguoi")
+    public ResponseEntity<List<Map<String, Object>>> getThongKeSoNguoi() {
+        return ResponseEntity.ok(thongKeService.thongKeSoNguoi());
+    }
 }

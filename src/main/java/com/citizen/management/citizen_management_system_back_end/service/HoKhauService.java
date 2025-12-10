@@ -15,5 +15,5 @@ public interface HoKhauService {
 
     void deleteHoKhauById(Long hoKhauId);
 
-    Long getCountHoKhau(String phuong);
+    Long getCountHoKhau(String diaChi);
 }

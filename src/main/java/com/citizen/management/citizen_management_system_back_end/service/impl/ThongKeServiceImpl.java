@@ -29,10 +29,10 @@ public class ThongKeServiceImpl implements ThongKeService {
     private final ThongKeRepository thongKeRepository;
 
     @Override
-    public Map<String, Object> thongKeHoKhau(String phuong) {
+    public Map<String, Object> thongKeHoKhau(String diaChi) {
         Map<String, Object> result = new HashMap<>();
-        result.put("phuong", phuong);
-        result.put("tongHoKhau", hoKhauService.getCountHoKhau(phuong));
+        result.put("diaChi", diaChi);
+        result.put("tongHoKhau", hoKhauService.getCountHoKhau(diaChi));
         return result;
     }
 
@@ -46,8 +46,6 @@ public class ThongKeServiceImpl implements ThongKeService {
 
     @Override
     public List<Map<String, Object>> thongKeTuoi() {
-        List<NhanKhau> list = nhanKhauRepository.findAll();
-
         Map<String, Long> raw = new LinkedHashMap<>();
         raw.put("0-17", 0L);
         raw.put("18-35", 0L);
@@ -56,6 +54,7 @@ public class ThongKeServiceImpl implements ThongKeService {
 
         LocalDate today = LocalDate.now();
 
+        List<NhanKhau> list = nhanKhauRepository.findAll();
         for (NhanKhau nk : list) {
             LocalDate birthDate = nk.getNgaySinh().toLocalDate();
             int age = Period.between(birthDate, today).getYears();
@@ -137,5 +136,38 @@ public class ThongKeServiceImpl implements ThongKeService {
         }
 
         return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> thongKeSoNguoi() {
+        Map<String, Long> raw = new LinkedHashMap<>();
+        raw.put("1-2", 0L);
+        raw.put("3-5", 0L);
+        raw.put(">5", 0L);
+
+        var list = thongKeRepository.theoSoNguoi();
+
+        for (KeyValueProjection item : list) {
+            Long num = item.getValue();
+
+            if (num <= 2)
+                raw.put("1-2", raw.get("1-2") + 1);
+            else if (num <= 5)
+                raw.put("3-5", raw.get("3-5") + 1);
+            else
+                raw.put(">5", raw.get(">5") + 1);
+        }
+
+        List<Map<String, Object>> listNivo = new ArrayList<>();
+
+        raw.forEach((k, v) -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", k);
+            item.put("label", k);
+            item.put("value", v);
+            listNivo.add(item);
+        });
+
+        return listNivo;
     }
 }

@@ -14,6 +14,7 @@ import lombok.Setter;
 
 public class NhanKhauDto {
     private Long id;
+    private Long idHoKhau;
     private String hoTen;
     private Date ngaySinh;
     private String gioiTinh;
