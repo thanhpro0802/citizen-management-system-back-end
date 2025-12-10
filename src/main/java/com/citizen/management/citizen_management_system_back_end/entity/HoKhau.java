@@ -1,12 +1,17 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "ho_khau") // Theo chuẩn đặt tên của db
+@Getter
+@Setter
 public class HoKhau {
 
     @Id
@@ -30,18 +35,6 @@ public class HoKhau {
     @OneToMany(mappedBy = "hoKhau", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NhanKhau> danhSachThanhVien = new ArrayList<>();
 
-    // Getter & Setter
-    public String getMaHoKhau() { return maHoKhau; }
-    public void setMaHoKhau(String maHoKhau) { this.maHoKhau = maHoKhau; }
-
-    public String getDiaChi() { return diaChi; }
-    public void setDiaChi(String diaChi) { this.diaChi = diaChi; }
-
-    public Date getNgayDangKy() { return ngayDangKy; }
-    public void setNgayDangKy(Date ngayDangKy) { this.ngayDangKy = ngayDangKy; }
-
-    public NhanKhau getChuHo() { return chuHo; }
-    public void setChuHo(NhanKhau chuHo) { this.chuHo = chuHo; }
 
     public List<NhanKhau> getDanhSachThanhVien() {
         return new ArrayList<>(danhSachThanhVien);
