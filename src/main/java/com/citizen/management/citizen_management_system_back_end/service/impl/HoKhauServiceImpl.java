@@ -11,13 +11,12 @@ import com.citizen.management.citizen_management_system_back_end.service.HoKhauS
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class HoKhauServiceImpl implements HoKhauService {
 
     private final HoKhauRepository hoKhauRepository;
     private final NhanKhauRepository nhanKhauRepository;
+
     @Override
     @Transactional
     public HoKhau taoMoi(HoKhau hoKhau) {
@@ -33,24 +33,23 @@ public class HoKhauServiceImpl implements HoKhauService {
 
     @Override
     @Transactional
-    public HoKhau capNhat(Long id, HoKhau hoKhauSua) {
-        Optional<HoKhau> optional = hoKhauRepository.findById(id);
+    public HoKhau capNhat(String maHoKhau, HoKhau hoKhauSua) {
+        Optional<HoKhau> optional = hoKhauRepository.findById(maHoKhau);
         if (optional.isPresent()) {
             HoKhau hk = optional.get();
-            hk.setSoHoKhau(hoKhauSua.getSoHoKhau());
             hk.setDiaChi(hoKhauSua.getDiaChi());
-            hk.setTenChuHo(hoKhauSua.getTenChuHo());
-            hk.setSoDienThoaiChuHo(hoKhauSua.getSoDienThoaiChuHo());
+            hk.setNgayDangKy(hoKhauSua.getNgayDangKy());
+            hk.setChuHo(hoKhauSua.getChuHo());
             hk.setDanhSachThanhVien(hoKhauSua.getDanhSachThanhVien());
             return hoKhauRepository.save(hk);
         }
-        throw new RuntimeException("Không tìm thấy hộ khẩu với ID: " + id);
+        throw new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoKhau);
     }
 
     @Override
     @Transactional
-    public void xoa(Long id) {
-        hoKhauRepository.deleteById(id);
+    public void xoa(String maHoKhau) {
+        hoKhauRepository.deleteById(maHoKhau);
     }
 
     @Override
@@ -59,79 +58,82 @@ public class HoKhauServiceImpl implements HoKhauService {
     }
 
     @Override
-    public HoKhau layTheoId(Long id) {
-        return hoKhauRepository.findById(id).orElse(null);
+    public HoKhau layTheoId(String maHoKhau) {
+        return hoKhauRepository.findById(maHoKhau).orElse(null);
     }
 
     @Override
     @Transactional
-    public HoKhau tachHo(Long idHoCu, TachHoRequest request) {
-        HoKhau hoCu = hoKhauRepository.findById(idHoCu)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với ID: " + idHoCu));
+    public HoKhau tachHo(String maHoCu, TachHoRequest request) {
+        HoKhau hoCu = hoKhauRepository.findById(maHoCu)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoCu));
 
-        // Lấy danh sách ID cần tách
-        List<Long> tachRaIds = request.getIdNhanKhauTachRa();
+        // Lấy danh sách mã nhân khẩu cần tách (UUID)
+        List<String> tachRaIds = request.getMaNhanKhauTachRa();
 
         // Kiểm tra các nhân khẩu này có thực sự thuộc về hoCu
         List<NhanKhau> thanhVienCu = hoCu.getDanhSachThanhVien();
-        Set<Long> idLienQuan = thanhVienCu.stream().map(NhanKhau::getId).collect(Collectors.toSet());
+        Set<String> idLienQuan = thanhVienCu.stream().map(NhanKhau::getMaNhanKhau).collect(Collectors.toSet());
 
-        for (Long id : tachRaIds) {
+        for (String id : tachRaIds) {
             if (!idLienQuan.contains(id)) {
-                throw new RuntimeException("Nhân khẩu id=" + id + " không thuộc hộ khẩu id=" + idHoCu);
+                throw new RuntimeException("Nhân khẩu id=" + id + " không thuộc hộ khẩu mã=" + maHoCu);
             }
         }
 
         // Tạo hộ khẩu mới
         HoKhau hoMoi = new HoKhau();
-        NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getIdChuHoMoi())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với ID: " + request.getIdChuHoMoi()));
-        hoMoi.setTenChuHo(chuHoMoi.getHoTen());
+        NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getMaNhanKhauChuHoMoi())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauChuHoMoi()));
+        hoMoi.setChuHo(chuHoMoi);
         hoMoi.setDiaChi(request.getDiaChiMoi());
-        hoMoi.setDanhSachThanhVien(new ArrayList<>()); // bắt đầu với danh sách rỗng
+        hoMoi.setNgayDangKy(null); // hoặc có thể lấy ngày hiện tại/new từ request
+        hoMoi.setDanhSachThanhVien(new ArrayList<>());
 
-        hoKhauRepository.save(hoMoi); // lưu để có ID nếu cần dùng
+        hoKhauRepository.save(hoMoi);
 
-        // Tách các nhân khẩu ra, đồng thời cập nhật hoKhau mới cho họ
         List<NhanKhau> nhanKhausTachRa = nhanKhauRepository.findAllById(tachRaIds);
         for (NhanKhau nk : nhanKhausTachRa) {
-            nk.setHoKhau(hoMoi);  // cập nhật trường tham chiếu ngược
+            nk.setHoKhau(hoMoi);
             nhanKhauRepository.save(nk);
-            hoMoi.getDanhSachThanhVien().add(nk); // thêm vào danh sách thành viên hộ mới
+            hoMoi.addThanhVien(nk);
         }
 
-        // Loại bỏ các nhân khẩu đã tách khỏi hộ cũ (cập nhật danh sách thành viên)
+        // Loại bỏ các nhân khẩu đã tách khỏi hộ cũ
         List<NhanKhau> thanhVienCuMoi = thanhVienCu.stream()
-                .filter(nk -> !tachRaIds.contains(nk.getId()))
+                .filter(nk -> !tachRaIds.contains(nk.getMaNhanKhau()))
                 .collect(Collectors.toList());
         hoCu.setDanhSachThanhVien(thanhVienCuMoi);
         hoKhauRepository.save(hoCu);
-        hoKhauRepository.save(hoMoi); // Lưu lại hộ mới với danh sách thành viên mới
+        hoKhauRepository.save(hoMoi);
 
         return hoMoi;
     }
+
     @Override
-    public HoKhau nhapHo(Long idHoNhapVao, NhapHoRequest request) {
-        HoKhau hoNhapVao = hoKhauRepository.findById(idHoNhapVao)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với ID: " + idHoNhapVao));
+    @Transactional
+    public HoKhau nhapHo(String maHoNhapVao, NhapHoRequest request) {
+        HoKhau hoNhapVao = hoKhauRepository.findById(maHoNhapVao)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoNhapVao));
 
-        // Lấy danh sách đối tượng NhanKhau cần nhập
-        List<NhanKhau> nhanKhauNhapVao = nhanKhauRepository.findAllById(request.getIdNhanKhauNhapVao());
-        List<NhanKhau> dsThanhVien = hoNhapVao.getDanhSachThanhVien();
-        dsThanhVien.addAll(nhanKhauNhapVao);
-        hoNhapVao.setDanhSachThanhVien(dsThanhVien);
+        List<String> maNhanKhauNhapVao = request.getMaNhanKhauNhapVao();
+        List<NhanKhau> nhanKhauNhapVao = nhanKhauRepository.findAllById(maNhanKhauNhapVao);
+        for (NhanKhau nk : nhanKhauNhapVao) {
+            nk.setHoKhau(hoNhapVao);
+            hoNhapVao.addThanhVien(nk);
+        }
 
-        // Bạn nên cập nhật hộ gốc của các nhân khẩu nhập vào (ngoài scope ở đây)
         return hoKhauRepository.save(hoNhapVao);
     }
 
     @Override
-    public HoKhau doiChuHo(Long idHoKhau, DoiChuHoRequest request) {
-        HoKhau hk = hoKhauRepository.findById(idHoKhau)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với ID: " + idHoKhau));
-        NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getIdNhanKhauMoi())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với ID: " + request.getIdNhanKhauMoi()));
-        hk.setTenChuHo(chuHoMoi.getHoTen()); // giả sử có trường hoTen bên NhanKhau
+    @Transactional
+    public HoKhau doiChuHo(String maHoKhau, DoiChuHoRequest request) {
+        HoKhau hk = hoKhauRepository.findById(maHoKhau)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoKhau));
+        NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getMaNhanKhauMoi())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauMoi()));
+        hk.setChuHo(chuHoMoi);
         return hoKhauRepository.save(hk);
     }
 }

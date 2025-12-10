@@ -1,16 +1,14 @@
 package com.citizen.management.citizen_management_system_back_end.dto;
 
 public class DoiChuHoRequest {
-    // ID nhân khẩu mới làm chủ hộ
-    private Long idNhanKhauMoi;
+    private String maNhanKhauMoi;
 
-    // getters và setters
-
-    public Long getIdNhanKhauMoi() {
-        return idNhanKhauMoi;
+    // Getters và setters
+    public String getMaNhanKhauMoi() {
+        return maNhanKhauMoi;
     }
 
-    public void setIdNhanKhauMoi(Long idNhanKhauMoi) {
-        this.idNhanKhauMoi = idNhanKhauMoi;
+    public void setMaNhanKhauMoi(String maNhanKhauMoi) {
+        this.maNhanKhauMoi = maNhanKhauMoi;
     }
 }
