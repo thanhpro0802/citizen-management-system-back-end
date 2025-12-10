@@ -1,2 +1,0 @@
-ALTER TABLE ho_khau
-DROP COLUMN IF EXISTS phuong;

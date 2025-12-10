@@ -141,7 +141,7 @@
 				<version>11.3.0</version>
 
 				<configuration>
-					<url>jdbc:postgresql://localhost:5432/cms</url>
+					<url>jdbc:postgresql://localhost:5432/citizen_db</url>
 					<user>postgres</user>
 					<password>admina</password>
 				</configuration>
