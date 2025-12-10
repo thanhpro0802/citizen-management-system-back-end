@@ -50,7 +50,7 @@ public class NhanKhauServiceImpl implements NhanKhauService {
             ent.setHoKhau(hk);
         }
         // Set default status if null
-        if (ent.getStatus() == null) ent.setStatus(EnumTrangThaiNhanKhau.THUONG_TRU.getValue());
+        if (ent.getTrangThai() == null) ent.setTrangThai(EnumTrangThaiNhanKhau.THUONG_TRU);
         
         try {
             nhanKhauRepository.save(ent);
@@ -65,11 +65,11 @@ public class NhanKhauServiceImpl implements NhanKhauService {
     }
 
     /**
-     * Updates citizen information. Note: The 'status' field cannot be modified through this method.
-     * Status changes must be performed through dedicated methods:
-     * - registerTamTru() to set status to "TAM_TRU"
-     * - registerTamVang() to set status to "TAM_VANG"
-     * - declareDeath() to set status to "KHAI_TU"
+     * Cập nhật thông tin nhân khẩu. Lưu ý: Trường 'trangThai' không thể thay đổi thông qua phương thức này.
+     * Thay đổi trạng thái phải được thực hiện thông qua các phương thức chuyên biệt:
+     * - registerTamTru() để đặt trạng thái thành "TAM_TRU"
+     * - registerTamVang() để đặt trạng thái thành "TAM_VANG"
+     * - declareDeath() để đặt trạng thái thành "KHAI_TU"
      */
     @Override
     @Transactional
@@ -148,7 +148,12 @@ public class NhanKhauServiceImpl implements NhanKhauService {
                 preds.add(cb.equal(root.get("gioiTinh"), criteria.getGioiTinh()));
             }
             if (criteria.getStatus() != null && !criteria.getStatus().isBlank()) {
-                preds.add(cb.equal(root.get("status"), criteria.getStatus()));
+                try {
+                    EnumTrangThaiNhanKhau trangThai = EnumTrangThaiNhanKhau.valueOf(criteria.getStatus());
+                    preds.add(cb.equal(root.get("trangThai"), trangThai));
+                } catch (IllegalArgumentException e) {
+                    // Invalid status value, skip this filter
+                }
             }
             if (criteria.getMaHoKhau() != null && !criteria.getMaHoKhau().isBlank()) {
                 preds.add(cb.equal(root.get("hoKhau").get("maHoKhau"), criteria.getMaHoKhau()));
@@ -196,11 +201,11 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         }
         
         // Validate current status before allowing transition to TAM_TRU
-        String currentStatus = nk.getStatus();
-        if (EnumTrangThaiNhanKhau.TAM_VANG.getValue().equals(currentStatus)) {
+        EnumTrangThaiNhanKhau trangThaiHienTai = nk.getTrangThai();
+        if (EnumTrangThaiNhanKhau.TAM_VANG.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Không thể đăng ký tạm trú cho nhân khẩu đang tạm vắng");
         }
-        if (EnumTrangThaiNhanKhau.KHAI_TU.getValue().equals(currentStatus)) {
+        if (EnumTrangThaiNhanKhau.KHAI_TU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Không thể đăng ký tạm trú cho nhân khẩu đã khai tử");
         }
         
@@ -209,7 +214,7 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         tt.setNhanKhau(nk);
         
         // Update citizen status and save within the same transaction
-        nk.setStatus(EnumTrangThaiNhanKhau.TAM_TRU.getValue());
+        nk.setTrangThai(EnumTrangThaiNhanKhau.TAM_TRU);
         TamTru saved = tamTruRepository.save(tt);
         nhanKhauRepository.save(nk);
 
@@ -239,11 +244,11 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         }
         
         // Validate current status before allowing transition to TAM_VANG
-        String currentStatus = nk.getStatus();
-        if (EnumTrangThaiNhanKhau.TAM_TRU.getValue().equals(currentStatus)) {
+        EnumTrangThaiNhanKhau trangThaiHienTai = nk.getTrangThai();
+        if (EnumTrangThaiNhanKhau.TAM_TRU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Không thể đăng ký tạm vắng cho nhân khẩu đang tạm trú");
         }
-        if (EnumTrangThaiNhanKhau.KHAI_TU.getValue().equals(currentStatus)) {
+        if (EnumTrangThaiNhanKhau.KHAI_TU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Không thể đăng ký tạm vắng cho nhân khẩu đã khai tử");
         }
         
@@ -252,7 +257,7 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         tv.setNhanKhau(nk);
         
         // Update citizen status and save within the same transaction
-        nk.setStatus(EnumTrangThaiNhanKhau.TAM_VANG.getValue());
+        nk.setTrangThai(EnumTrangThaiNhanKhau.TAM_VANG);
         TamVang saved = tamVangRepository.save(tv);
         nhanKhauRepository.save(nk);
 
@@ -272,23 +277,23 @@ public class NhanKhauServiceImpl implements NhanKhauService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã " + maNhanKhau));
         
         // Validate current status before allowing death declaration
-        String currentStatus = nk.getStatus();
-        if (EnumTrangThaiNhanKhau.KHAI_TU.getValue().equals(currentStatus)) {
+        EnumTrangThaiNhanKhau trangThaiHienTai = nk.getTrangThai();
+        if (EnumTrangThaiNhanKhau.KHAI_TU.equals(trangThaiHienTai)) {
             throw new IllegalStateException("Nhân khẩu đã được khai tử trước đó");
         }
         
-        nk.setStatus(EnumTrangThaiNhanKhau.KHAI_TU.getValue());
+        nk.setTrangThai(EnumTrangThaiNhanKhau.KHAI_TU);
         // Depending on business requirements, the hoKhau field can be set to null or the individual can be removed from the household.
         nhanKhauRepository.save(nk);
         return convertToDto(nk);
     }
 
     /**
-     * Helper method to convert NhanKhau entity to NhanKhauDto.
-     * Handles copying properties and extracting maHoKhau if hoKhau is present.
+     * Phương thức helper để chuyển đổi NhanKhau entity sang NhanKhauDto.
+     * Xử lý sao chép thuộc tính và trích xuất maHoKhau nếu hoKhau tồn tại.
      * 
-     * @param entity The NhanKhau entity to convert
-     * @return NhanKhauDto with all properties copied from the entity
+     * @param entity Entity NhanKhau cần chuyển đổi
+     * @return NhanKhauDto với tất cả thuộc tính được sao chép từ entity
      */
     private NhanKhauDto convertToDto(NhanKhau entity) {
         NhanKhauDto dto = new NhanKhauDto();

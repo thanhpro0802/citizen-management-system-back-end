@@ -1,5 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
+import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Date;
@@ -34,8 +35,9 @@ public class NhanKhau {
     @Column(name = "quan_he_voi_chu_ho")
     private String quanHeVoiChuHo;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "trang_thai")
+    private EnumTrangThaiNhanKhau trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_ho_khau")
@@ -115,12 +117,12 @@ public class NhanKhau {
         this.quanHeVoiChuHo = quanHeVoiChuHo;
     }
 
-    public String getStatus() {
-        return status;
+    public EnumTrangThaiNhanKhau getTrangThai() {
+        return trangThai;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTrangThai(EnumTrangThaiNhanKhau trangThai) {
+        this.trangThai = trangThai;
     }
 
     public HoKhau getHoKhau() {
