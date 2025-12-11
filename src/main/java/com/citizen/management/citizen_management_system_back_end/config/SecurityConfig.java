@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer; // Import mới
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration; // Import mới
+import org.springframework.web.cors.CorsConfigurationSource; // Import mới
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // Import mới
+
+import java.util.Arrays; // Import mới
+import java.util.List;   // Import mới
 
 @Configuration
 public class SecurityConfig {
@@ -44,22 +51,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+                // 1. Bật cấu hình CORS tại đây
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Cho phép tất cả mọi người truy cập Đăng nhập & Đăng ký
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        // 2. KHU VỰC CẤM: Chỉ tài khoản CÁN BỘ mới được truy cập
-                        // Quản lý nhân khẩu, hộ khẩu
                         .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
-                        // Các hành động xử lý phản ánh (Phân công, Xử lý nội bộ, Phản hồi)
                         .requestMatchers("/api/v1/phan-anh/*/phan-cong",
                                 "/api/v1/phan-anh/*/xu-ly-noi-bo",
                                 "/api/v1/phan-anh/*/phan-hoi").hasAuthority("CAN_BO")
-
-                        // 3. Các API còn lại (Gửi phản ánh, xem danh sách...) chỉ cần Đã Đăng Nhập là được
-                        // (Không phân biệt Cán bộ hay Dân)
                         .anyRequest().authenticated()
                 );
 
@@ -67,5 +69,23 @@ public class SecurityConfig {
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // 2. Thêm Bean cấu hình CORS global
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Cho phép frontend từ localhost:3000
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        // Cho phép các phương thức
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Cho phép tất cả các headers (Authorization, Content-Type, v.v.)
+        configuration.setAllowedHeaders(List.of("*"));
+        // Cho phép gửi credentials (nếu cần thiết sau này)
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
