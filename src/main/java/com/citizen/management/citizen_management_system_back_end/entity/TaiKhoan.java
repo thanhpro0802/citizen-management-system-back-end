@@ -15,15 +15,20 @@ import java.util.List;
 public class TaiKhoan {
 
     @Id
-    // @GeneratedValue // Bỏ qua nếu bạn muốn tự gán mã như 'user123'
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_tai_khoan")
     private String maTaiKhoan;
 
-    @Column(name = "ten_dang_nhap", unique = true, nullable = false)
-    private String tenDangNhap;
+    // Tên đăng nhập chính là số CCCD
+    @Column(name = "so_cccd", unique = true, nullable = false)
+    private String cccd;
 
-    @Column(name = "mat_khau") // Nên là private và không có Getter
+    @Column(name = "mat_khau")
     private String matKhau;
+
+    // --- THÊM CỘT SỐ ĐIỆN THOẠI ---
+    @Column(name = "so_dien_thoai")
+    private String soDienThoai;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "vai_tro")
@@ -31,31 +36,23 @@ public class TaiKhoan {
 
     // --- Mối quan hệ (Relationships) ---
 
-    // Quan hệ 1:1 với NhanKhau (Một tài khoản thuộc về 1 nhân khẩu)
-    // 'mappedBy = "taiKhoan"' nghĩa là: "Hãy tìm thuộc tính 'taiKhoan'
-    // bên trong class NhanKhau để biết cách join bảng"
-    //@OneToOne(mappedBy = "taiKhoan", fetch = FetchType.LAZY)
-    //private NhanKhau nhanKhau;
+    // Quan hệ 1:1 với NhanKhau
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nhan_khau_id", referencedColumnName = "ma_nhan_khau")
+    private NhanKhau nhanKhau;
 
-    // Quan hệ 1:N với PhanAnh (Một tài khoản gửi nhiều phản ánh)
-    // 'mappedBy = "nguoiGui"' trỏ đến thuộc tính 'nguoiGui' trong class PhanAnh
     @JsonIgnore
     @OneToMany(mappedBy = "nguoiGui", fetch = FetchType.LAZY)
     private List<PhanAnh> phanAnhDaGui;
 
-    // Quan hệ 1:N với PhanAnh (Một tài khoản (cán bộ) xử lý nhiều phản ánh)
-    // 'mappedBy = "canBoPhuTrach"' trỏ đến thuộc tính 'canBoPhuTrach' trong class PhanAnh
     @JsonIgnore
     @OneToMany(mappedBy = "canBoPhuTrach", fetch = FetchType.LAZY)
     private List<PhanAnh> phanAnhDaXuLy;
 
-    // Quan hệ 1:N với LichSuPhanAnh (Một tài khoản thực hiện nhiều lịch sử)
-    // 'mappedBy = "nguoiThucHien"' trỏ đến thuộc tính 'nguoiThucHien' trong class LichSuPhanAnh
     @JsonIgnore
     @OneToMany(mappedBy = "taiKhoanThucHien", fetch = FetchType.LAZY)
     private List<LichSuPhanAnh> lichSuDaThucHien;
 
-    // Constructors (Nếu không dùng Lombok @NoArgsConstructor)
     public TaiKhoan() {
     }
 }

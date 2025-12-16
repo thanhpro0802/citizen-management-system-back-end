@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import jakarta.persistence.*;
@@ -33,10 +32,6 @@ public class ThongBao {
     private TaiKhoan nguoiNhan;
 
 }
-=======
-package com.citizen.management.citizen_management_system_back_end.entity;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,4 +65,3 @@ public class ThongBao {
     private TaiKhoan nguoiNhan;
 
 }
->>>>>>> Stashed changes

@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
@@ -63,7 +62,6 @@ public class PhanAnh {
     @OneToMany(mappedBy = "phanAnh")
     private List<TepDinhKem> tepDinhKemList;
 }
-=======
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
@@ -140,4 +138,3 @@ public class PhanAnh {
     @OneToMany(mappedBy = "phanAnh")
     private List<TepDinhKem> tepDinhKemList;
 }
->>>>>>> Stashed changes

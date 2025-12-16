@@ -1,6 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.service.impl;
 
-import com.citizen.management.citizen_management_system_back_end.dto.*;
+import com.citizen.management.citizen_management_system_back_end.dto.request.*;
 import com.citizen.management.citizen_management_system_back_end.entity.*;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumHanhDong;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
@@ -23,7 +23,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     private final LichSuPhanAnhRepository lichSuRepository;
     private final TaiKhoanRepository taiKhoanRepository;
     private final TepDinhKemRepository tepDinhKemRepository;
-    private final ThongBaoReposity thongBaoReposity;
+    private final ThongBaoRepository thongBaoRepository;
 
     @Override
     @Transactional
@@ -95,8 +95,9 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.PHAN_CONG);
         ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
-        //Ghi chu
-        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getTenDangNhap());
+
+        // SỬA: Đổi getTenDangNhap() -> getCccd()
+        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getCccd());
 
         lichSuRepository.save(ls);
         return paDaCapNhat;
@@ -169,7 +170,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         tb.setMaPhanAnhLienQuan(pa.getMaPhanAnh());
 
-        thongBaoReposity.save(tb);
+        thongBaoRepository.save(tb);
 
         return paDaCapNhat;
     }
@@ -178,7 +179,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Transactional
     public PhanAnh danhGiaPhanHoi(String maPhanAnh, DanhGiaRequest request, TaiKhoan nguoiDanhGia) {
         //1.TIm phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong thay Phan anh: " + maPhanAnh));
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
 
         //2.Kiem tra bao mat
         if (!pa.getNguoiGui().getMaTaiKhoan().equals(nguoiDanhGia.getMaTaiKhoan())) {
@@ -211,6 +212,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     public List<LichSuPhanAnh> layLichSuPhanAnh(String maPhanAnh) {
         PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phản ánh"));
+        // Đảm bảo method này tồn tại trong LichSuPhanAnhRepository
         return lichSuRepository.findByPhanAnhOrderByThoiGianDesc(pa);
     }
 

@@ -3,7 +3,6 @@ package com.citizen.management.citizen_management_system_back_end.repository;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface HoKhauRepository extends JpaRepository<HoKhau, Long> {
-
-    Long countByPhuong(String phuong);
+public interface HoKhauRepository extends JpaRepository<HoKhau, String> {
+    // Custom query nếu cần
 }

@@ -1,19 +1,17 @@
 package com.citizen.management.citizen_management_system_back_end.service;
 
-import com.citizen.management.citizen_management_system_back_end.dto.NhanKhauDto;
-
-import java.util.List;
+import com.citizen.management.citizen_management_system_back_end.dto.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface NhanKhauService {
-    NhanKhauDto createNhanKhau(NhanKhauDto nhanKhauDto);
+    NhanKhauDto create(NhanKhauDto dto);
+    NhanKhauDto update(String maNhanKhau, NhanKhauDto dto);
+    void delete(String maNhanKhau);
+    NhanKhauDto getById(String maNhanKhau);
+    Page<NhanKhauDto> search(SearchNhanKhauCriteria criteria, Pageable pageable);
 
-    NhanKhauDto getNhanKhauById(Long nhanKhauId);
-
-    List<NhanKhauDto> getAllNhanKhau();
-
-    NhanKhauDto updateNhanKhau(Long nhanKhauId, NhanKhauDto nhanKhauDto);
-
-    void deleteNhanKhau(Long nhanKhauid);
-
-    Long getCountNhanKhau(String gioiTinh);
+    TamTruDto registerTamTru(TamTruDto dto);
+    TamVangDto registerTamVang(TamVangDto dto);
+    NhanKhauDto declareDeath(String maNhanKhau); // cập nhật status = KHAI_TU
 }

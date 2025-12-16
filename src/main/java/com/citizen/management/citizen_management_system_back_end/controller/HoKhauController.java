@@ -1,54 +1,69 @@
 package com.citizen.management.citizen_management_system_back_end.controller;
 
-import lombok.AllArgsConstructor;
-import com.citizen.management.citizen_management_system_back_end.dto.HoKhauDto;
+import com.citizen.management.citizen_management_system_back_end.dto.DoiChuHoRequest;
+import com.citizen.management.citizen_management_system_back_end.dto.NhapHoRequest;
+import com.citizen.management.citizen_management_system_back_end.dto.TachHoRequest;
+import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @RestController
-@RequestMapping("api/DanhSachHoKhau")
-
+@RequestMapping("/api/ho-khau")
+@RequiredArgsConstructor
 public class HoKhauController {
-    private HoKhauService hoKhauService;
 
-    // Build Add API
+    private final HoKhauService hoKhauService;
+
     @PostMapping
-    public ResponseEntity<HoKhauDto> createHoKhau(@RequestBody HoKhauDto hoKhauDto) {
-        HoKhauDto savedHoKhau = hoKhauService.createHoKhau(hoKhauDto);
-        return new ResponseEntity<>(savedHoKhau, HttpStatus.CREATED);
+    public ResponseEntity<HoKhau> themMoi(@RequestBody HoKhau hoKhau) {
+        HoKhau ketQua = hoKhauService.taoMoi(hoKhau);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ketQua);
     }
 
-    // Build Get API
-    @GetMapping("{id}")
-    public ResponseEntity<HoKhauDto> getHoKhau(@PathVariable("id") Long hoKhauId) {
-        HoKhauDto hoKhauDto = hoKhauService.getHoKhauById(hoKhauId);
-        return ResponseEntity.ok(hoKhauDto);
+    @PutMapping("/{id}")
+    public ResponseEntity<HoKhau> sua(@PathVariable String id, @RequestBody HoKhau hoKhau) {
+        return ResponseEntity.ok(hoKhauService.capNhat(id, hoKhau));
     }
 
-    // Build Get All API
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> xoa(@PathVariable String id) {
+        hoKhauService.xoa(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
-    public ResponseEntity<List<HoKhauDto>> getAllHoKhau() {
-        List<HoKhauDto> listHoKhau = hoKhauService.getAllHoKhau();
-        return ResponseEntity.ok(listHoKhau);
+    public ResponseEntity<List<HoKhau>> xemDanhSach() {
+        List<HoKhau> ds = hoKhauService.layTatCa();
+        return ResponseEntity.ok(ds);
     }
 
-    // Build Update API
-    @PutMapping("{id}")
-    public ResponseEntity<HoKhauDto> updateHoKhau(@PathVariable("id") Long hoKhauId,
-                                                  @RequestBody HoKhauDto hoKhauDto) {
-        HoKhauDto updatedHoKhau = hoKhauService.updateHoKhau(hoKhauId, hoKhauDto);
-        return ResponseEntity.ok(updatedHoKhau);
+    @GetMapping("/{id}")
+    public ResponseEntity<HoKhau> xemChiTiet(@PathVariable String id) {
+        HoKhau result = hoKhauService.layTheoId(id);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // Build Delete API
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteHoKhau(@PathVariable("id") Long hoKhauId) {
-        hoKhauService.deleteHoKhauById(hoKhauId);
-        return ResponseEntity.ok("Xoa ho khau thanh cong!");
+    @PostMapping("/{id}/tach-ho")
+    public ResponseEntity<HoKhau> tachHo(@PathVariable String id, @RequestBody TachHoRequest request) {
+        return ResponseEntity.ok(hoKhauService.tachHo(id, request));
+    }
+
+    @PostMapping("/{id}/nhap-ho")
+    public ResponseEntity<HoKhau> nhapHo(@PathVariable String id, @RequestBody NhapHoRequest request) {
+        return ResponseEntity.ok(hoKhauService.nhapHo(id, request));
+    }
+
+    @PutMapping("/{id}/doi-chu-ho")
+    public ResponseEntity<HoKhau> doiChuHo(@PathVariable String id, @RequestBody DoiChuHoRequest request) {
+        return ResponseEntity.ok(hoKhauService.doiChuHo(id, request));
     }
 }
