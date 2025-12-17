@@ -35,9 +35,13 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         pa.setLinhVuc(request.getLinhVuc());
         pa.setNguoiGui(nguoiGui);
 
+        pa.setNoiDung(request.getNoiDung());
+
         //Set trang thai dau
         pa.setTrangThaiHienTai(EnumTrangThai.CHO);
         pa.setMucDoKhanCap(EnumMucDoKhanCap.THAP);
+
+        pa.setThoiGianTao(new Date());
 
         //Luu de lay ID
         PhanAnh paDaLuu = phanAnhRepository.save(pa);
@@ -219,5 +223,19 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     public List<PhanAnh> layTatCaPhanAnh() {
         return phanAnhRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public PhanAnh capNhatMucDoKhanCap(String maPhanAnh, EnumMucDoKhanCap mucDoMoi) {
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException(("Không tìm thấy phản ánh: " + maPhanAnh)));
+
+        if (pa.getTrangThaiHienTai() ==  EnumTrangThai.DA_XU_LY) {
+            throw new RuntimeException("Hồ sơ đã đóng, không thể thay đổi mức độ khẩn cấp!");
+        }
+
+        pa.setMucDoKhanCap(mucDoMoi);
+        return phanAnhRepository.save(pa);
     }
 }

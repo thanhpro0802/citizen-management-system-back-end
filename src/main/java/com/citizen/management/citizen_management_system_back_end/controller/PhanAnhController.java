@@ -4,6 +4,7 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.*;
 import com.citizen.management.citizen_management_system_back_end.entity.LichSuPhanAnh;
 import com.citizen.management.citizen_management_system_back_end.entity.PhanAnh;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
 import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
 import com.citizen.management.citizen_management_system_back_end.security.services.UserDetailsImpl;
 import com.citizen.management.citizen_management_system_back_end.service.IPhanAnhService;
@@ -95,5 +96,11 @@ public class PhanAnhController {
     public ResponseEntity<List<PhanAnh>> layTatCa() {
         // API này dành cho Admin/Cán bộ xem toàn bộ danh sách
         return ResponseEntity.ok(phanAnhService.layTatCaPhanAnh());
+    }
+
+    @PutMapping("/{id}/muc-do-khan-cap")
+    public ResponseEntity<PhanAnh> capNhatMucDoKhanCap(@PathVariable String id, @RequestParam EnumMucDoKhanCap mucDoKhanCap) {
+        PhanAnh pa = phanAnhService.capNhatMucDoKhanCap(id, mucDoKhanCap);
+        return ResponseEntity.ok(pa);
     }
 }
