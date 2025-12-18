@@ -9,6 +9,7 @@ import com.citizen.management.citizen_management_system_back_end.repository.*;
 import com.citizen.management.citizen_management_system_back_end.service.IPhanAnhService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,36 +111,44 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     @Transactional
     public void capNhatXuLyNoiBo(String maPhanAnh, XuLyNoiBoRequest request, TaiKhoan canBoXuLy) {
-        //1.Tim phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
+        // 1. Tìm phản ánh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
 
+        // 2. CHECK QUYỀN: Đảm bảo đúng người mới được ghi nhật ký
+        if (pa.getCanBoPhuTrach() == null || !pa.getCanBoPhuTrach().getMaTaiKhoan().equals(canBoXuLy.getMaTaiKhoan())) {
+            throw new AccessDeniedException("Bạn không phải người phụ trách hồ sơ này!");
+        }
+
+        // 3. Cập nhật trạng thái nếu đang CHỜ
         if (pa.getTrangThaiHienTai() == EnumTrangThai.CHO) {
             pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
             phanAnhRepository.save(pa);
         }
 
-        //2.Tao lich su ghi nhan viec xu ly noi bo
+        // 4. Ghi lịch sử
         LichSuPhanAnh ls = new LichSuPhanAnh();
         ls.setPhanAnh(pa);
         ls.setTaiKhoanThucHien(canBoXuLy);
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.XU_LY);
-        ls.setNoiDung(request.getNoiDungCapNhat());
-        ls.setTrangThaiMoi(pa.getTrangThaiHienTai());
 
+        // ⚠️ QUAN TRỌNG: Lấy đúng trường "noiDung" (đã sửa ở bước 1)
+        ls.setNoiDung(request.getNoiDung());
+
+        ls.setTrangThaiMoi(pa.getTrangThaiHienTai());
         lichSuRepository.save(ls);
 
-        //3.Xu ly file dinh kem
+        // 5. Xử lý file đính kèm
         if (request.getDanhSachFileUrl() != null && !request.getDanhSachFileUrl().isEmpty()) {
             List<TepDinhKem> tepMoiList = new ArrayList<>();
             for (String fileUrl : request.getDanhSachFileUrl()) {
                 TepDinhKem tep = new TepDinhKem();
                 tep.setPhanAnh(pa);
                 tep.setUrl(fileUrl);
-                tep.setTenFileGoc("File_tu_can_bo_xu_ly.jpg"); //FE xu ly sau
+                tep.setTenFileGoc("File_tu_can_bo_xu_ly.jpg");
                 tepMoiList.add(tep);
             }
-            //Luu tat ca file vao CSDL
             tepDinhKemRepository.saveAll(tepMoiList);
         }
     }

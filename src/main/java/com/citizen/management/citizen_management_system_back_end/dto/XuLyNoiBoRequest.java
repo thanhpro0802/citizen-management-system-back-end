@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class XuLyNoiBoRequest {
     //Ghi chu noi bo
-    private String noiDungCapNhat;
+    private String noiDung;
 
     //Danh sach cac URL file da tai len
     private List<String> danhSachFileUrl;
