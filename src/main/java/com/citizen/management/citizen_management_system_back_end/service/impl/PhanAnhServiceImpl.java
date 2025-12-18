@@ -79,32 +79,48 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     @Transactional
     public PhanAnh phanCongXuLy(String maPhanAnh, PhanCongRequest request, TaiKhoan nguoiPhanCong) {
-        //1.Tim can bo nhan viec
-        TaiKhoan canBoDuocGiao = taiKhoanRepository.findById(request.getMaCanBoPhuTrach()).orElseThrow(() -> new EntityNotFoundException("Khong tim thay can bo voi ma: " + request.getMaCanBoPhuTrach()));
+        // 1. Tìm cán bộ nhận việc (Người cấp dưới)
+        TaiKhoan canBoDuocGiao = taiKhoanRepository.findById(request.getMaCanBoPhuTrach())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy cán bộ với mã: " + request.getMaCanBoPhuTrach()));
 
-        //2.Tim phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh voi ma: " + maPhanAnh));
+        // 2. Tìm phản ánh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy Phản ánh với mã: " + maPhanAnh));
 
-        //3.Cap nhat thong tin
+        // 3. Cập nhật thông tin phản ánh
         pa.setCanBoPhuTrach(canBoDuocGiao);
         pa.setThoiHanXuLy(request.getThoiHanXuLy());
-        pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
+        pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY); // Chuyển sang đang xử lý luôn
 
-        //4.Luu
+        // 4. Lưu phản ánh
         PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
 
-        //5.Tao lich su nhan viec
+        // 5. Ghi lịch sử (Như cũ)
         LichSuPhanAnh ls = new LichSuPhanAnh();
         ls.setPhanAnh(paDaCapNhat);
-        ls.setTaiKhoanThucHien(nguoiPhanCong);
+        ls.setTaiKhoanThucHien(nguoiPhanCong); // Người thực hiện là Sếp (người phân công)
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.PHAN_CONG);
         ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
-
-        // SỬA: Đổi getTenDangNhap() -> getCccd()
-        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getCccd());
-
+        ls.setNoiDung("Phân công cho cán bộ: " + canBoDuocGiao.getCccd());
         lichSuRepository.save(ls);
+
+        // --- 6. MỚI: TẠO THÔNG BÁO CHO CÁN BỘ ĐƯỢC GIAO ---
+        ThongBao tb = new ThongBao();
+
+        // Người nhận là Cán bộ cấp dưới (canBoDuocGiao)
+        tb.setNguoiNhan(canBoDuocGiao);
+
+        // Nội dung thông báo
+        tb.setNoiDung("Bạn vừa được phân công xử lý hồ sơ: " + pa.getTieuDe());
+
+        tb.setThoiGian(new Date());
+        tb.setDaXem(false);
+        tb.setMaPhanAnhLienQuan(pa.getMaPhanAnh()); // Để bấm vào thông báo thì nhảy tới hồ sơ
+
+        thongBaoRepository.save(tb);
+        // ---------------------------------------------------
+
         return paDaCapNhat;
     }
 
