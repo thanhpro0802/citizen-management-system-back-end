@@ -3,6 +3,7 @@ package com.citizen.management.citizen_management_system_back_end.entity;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,15 +48,19 @@ public class NhanKhau {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_ho_khau")
+    @JsonIgnore // [THÊM DÒNG NÀY]: Ngắt vòng lặp khi xem NhanKhau sẽ không load lại HoKhau
     private HoKhau hoKhau;
 
     @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
+    @JsonIgnore // [THÊM DÒNG NÀY]: Nên ẩn danh sách tạm trú khi load nhân khẩu để tránh nặng
     private List<TamTru> danhSachTamTru;
 
     @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
+    @JsonIgnore // [THÊM DÒNG NÀY]: Nên ẩn danh sách tạm vắng khi load nhân khẩu để tránh nặng
     private List<TamVang> danhSachTamVang;
 
     @OneToOne(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
+    @JsonIgnore // [THÊM DÒNG NÀY]: Nên ẩn thông tin tài khoản khi load nhân khẩu để tránh lộ thông tin nhạy cảm
     private TaiKhoan taiKhoan;
 
 }

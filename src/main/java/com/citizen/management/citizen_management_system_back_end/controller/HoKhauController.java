@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/ho-khau")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class HoKhauController {
 
     private final HoKhauService hoKhauService;

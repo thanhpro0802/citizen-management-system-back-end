@@ -8,6 +8,8 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // [Thêm import này]
+
 @RequiredArgsConstructor
 @CrossOrigin("*")
 @RestController
