@@ -51,22 +51,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // 1. Bật cấu hình CORS tại đây
-                .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
-                        .requestMatchers("/api/v1/phan-anh/*/phan-cong",
-                                "/api/v1/phan-anh/*/xu-ly-noi-bo",
-                                "/api/v1/phan-anh/*/phan-hoi").hasAuthority("CAN_BO")
+                        .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers("/api/nhankhau/**").permitAll() // Cho phép tất cả API nhân khẩu
                         .anyRequest().authenticated()
                 );
-
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

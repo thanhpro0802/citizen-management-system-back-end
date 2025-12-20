@@ -1,5 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.dto;
 
+import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
 import java.util.Date;
 
 public class NhanKhauDto {
@@ -12,7 +13,7 @@ public class NhanKhauDto {
     private String danToc;
     private String quanHeVoiChuHo;
     private String maHoKhau; // id ho khau nếu có
-    private String status; // THUONG_TRU, TAM_TRU, TAM_VANG, KHAI_TU
+    private EnumTrangThaiNhanKhau trangThai; // Enum thay vì String
 
     // Getters and Setters
     public String getMaNhanKhau() {
@@ -87,11 +88,11 @@ public class NhanKhauDto {
         this.maHoKhau = maHoKhau;
     }
 
-    public String getStatus() {
-        return status;
+    public EnumTrangThaiNhanKhau getTrangThai() {
+        return trangThai;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTrangThai(EnumTrangThaiNhanKhau trangThai) {
+        this.trangThai = trangThai;
     }
 }

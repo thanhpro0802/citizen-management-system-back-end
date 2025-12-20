@@ -27,27 +27,27 @@ VALUES
 -- Note: so_cccd must be unique
 INSERT INTO nhan_khau (ma_nhan_khau, ho_ten, ngay_sinh, gioi_tinh, so_cccd, que_quan, dan_toc, quan_he_voi_chu_ho, trang_thai, ma_ho_khau)
 VALUES
-('NK001', 'Nguyễn Văn A', '1990-05-12', 'Nam', '012345678901', 'Quảng Trị', 'Kinh', 'Chủ hộ', 'THUONG_TRU', 'HK001'),
-('NK002', 'Trần Thị B', '1992-09-03', 'Nữ', '112345678902', 'Hà Nội', 'Kinh', 'Vợ', DEFAULT, 'HK001'),
-('NK003', 'Lê Văn C', '1985-02-20', 'Nam', '212345678903', 'Đà Nẵng', 'Kinh', 'Con trai', DEFAULT, 'HK002'),
-('NK004', 'Phạm Thị D', '2000-12-01', 'Nữ', '312345678904', 'Huế', 'Kinh', 'Con gái', DEFAULT, 'HK002'),
-('NK005', 'Hoàng Văn E', '1975-07-07', 'Nam', '412345678905', 'Hải Phòng', 'Kinh', 'Chủ hộ', DEFAULT, 'HK003'),
-('NK006', 'Đặng Thị F', '1980-03-30', 'Nữ', '512345678906', 'Nam Định', 'Kinh', 'Vợ', DEFAULT, 'HK003'),
-('NK007', 'Võ Văn G', '1995-11-11', 'Nam', '612345678907', 'Bình Dương', 'Kinh', 'Con trai', DEFAULT, 'HK004'),
-('NK008', 'Bùi Thị H', '1988-06-25', 'Nữ', '712345678908', 'Vĩnh Phúc', 'Kinh', 'Chủ hộ', DEFAULT, 'HK005'),
-('NK009', 'Phan Văn I', '1965-01-09', 'Nam', '812345678909', 'Quảng Ngãi', 'Kinh', 'Chủ hộ', DEFAULT, 'HK006'),
-('NK010', 'Ngô Thị J', '1970-04-14', 'Nữ', '912345678910', 'Thanh Hóa', 'Kinh', 'Vợ', DEFAULT, 'HK006'),
-('NK011', 'Trương Văn K', '1998-08-08', 'Nam', '022345678911', 'TP HCM', 'Kinh', 'Chủ hộ', DEFAULT, 'HK007'),
-('NK012', 'Lưu Thị L', '2002-10-20', 'Nữ', '132345678912', 'Cần Thơ', 'Kinh', 'Con', DEFAULT, 'HK007'),
-('NK013', 'Đỗ Văn M', '1986-05-05', 'Nam', '242345678913', 'Nghệ An', 'Kinh', 'Chủ hộ', DEFAULT, 'HK008'),
-('NK014', 'Hà Thị N', '1994-03-03', 'Nữ', '352345678914', 'Hải Dương', 'Kinh', 'Vợ', DEFAULT, 'HK008'),
-('NK015', 'Mai Văn O', '2010-09-09', 'Nam', '462345678915', 'Quảng Bình', 'Kinh', 'Con', DEFAULT, 'HK009'),
-('NK016', 'Phùng Thị P', '1983-02-17', 'Nữ', '572345678916', 'Bắc Ninh', 'Kinh', 'Chủ hộ', DEFAULT, 'HK010'),
-('NK017', 'Nguyễn Thị Q', '1991-06-30', 'Nữ', '682345678917', 'Hòa Bình', 'Kinh', 'Chủ hộ', DEFAULT, 'HK011'),
-('NK018', 'Lê Thị R', '1978-11-22', 'Nữ', '792345678918', 'Nam Định', 'Kinh', 'Khác', DEFAULT, NULL), -- không thuộc hộ nào
-('NK019', 'Phạm Văn S', '2004-07-16', 'Nam', '892345678919', 'Bình Thuận', 'Kinh', 'Thuê trọ', DEFAULT, 'HK012'),
+('NK001', 'Nguyễn Văn A', '1990-05-12', 'Nam', '012345678901', 'Quảng Trị', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK001'),
+('NK002', 'Trần Thị B', '1992-09-03', 'Nữ', '112345678902', 'Hà Nội', 'Kinh', 'Vợ', 'THUONG_TRU'::person_status, 'HK001'),
+('NK003', 'Lê Văn C', '1985-02-20', 'Nam', '212345678903', 'Đà Nẵng', 'Kinh', 'Con trai', 'THUONG_TRU'::person_status, 'HK002'),
+('NK004', 'Phạm Thị D', '2000-12-01', 'Nữ', '312345678904', 'Huế', 'Kinh', 'Con gái', 'THUONG_TRU'::person_status, 'HK002'),
+('NK005', 'Hoàng Văn E', '1975-07-07', 'Nam', '412345678905', 'Hải Phòng', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK003'),
+('NK006', 'Đặng Thị F', '1980-03-30', 'Nữ', '512345678906', 'Nam Định', 'Kinh', 'Vợ', 'THUONG_TRU'::person_status, 'HK003'),
+('NK007', 'Võ Văn G', '1995-11-11', 'Nam', '612345678907', 'Bình Dương', 'Kinh', 'Con trai', 'TAM_TRU'::person_status, 'HK004'),
+('NK008', 'Bùi Thị H', '1988-06-25', 'Nữ', '712345678908', 'Vĩnh Phúc', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK005'),
+('NK009', 'Phan Văn I', '1965-01-09', 'Nam', '812345678909', 'Quảng Ngãi', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK006'),
+('NK010', 'Ngô Thị J', '1970-04-14', 'Nữ', '912345678910', 'Thanh Hóa', 'Kinh', 'Vợ', 'THUONG_TRU'::person_status, 'HK006'),
+('NK011', 'Trương Văn K', '1998-08-08', 'Nam', '022345678911', 'TP HCM', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK007'),
+('NK012', 'Lưu Thị L', '2002-10-20', 'Nữ', '132345678912', 'Cần Thơ', 'Kinh', 'Con', 'TAM_TRU'::person_status, 'HK007'),
+('NK013', 'Đỗ Văn M', '1986-05-05', 'Nam', '242345678913', 'Nghệ An', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK008'),
+('NK014', 'Hà Thị N', '1994-03-03', 'Nữ', '352345678914', 'Hải Dương', 'Kinh', 'Vợ', 'TAM_TRU'::person_status, 'HK008'),
+('NK015', 'Mai Văn O', '2010-09-09', 'Nam', '462345678915', 'Quảng Bình', 'Kinh', 'Con', 'THUONG_TRU'::person_status, 'HK009'),
+('NK016', 'Phùng Thị P', '1983-02-17', 'Nữ', '572345678916', 'Bắc Ninh', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK010'),
+('NK017', 'Nguyễn Thị Q', '1991-06-30', 'Nữ', '682345678917', 'Hòa Bình', 'Kinh', 'Chủ hộ', 'THUONG_TRU'::person_status, 'HK011'),
+('NK018', 'Lê Thị R', '1978-11-22', 'Nữ', '792345678918', 'Nam Định', 'Kinh', 'Khác', 'TAM_TRU'::person_status, NULL), -- không thuộc hộ nào
+('NK019', 'Phạm Văn S', '2004-07-16', 'Nam', '892345678919', 'Bình Thuận', 'Kinh', 'Thuê trọ', 'TAM_TRU'::person_status, 'HK012'),
 -- Một nhân khẩu đã KHAI_TU (khai tử) — status không bị trigger ghi đè
-('NK020', 'Trần Văn T', '1950-01-01', 'Nam', '992345678920', 'Thái Bình', 'Kinh', 'Chủ hộ', 'KHAI_TU', 'HK013');
+('NK020', 'Trần Văn T', '1950-01-01', 'Nam', '992345678920', 'Thái Bình', 'Kinh', 'Chủ hộ', 'KHAI_TU'::person_status, 'HK013');
 
 -- ---------------------------
 -- TAM_TRU (20)
@@ -105,56 +105,56 @@ INSERT INTO tam_vang (ma_tam_vang, ngay_bat_dau, ngay_ket_thuc, ly_do, ma_nhan_k
 
 -- A. TẠO USER
 INSERT INTO tai_khoan (ma_tai_khoan, so_cccd, mat_khau, vai_tro) VALUES
-                                                                             ('user_congdan', '001200000001', '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'CONG_DAN'),
-                                                                             ('user_canbo', '001200000002',  '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'CAN_BO'),
-                                                                             ('user_admin', '001200000003',  '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'ADMIN');
+    ('user_congdan', '001200000001', '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'CONG_DAN'),
+    ('user_canbo', '001200000002',  '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'CAN_BO'),
+    ('user_admin', '001200000003',  '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'ADMIN');
 
 -- B. TẠO PHẢN ÁNH (25 Bản ghi)
 
 -- 1. Nhóm QUÁ HẠN (5 hồ sơ) -> Deadline trong quá khứ
 INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, thoi_han_xu_ly, ma_tai_khoan_gui, ma_can_bo_phu_trach) VALUES
-                                                                                                                                                                                ('PA-OVER-01', 'Karaoke ồn ào quá hạn', 'Hát suốt đêm ngày này qua ngày khác.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '10 days', (CURRENT_TIMESTAMP - INTERVAL '2 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-OVER-02', 'Lấn chiếm vỉa hè bán quán', 'Không còn lối cho người đi bộ.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '12 days', (CURRENT_TIMESTAMP - INTERVAL '5 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-OVER-03', 'Xả rác bừa bãi đầu ngõ', 'Mùi hôi thối nồng nặc.', 'MOI_TRUONG', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '15 days', (CURRENT_TIMESTAMP - INTERVAL '1 day')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-OVER-04', 'Đèn đường hỏng ngã tư', 'Nguy hiểm giao thông.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '20 days', (CURRENT_TIMESTAMP - INTERVAL '10 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-OVER-05', 'Hố ga mất nắp nguy hiểm', 'Đề nghị khắc phục ngay.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '8 days', (CURRENT_TIMESTAMP - INTERVAL '3 days')::date, 'user_congdan', 'user_canbo');
+    ('PA-OVER-01', 'Karaoke ồn ào quá hạn', 'Hát suốt đêm ngày này qua ngày khác.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '10 days', (CURRENT_TIMESTAMP - INTERVAL '2 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-OVER-02', 'Lấn chiếm vỉa hè bán quán', 'Không còn lối cho người đi bộ.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '12 days', (CURRENT_TIMESTAMP - INTERVAL '5 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-OVER-03', 'Xả rác bừa bãi đầu ngõ', 'Mùi hôi thối nồng nặc.', 'MOI_TRUONG', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '15 days', (CURRENT_TIMESTAMP - INTERVAL '1 day')::date, 'user_congdan', 'user_canbo'),
+    ('PA-OVER-04', 'Đèn đường hỏng ngã tư', 'Nguy hiểm giao thông.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '20 days', (CURRENT_TIMESTAMP - INTERVAL '10 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-OVER-05', 'Hố ga mất nắp nguy hiểm', 'Đề nghị khắc phục ngay.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '8 days', (CURRENT_TIMESTAMP - INTERVAL '3 days')::date, 'user_congdan', 'user_canbo');
 
 -- 2. Nhóm CHỜ TIẾP NHẬN (8 hồ sơ) -> Mới nhất
 INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
-                                                                                                                                           ('PA-NEW-01', 'Cây đổ sau bão', 'Cây chắn ngang đường đi.', 'HA_TANG_DO_THI', 'CHO', 'CAO', CURRENT_TIMESTAMP, 'user_congdan'),
-                                                                                                                                           ('PA-NEW-02', 'Yêu cầu cắt tỉa cây xanh', 'Cành cây vướng dây điện.', 'HA_TANG_DO_THI', 'CHO', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '1 hour', 'user_congdan'),
-                                                                                                                                           ('PA-NEW-03', 'Nhà máy xả khói đen', 'Ô nhiễm không khí nghiêm trọng.', 'MOI_TRUONG', 'CHO', 'CAO', CURRENT_TIMESTAMP - INTERVAL '2 hours', 'user_congdan'),
-                                                                                                                                           ('PA-NEW-04', 'Hỏi thủ tục tạm trú', 'Tôi cần giấy tờ gì?', 'HANH_CHINH_CONG', 'CHO', 'THAP', CURRENT_TIMESTAMP - INTERVAL '5 hours', 'user_congdan'),
-                                                                                                                                           ('PA-NEW-05', 'Mất nước toàn khu', 'Đã mất nước 2 ngày.', 'HA_TANG_DO_THI', 'CHO', 'CAO', CURRENT_TIMESTAMP - INTERVAL '6 hours', 'user_congdan'),
-                                                                                                                                           ('PA-NEW-06', 'Chó thả rông', 'Nhiều chó không rọ mõm.', 'AN_NINH_TRAT_TU', 'CHO', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '1 day', 'user_congdan'),
-                                                                                                                                           ('PA-NEW-07', 'Thu phí sai quy định', 'Tổ trưởng thu tiền lạ.', 'HANH_CHINH_CONG', 'CHO', 'THAP', CURRENT_TIMESTAMP - INTERVAL '1 day', 'user_congdan'),
-                                                                                                                                           ('PA-NEW-08', 'Biển báo bị che khuất', 'Cây che mất biển báo.', 'GIAO_THONG', 'CHO', 'THAP', CURRENT_TIMESTAMP - INTERVAL '2 days', 'user_congdan');
+    ('PA-NEW-01', 'Cây đổ sau bão', 'Cây chắn ngang đường đi.', 'HA_TANG_DO_THI', 'CHO', 'CAO', CURRENT_TIMESTAMP, 'user_congdan'),
+    ('PA-NEW-02', 'Yêu cầu cắt tỉa cây xanh', 'Cành cây vướng dây điện.', 'HA_TANG_DO_THI', 'CHO', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '1 hour', 'user_congdan'),
+    ('PA-NEW-03', 'Nhà máy xả khói đen', 'Ô nhiễm không khí nghiêm trọng.', 'MOI_TRUONG', 'CHO', 'CAO', CURRENT_TIMESTAMP - INTERVAL '2 hours', 'user_congdan'),
+    ('PA-NEW-04', 'Hỏi thủ tục tạm trú', 'Tôi cần giấy tờ gì?', 'HANH_CHINH_CONG', 'CHO', 'THAP', CURRENT_TIMESTAMP - INTERVAL '5 hours', 'user_congdan'),
+    ('PA-NEW-05', 'Mất nước toàn khu', 'Đã mất nước 2 ngày.', 'HA_TANG_DO_THI', 'CHO', 'CAO', CURRENT_TIMESTAMP - INTERVAL '6 hours', 'user_congdan'),
+    ('PA-NEW-06', 'Chó thả rông', 'Nhiều chó không rọ mõm.', 'AN_NINH_TRAT_TU', 'CHO', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '1 day', 'user_congdan'),
+    ('PA-NEW-07', 'Thu phí sai quy định', 'Tổ trưởng thu tiền lạ.', 'HANH_CHINH_CONG', 'CHO', 'THAP', CURRENT_TIMESTAMP - INTERVAL '1 day', 'user_congdan'),
+    ('PA-NEW-08', 'Biển báo bị che khuất', 'Cây che mất biển báo.', 'GIAO_THONG', 'CHO', 'THAP', CURRENT_TIMESTAMP - INTERVAL '2 days', 'user_congdan');
 
 -- 3. Nhóm ĐANG XỬ LÝ (7 hồ sơ) -> Deadline tương lai
 INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, thoi_han_xu_ly, ma_tai_khoan_gui, ma_can_bo_phu_trach) VALUES
-                                                                                                                                                                                ('PA-PROC-01', 'Tranh chấp đất đai', 'Hàng xóm lấn tường rào.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '2 days', (CURRENT_TIMESTAMP + INTERVAL '5 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-PROC-02', 'Thủ tục kết hôn nước ngoài', 'Hướng dẫn hồ sơ.', 'HANH_CHINH_CONG', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '3 days', (CURRENT_TIMESTAMP + INTERVAL '2 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-PROC-03', 'Bụi từ công trình xây dựng', 'Công trình không che chắn.', 'MOI_TRUONG', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '3 days', (CURRENT_TIMESTAMP + INTERVAL '3 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-PROC-04', 'Lắp camera an ninh', 'Đề nghị lắp thêm camera.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '4 days', (CURRENT_TIMESTAMP + INTERVAL '7 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-PROC-05', 'Sửa chữa vỉa hè', 'Gạch lát bị vỡ.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '4 days', (CURRENT_TIMESTAMP + INTERVAL '10 days')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-PROC-06', 'Tiêm chủng mở rộng', 'Hỏi lịch tiêm cho trẻ.', 'Y_TE', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '5 days', (CURRENT_TIMESTAMP + INTERVAL '1 day')::date, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                ('PA-PROC-07', 'Vệ sinh an toàn thực phẩm', 'Quán ăn mất vệ sinh.', 'Y_TE', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '5 days', (CURRENT_TIMESTAMP + INTERVAL '1 day')::date, 'user_congdan', 'user_canbo');
+    ('PA-PROC-01', 'Tranh chấp đất đai', 'Hàng xóm lấn tường rào.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '2 days', (CURRENT_TIMESTAMP + INTERVAL '5 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-PROC-02', 'Thủ tục kết hôn nước ngoài', 'Hướng dẫn hồ sơ.', 'HANH_CHINH_CONG', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '3 days', (CURRENT_TIMESTAMP + INTERVAL '2 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-PROC-03', 'Bụi từ công trình xây dựng', 'Công trình không che chắn.', 'MOI_TRUONG', 'DANG_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '3 days', (CURRENT_TIMESTAMP + INTERVAL '3 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-PROC-04', 'Lắp camera an ninh', 'Đề nghị lắp thêm camera.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '4 days', (CURRENT_TIMESTAMP + INTERVAL '7 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-PROC-05', 'Sửa chữa vỉa hè', 'Gạch lát bị vỡ.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '4 days', (CURRENT_TIMESTAMP + INTERVAL '10 days')::date, 'user_congdan', 'user_canbo'),
+    ('PA-PROC-06', 'Tiêm chủng mở rộng', 'Hỏi lịch tiêm cho trẻ.', 'Y_TE', 'DANG_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '5 days', (CURRENT_TIMESTAMP + INTERVAL '1 day')::date, 'user_congdan', 'user_canbo'),
+    ('PA-PROC-07', 'Vệ sinh an toàn thực phẩm', 'Quán ăn mất vệ sinh.', 'Y_TE', 'DANG_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '5 days', (CURRENT_TIMESTAMP + INTERVAL '1 day')::date, 'user_congdan', 'user_canbo');
 
 -- 4. Nhóm ĐÃ XỬ LÝ (5 hồ sơ)
 INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, thoi_han_xu_ly, danh_gia_hai_long, gop_y, ma_tai_khoan_gui, ma_can_bo_phu_trach) VALUES
-                                                                                                                                                                                                          ('PA-DONE-01', 'Làm giấy khai sinh', 'Đã nhận kết quả.', 'HANH_CHINH_CONG', 'DA_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '20 days', (CURRENT_TIMESTAMP - INTERVAL '18 days')::date, 5, 'Rất nhanh', 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                                          ('PA-DONE-02', 'Phun thuốc muỗi', 'Đã thực hiện xong.', 'Y_TE', 'DA_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '25 days', (CURRENT_TIMESTAMP - INTERVAL '24 days')::date, 4, 'Cảm ơn', 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                                          ('PA-DONE-03', 'Dọn rác tồn đọng', 'Đã sạch sẽ.', 'MOI_TRUONG', 'DA_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '30 days', (CURRENT_TIMESTAMP - INTERVAL '28 days')::date, 5, NULL, 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                                          ('PA-DONE-04', 'Đánh nhau gây rối', 'Đã hòa giải.', 'AN_NINH_TRAT_TU', 'DA_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '40 days', (CURRENT_TIMESTAMP - INTERVAL '39 days')::date, 3, 'Hơi chậm', 'user_congdan', 'user_canbo'),
-                                                                                                                                                                                                          ('PA-DONE-05', 'Vỡ ống nước', 'Đã sửa.', 'HA_TANG_DO_THI', 'DA_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '50 days', (CURRENT_TIMESTAMP - INTERVAL '49 days')::date, 5, 'Tốt', 'user_congdan', 'user_canbo');
+    ('PA-DONE-01', 'Làm giấy khai sinh', 'Đã nhận kết quả.', 'HANH_CHINH_CONG', 'DA_XU_LY', 'THAP', CURRENT_TIMESTAMP - INTERVAL '20 days', (CURRENT_TIMESTAMP - INTERVAL '18 days')::date, 5, 'Rất nhanh', 'user_congdan', 'user_canbo'),
+    ('PA-DONE-02', 'Phun thuốc muỗi', 'Đã thực hiện xong.', 'Y_TE', 'DA_XU_LY', 'TRUNG_BINH', CURRENT_TIMESTAMP - INTERVAL '25 days', (CURRENT_TIMESTAMP - INTERVAL '24 days')::date, 4, 'Cảm ơn', 'user_congdan', 'user_canbo'),
+    ('PA-DONE-03', 'Dọn rác tồn đọng', 'Đã sạch sẽ.', 'MOI_TRUONG', 'DA_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '30 days', (CURRENT_TIMESTAMP - INTERVAL '28 days')::date, 5, NULL, 'user_congdan', 'user_canbo'),
+    ('PA-DONE-04', 'Đánh nhau gây rối', 'Đã hòa giải.', 'AN_NINH_TRAT_TU', 'DA_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '40 days', (CURRENT_TIMESTAMP - INTERVAL '39 days')::date, 3, 'Hơi chậm', 'user_congdan', 'user_canbo'),
+    ('PA-DONE-05', 'Vỡ ống nước', 'Đã sửa.', 'HA_TANG_DO_THI', 'DA_XU_LY', 'CAO', CURRENT_TIMESTAMP - INTERVAL '50 days', (CURRENT_TIMESTAMP - INTERVAL '49 days')::date, 5, 'Tốt', 'user_congdan', 'user_canbo');
 
 -- C. TẠO THÔNG BÁO
 INSERT INTO thong_bao (ma_thong_bao, noi_dung, thoi_gian, da_xem, ma_phan_anh_lien_quan, ma_nguoi_nhan) VALUES
-                                                                                                            ('TB-01', '⚠️ CẢNH BÁO: Hồ sơ PA-OVER-01 đã quá hạn!', CURRENT_TIMESTAMP, FALSE, 'PA-OVER-01', 'user_canbo'),
-                                                                                                            ('TB-02', 'Bạn được phân công xử lý hồ sơ PA-PROC-01', CURRENT_TIMESTAMP, FALSE, 'PA-PROC-01', 'user_canbo'),
-                                                                                                            ('TB-03', 'Thông báo cũ đã xem', CURRENT_TIMESTAMP - INTERVAL '1 day', TRUE, 'PA-DONE-01', 'user_canbo');
+    ('TB-01', '⚠️ CẢNH BÁO: Hồ sơ PA-OVER-01 đã quá hạn!', CURRENT_TIMESTAMP, FALSE, 'PA-OVER-01', 'user_canbo'),
+    ('TB-02', 'Bạn được phân công xử lý hồ sơ PA-PROC-01', CURRENT_TIMESTAMP, FALSE, 'PA-PROC-01', 'user_canbo'),
+    ('TB-03', 'Thông báo cũ đã xem', CURRENT_TIMESTAMP - INTERVAL '1 day', TRUE, 'PA-DONE-01', 'user_canbo');
 
 -- D. TẠO LỊCH SỬ
 INSERT INTO lich_su_phan_anh (ma_lich_su, ma_phan_anh, ma_tai_khoan_thuc_hien, hanh_dong, trang_thai_moi, noi_dung, thoi_gian) VALUES
-                                                                                                                                   ('LS-01', 'PA-OVER-01', 'user_congdan', 'TAO_MOI', 'CHO', 'Công dân gửi phản ánh', CURRENT_TIMESTAMP - INTERVAL '10 days'),
-                                                                                                                                   ('LS-02', 'PA-OVER-01', 'user_admin', 'PHAN_CONG', 'DANG_XU_LY', 'Phân công cho cán bộ xử lý', CURRENT_TIMESTAMP - INTERVAL '9 days');
+    ('LS-01', 'PA-OVER-01', 'user_congdan', 'TAO_MOI', 'CHO', 'Công dân gửi phản ánh', CURRENT_TIMESTAMP - INTERVAL '10 days'),
+    ('LS-02', 'PA-OVER-01', 'user_admin', 'PHAN_CONG', 'DANG_XU_LY', 'Phân công cho cán bộ xử lý', CURRENT_TIMESTAMP - INTERVAL '9 days');
