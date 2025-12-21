@@ -1,6 +1,7 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumVaiTro;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +38,9 @@ public class TaiKhoan {
     // --- Mối quan hệ (Relationships) ---
 
     // Quan hệ 1:1 với NhanKhau
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "nhan_khau_id", referencedColumnName = "ma_nhan_khau")
+    @JsonIgnoreProperties(value = {"hoKhau", "thanhVienCuaHo", "taiKhoan", "hibernateLazyInitializer", "handler"})
     private NhanKhau nhanKhau;
 
     @JsonIgnore

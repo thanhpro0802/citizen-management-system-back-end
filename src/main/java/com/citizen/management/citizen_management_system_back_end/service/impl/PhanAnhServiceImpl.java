@@ -102,7 +102,18 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.PHAN_CONG);
         ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
-        ls.setNoiDung("Phân công cho cán bộ: " + canBoDuocGiao.getCccd());
+        String tenCanBo = "Cán bộ"; // Giá trị mặc định
+
+        // Kiểm tra xem Tài khoản có liên kết với Nhân khẩu không để tránh NullPointerException
+        if (canBoDuocGiao.getNhanKhau() != null && canBoDuocGiao.getNhanKhau().getHoTen() != null) {
+            tenCanBo = canBoDuocGiao.getNhanKhau().getHoTen();
+        }
+
+        // Format nội dung log: "Phân công cho cán bộ: Nguyễn Văn A (001...)"
+        String noiDungLog = String.format("Phân công cho cán bộ: %s (%s)",
+                tenCanBo,
+                canBoDuocGiao.getCccd());
+        ls.setNoiDung(noiDungLog);
         lichSuRepository.save(ls);
 
         // --- 6. MỚI: TẠO THÔNG BÁO CHO CÁN BỘ ĐƯỢC GIAO ---
@@ -177,6 +188,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         //2.Cap nhat trang thai
         pa.setTrangThaiHienTai(EnumTrangThai.DA_XU_LY);
+        pa.setThoiGianHoanThanh(new Date());
         PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
 
         //3.Tao lich su ghi nhan phan hoi
