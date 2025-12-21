@@ -102,3 +102,50 @@ INSERT INTO tam_vang (ma_tam_vang, ngay_bat_dau, ngay_ket_thuc, ly_do, ma_nhan_k
 ('TV020','2024-11-11','2025-11-10','Thăm con','NK020');
 
 -- End of sample inserts
+
+
+-- Xóa dữ liệu cũ để tránh trùng ID (nếu cần)
+DELETE FROM lich_su_phan_anh;
+DELETE FROM thong_bao;
+DELETE FROM tep_dinh_kem;
+DELETE FROM phan_anh;
+
+-- --- DỮ LIỆU MẪU PHẢN ÁNH (20 bản ghi) ---
+
+-- 1. Nhóm CHỜ TIẾP NHẬN (Mới nhất)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, nguoi_gui_id, thoi_gian_tao) VALUES
+                                                                                                                                       ('PA001', 'Cống tắc đường Nguyễn Trãi', 'Nước ngập lênh láng khi mưa nhỏ.', 'HA_TANG_DO_THI', 'CHO', 'CAO', 'congdan1', NOW()),
+                                                                                                                                       ('PA002', 'Đèn đường hỏng tổ 5', 'Đèn nhấp nháy gây nguy hiểm.', 'HA_TANG_DO_THI', 'CHO', 'TRUNG_BINH', 'congdan1', DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+                                                                                                                                       ('PA003', 'Hỏi thủ tục làm lại CCCD', 'Tôi bị mất thẻ thì làm lại ở đâu?', 'HANH_CHINH_CONG', 'CHO', 'THAP', 'congdan1', DATE_SUB(NOW(), INTERVAL 5 HOUR)),
+                                                                                                                                       ('PA004', 'Xả rác bừa bãi tại công viên', 'Người dân vứt rác không đúng nơi quy định.', 'MOI_TRUONG', 'CHO', 'TRUNG_BINH', 'congdan1', DATE_SUB(NOW(), INTERVAL 1 DAY));
+
+-- 2. Nhóm ĐANG XỬ LÝ - QUÁ HẠN (Test cảnh báo đỏ ⚠️)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, nguoi_gui_id, can_bo_phu_trach_id, thoi_gian_tao, thoi_han_xu_ly) VALUES
+                                                                                                                                                                            ('PA005', 'Tiếng ồn quán Karaoke đêm khuya', 'Hát ầm ĩ sau 12h đêm.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 2 DAY)), -- Quá hạn 2 ngày
+                                                                                                                                                                            ('PA006', 'Lấn chiếm vỉa hè bán trà đá', 'Không có lối cho người đi bộ.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'TRUNG_BINH', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 15 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY)), -- Quá hạn 5 ngày
+                                                                                                                                                                            ('PA007', 'Mùi hôi từ xưởng chế biến', 'Xưởng xả thải mùi rất khó chịu.', 'MOI_TRUONG', 'DANG_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY)); -- Quá hạn 1 ngày
+
+-- 3. Nhóm ĐANG XỬ LÝ - TRONG HẠN (Bình thường)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, nguoi_gui_id, can_bo_phu_trach_id, thoi_gian_tao, thoi_han_xu_ly) VALUES
+                                                                                                                                                                            ('PA008', 'Đề nghị cắt tỉa cây xanh', 'Cây phượng sắp đổ vào nhà dân.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 1 DAY), DATE_ADD(NOW(), INTERVAL 2 DAY)),
+                                                                                                                                                                            ('PA009', 'Hố ga mất nắp khu B', 'Nguy hiểm cho trẻ em.', 'HA_TANG_DO_THI', 'DANG_XU_LY', 'TRUNG_BINH', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 2 DAY), DATE_ADD(NOW(), INTERVAL 3 DAY)),
+                                                                                                                                                                            ('PA010', 'Tranh chấp đất đai ngõ 2', 'Hàng xóm xây tường lấn sang.', 'AN_NINH_TRAT_TU', 'DANG_XU_LY', 'TRUNG_BINH', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 3 DAY), DATE_ADD(NOW(), INTERVAL 5 DAY)),
+                                                                                                                                                                            ('PA011', 'Thủ tục đăng ký kết hôn', 'Hồ sơ cần những gì?', 'HANH_CHINH_CONG', 'DANG_XU_LY', 'THAP', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 4 DAY), DATE_ADD(NOW(), INTERVAL 1 DAY));
+
+-- 4. Nhóm ĐÃ XỬ LÝ (Lịch sử cũ)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, nguoi_gui_id, can_bo_phu_trach_id, thoi_gian_tao, danh_gia_hai_long) VALUES
+                                                                                                                                                                               ('PA012', 'Mất nước sinh hoạt toàn khu', 'Đã có nước lại chưa?', 'HA_TANG_DO_THI', 'DA_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 30 DAY), 5),
+                                                                                                                                                                               ('PA013', 'Chó thả rông cắn người', 'Yêu cầu bắt chó thả rông.', 'AN_NINH_TRAT_TU', 'DA_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 25 DAY), 4),
+                                                                                                                                                                               ('PA014', 'Thu phí vệ sinh không đúng', 'Tổ trưởng thu cao hơn quy định.', 'HANH_CHINH_CONG', 'DA_XU_LY', 'TRUNG_BINH', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 28 DAY), 3),
+                                                                                                                                                                               ('PA015', 'Biển báo giao thông bị che khuất', 'Cây che mất biển cấm rẽ phải.', 'GIAO_THONG', 'DA_XU_LY', 'THAP', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 35 DAY), 5),
+                                                                                                                                                                               ('PA016', 'Đăng ký khai sinh online lỗi', 'Web không vào được.', 'HANH_CHINH_CONG', 'DA_XU_LY', 'THAP', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 40 DAY), 4),
+                                                                                                                                                                               ('PA017', 'Hỏi về lịch tiêm chủng', 'Trạm y tế bao giờ tiêm?', 'Y_TE', 'DA_XU_LY', 'THAP', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 45 DAY), 5),
+                                                                                                                                                                               ('PA018', 'Trường tiểu học thu tiền sai', 'Khoản thu tự nguyện nhưng ép buộc.', 'GIAO_DUC', 'DA_XU_LY', 'TRUNG_BINH', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 50 DAY), 2),
+                                                                                                                                                                               ('PA019', 'F0 điều trị tại nhà', 'Cần hỗ trợ thuốc men.', 'Y_TE', 'DA_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 60 DAY), 5),
+                                                                                                                                                                               ('PA020', 'Cột điện nghiêng', 'Sắp đổ sau bão.', 'HA_TANG_DO_THI', 'DA_XU_LY', 'CAO', 'congdan1', 'canbo_con', DATE_SUB(NOW(), INTERVAL 70 DAY), 5);
+
+-- --- TẠO MỘT VÀI LỊCH SỬ CHO CÓ DỮ LIỆU ĐỂ TEST CHI TIẾT ---
+INSERT INTO lich_su_phan_anh (ma_phan_anh, nguoi_thuc_hien_id, hanh_dong, trang_thai_moi, noi_dung, thoi_gian) VALUES
+                                                                                                                   ('PA005', 'congdan1', 'TAO_MOI', 'CHO', 'Gửi phản ánh ồn ào', DATE_SUB(NOW(), INTERVAL 10 DAY)),
+                                                                                                                   ('PA005', 'canbo_to', 'PHAN_CONG', 'DANG_XU_LY', 'Giao cho cán bộ xử lý', DATE_SUB(NOW(), INTERVAL 9 DAY)),
+                                                                                                                   ('PA012', 'canbo_con', 'PHAN_HOI', 'DA_XU_LY', 'Đã cấp nước lại cho khu dân cư', DATE_SUB(NOW(), INTERVAL 29 DAY));
