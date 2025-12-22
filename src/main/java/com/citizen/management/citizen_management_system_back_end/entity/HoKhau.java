@@ -1,5 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,9 +30,11 @@ public class HoKhau {
     // Chủ hộ: FK đến NhanKhau (một nhân khẩu làm chủ hộ)
     @OneToOne
     @JoinColumn(name = "ma_nhan_khau_chu_ho") // FK tới nhân khẩu chủ hộ
+    @JsonIgnoreProperties({"hoKhau", "danhSachTamTru", "danhSachTamVang", "taiKhoan", "hibernateLazyInitializer", "handler"})
     private NhanKhau chuHo;
 
     // Một HoKhau có nhiều NhanKhau (Thành viên hộ)
+    // Giữ nguyên để API lấy chi tiết hộ khẩu vẫn thấy danh sách thành viên
     @OneToMany(mappedBy = "hoKhau", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NhanKhau> danhSachThanhVien = new ArrayList<>();
 

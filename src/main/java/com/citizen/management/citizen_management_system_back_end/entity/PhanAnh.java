@@ -58,8 +58,7 @@ public class PhanAnh {
     @Column(name = "thoi_gian_hoan_thanh")
     private Date thoiGianHoanThanh;
 
-    // --- QUAN TRỌNG: CHẶN VÒNG LẶP Ở ĐÂY ---
-    // Chúng ta ignore luôn "nhanKhau" để tránh việc load lan man sang bảng Hộ khẩu
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ma_tai_khoan_gui", referencedColumnName = "ma_tai_khoan")
     @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "nhanKhau", "matKhau", "hibernateLazyInitializer", "handler"})
@@ -67,7 +66,7 @@ public class PhanAnh {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_can_bo_phu_trach", referencedColumnName = "ma_tai_khoan")
-    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "matKhau", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "nhanKhau", "matKhau", "hibernateLazyInitializer", "handler"})
     private TaiKhoan canBoPhuTrach;
 
     @JsonIgnore
