@@ -104,9 +104,10 @@ INSERT INTO tam_vang (ma_tam_vang, ngay_bat_dau, ngay_ket_thuc, ly_do, ma_nhan_k
 -- End of sample inserts
 
 -- A. TẠO USER
-INSERT INTO tai_khoan (ma_tai_khoan, so_cccd, ho_ten, mat_khau, vai_tro) VALUES
-                                                                             ('user_congdan', '001200000001', 'Nguyễn Văn Dân', '$2a$10$iWwaxM70wph9JdDJyk2EdeY38Ejf2aHYgJCj4hgU6Bsgn5rZe6T2a', 'CONG_DAN'),
-                                                                             ('user_canbo', '001200000002', 'Trần Cán Bộ', '$2a$10$iWwaxM70wph9JdDJyk2EdeY38Ejf2aHYgJCj4hgU6Bsgn5rZe6T2a', 'CAN_BO');
+INSERT INTO tai_khoan (ma_tai_khoan, so_cccd, mat_khau, vai_tro) VALUES
+                                                                             ('user_congdan', '001200000001', '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'CONG_DAN'),
+                                                                             ('user_canbo', '001200000002',  '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'CAN_BO'),
+                                                                             ('user_admin', '001200000003',  '$2a$10$EP6.1.M4e8d3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3r3', 'ADMIN');
 
 -- B. TẠO PHẢN ÁNH (25 Bản ghi)
 
