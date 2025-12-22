@@ -1,15 +1,19 @@
 package com.citizen.management.citizen_management_system_back_end.config;
 
+import com.citizen.management.citizen_management_system_back_end.security.jwt.AuthTokenFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager; // [Mới]
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration; // [Mới]
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -20,13 +24,17 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // 1. Bean Mã hóa mật khẩu (Đã thêm ở bước trước)
+    // Inject Filter do Spring quản lý (Đầy đủ các dependency bên trong)
+    @Autowired
+    private AuthTokenFilter authTokenFilter;
+
+    // [QUAN TRỌNG]: ĐÃ XÓA hàm authenticationJwtTokenFilter() tự tạo bằng new
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. Bean Quản lý xác thực (ĐÂY LÀ CÁI BẠN ĐANG THIẾU DẪN ĐẾN LỖI)
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -35,23 +43,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Kích hoạt CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // Tắt CSRF
                 .csrf(csrf -> csrf.disable())
-
-                // Phân quyền
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Cho phép OPTIONS đi qua (fix lỗi 403 Preflight của React)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Các API Public
                         .requestMatchers("/api/auth/**", "/api/login/**").permitAll()
-
-                        // Cho phép tất cả các request khác (để bạn test cho dễ)
-                        .anyRequest().permitAll()
+                        // API xem hộ khẩu của tôi
+                        .requestMatchers("/api/ho-khau/cua-toi").authenticated()
+                        .anyRequest().authenticated()
                 );
+
+        // [SỬA LẠI]: Dùng trực tiếp biến authTokenFilter đã được Autowired ở trên
+        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -59,19 +63,10 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Cho phép Frontend
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-
-        // Cho phép các method
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-
-        // Cho phép mọi Header
         configuration.setAllowedHeaders(List.of("*"));
-
-        // Cho phép Credentials
         configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

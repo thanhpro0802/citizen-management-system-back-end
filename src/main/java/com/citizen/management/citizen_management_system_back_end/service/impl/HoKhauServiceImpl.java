@@ -28,7 +28,36 @@ public class HoKhauServiceImpl implements HoKhauService {
     @Override
     @Transactional
     public HoKhau taoMoi(HoKhau hoKhau) {
-        return hoKhauRepository.save(hoKhau);
+        // 1. Lưu Hộ khẩu trước để sinh ra ID (maHoKhau)
+        // Lúc này bảng ho_khau đã có dữ liệu, nhưng bảng nhan_khau chưa có ma_ho_khau
+        HoKhau hoKhauMoi = hoKhauRepository.save(hoKhau);
+
+        // 2. Cập nhật mối quan hệ cho Chủ Hộ
+        // Chủ hộ cũng là một thành viên, nên cần set hoKhau cho chủ hộ
+        if (hoKhauMoi.getChuHo() != null) {
+            NhanKhau chuHo = nhanKhauRepository.findById(hoKhauMoi.getChuHo().getMaNhanKhau())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy chủ hộ"));
+
+            // [QUAN TRỌNG]: Gán hộ khẩu này cho chủ hộ
+            chuHo.setHoKhau(hoKhauMoi);
+
+            // Lưu lại nhân khẩu để cập nhật cột ma_ho_khau trong db
+            nhanKhauRepository.save(chuHo);
+        }
+
+        // 3. (Tùy chọn) Nếu form tạo mới có gửi kèm danh sách thành viên khác
+        // Cần duyệt qua list và cập nhật tương tự
+        if (hoKhau.getDanhSachThanhVien() != null) {
+            for (NhanKhau nk : hoKhau.getDanhSachThanhVien()) {
+                NhanKhau thanhVien = nhanKhauRepository.findById(nk.getMaNhanKhau()).orElse(null);
+                if (thanhVien != null) {
+                    thanhVien.setHoKhau(hoKhauMoi);
+                    nhanKhauRepository.save(thanhVien);
+                }
+            }
+        }
+
+        return hoKhauMoi;
     }
 
     @Override
@@ -144,5 +173,21 @@ public class HoKhauServiceImpl implements HoKhauService {
         if (diaChi != null)
             return hoKhauRepository.countByDiaChi(diaChi);
         return hoKhauRepository.count();
+    }
+
+    @Override
+    public HoKhau xemHoKhauCuaToi(String username) {
+        // 1. Tìm nhân khẩu gắn với tài khoản đang đăng nhập
+        NhanKhau nhanKhau = nhanKhauRepository.findByTaiKhoan_Cccd(username)
+                .orElseThrow(() -> new RuntimeException("Tài khoản (CCCD: " + username + ") chưa được liên kết với nhân khẩu nào."));
+
+        // 2. Lấy hộ khẩu của nhân khẩu đó
+        HoKhau hoKhau = nhanKhau.getHoKhau();
+
+        if (hoKhau == null) {
+            throw new RuntimeException("Công dân này chưa thuộc hộ khẩu nào.");
+        }
+
+        return hoKhau;
     }
 }

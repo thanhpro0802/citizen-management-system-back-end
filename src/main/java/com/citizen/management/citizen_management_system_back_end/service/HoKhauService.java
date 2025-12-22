@@ -24,4 +24,6 @@ public interface HoKhauService {
     HoKhau doiChuHo(String maHoKhau, DoiChuHoRequest request);
 
     Long getCountHoKhau(String diaChi);
+
+    HoKhau xemHoKhauCuaToi(String username);
 }

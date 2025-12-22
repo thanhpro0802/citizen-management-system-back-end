@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -66,5 +67,18 @@ public class HoKhauController {
     @PutMapping("/{id}/doi-chu-ho")
     public ResponseEntity<HoKhau> doiChuHo(@PathVariable String id, @RequestBody DoiChuHoRequest request) {
         return ResponseEntity.ok(hoKhauService.doiChuHo(id, request));
+    }
+
+    @GetMapping("/cua-toi")
+    public ResponseEntity<?> xemHoKhauCuaToi(Principal principal) {
+        try {
+            // Lấy username từ token của người dùng đăng nhập
+            String username = principal.getName();
+            HoKhau hoKhau = hoKhauService.xemHoKhauCuaToi(username);
+            return ResponseEntity.ok(hoKhau);
+        } catch (RuntimeException e) {
+            // Trả về lỗi 404 hoặc 400 kèm message để Frontend hiển thị
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }
