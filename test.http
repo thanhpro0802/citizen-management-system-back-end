@@ -1,0 +1,88 @@
+### Gửi một phản ánh mới (Test Giai đoạn 1)
+POST http://localhost:8080/api/v1/phan-anh
+Content-Type: application/json
+
+{
+  "tieuDe": "Đèn đường khu phố A bị hỏng (Test từ IntelliJ)",
+  "noiDung": "Mong phường cho người xuống sửa đèn, đã hỏng 3 ngày.",
+  "linhVuc": "Cơ sở hạ tầng"
+}
+### ------------------------------------
+### Giai đoạn 2: Phân công xử lý
+#
+# Thay "abc-123-xyz" bằng ID Phản ánh bạn vừa tạo ở trên
+#
+PUT http://localhost:8080/api/v1/phan-anh/14d2fa33-eada-49d0-841c-d5bee6249e0d/phan-cong
+Content-Type: application/json
+
+{
+  "maCanBoPhuTrach": "canbo123",
+  "thoiHanXuLy": "2025-11-10"
+}
+### ------------------------------------
+### Giai đoạn 3: Cán bộ cập nhật xử lý nội bộ
+#
+# Thay "id-moi-123" bằng ID Phản ánh bạn vừa tạo ở trên
+#
+POST http://localhost:8080/api/v1/phan-anh/faf21789-1a15-44c6-8f9b-dd0420240120/xu-ly-noi-bo
+Content-Type: application/json
+
+{
+  "noiDungCapNhat": "Đã cử đội kỹ thuật xuống kiểm tra.",
+  "danhSachFileUrl": [
+    "http://storage.cloud/anh_hien_truong_1.jpg",
+    "http://storage.cloud/bien_ban_khao_sat.pdf"
+  ]
+}
+### ------------------------------------
+### Giai đoạn 4: Cán bộ phản hồi công dân
+#
+# Thay "id-can-dong-456" bằng ID Phản ánh bạn vừa tạo ở trên
+#
+POST http://localhost:8080/api/v1/phan-anh/7d5a1222-bbc8-4390-a07f-5d2ea5c79537/phan-hoi
+Content-Type: application/json
+
+{
+  "noiDungPhanHoi": "Sự cố đèn đường đã được khắc phục. Cảm ơn ông/bà đã phản ánh."
+}
+
+### ------------------------------------
+### BƯỚC 1: CÔNG DÂN GỬI
+POST http://localhost:8080/api/v1/phan-anh
+Content-Type: application/json
+
+{
+  "tieuDe": "Test đánh giá",
+  "noiDung": "Nội dung test đánh giá.",
+  "linhVuc": "Test"
+}
+
+### Lấy "maPhanAnh" từ kết quả (ví dụ: "id-danh-gia-789")
+### ------------------------------------
+
+
+### BƯỚC 2: CÁN BỘ PHẢN HỒI (ĐÓNG TICKET)
+#
+# Thay "id-danh-gia-789" bằng ID Phản ánh bạn vừa tạo ở BƯỚC 1
+#
+POST http://localhost:8080/api/v1/phan-anh/a9ab44f5-9e29-4bf3-8e8e-68c1d5d5701f/phan-hoi
+Content-Type: application/json
+
+{
+  "noiDungPhanHoi": "Đã xử lý xong. Mời bạn đánh giá."
+}
+
+### ------------------------------------
+
+
+### BƯỚC 3: CÔNG DÂN ĐÁNH GIÁ (GIAI ĐOẠN MỚI)
+#
+# Dùng lại "maPhanAnh" ở trên
+#
+PUT http://localhost:8080/api/v1/phan-anh/a9ab44f5-9e29-4bf3-8e8e-68c1d5d5701f/danh-gia
+Content-Type: application/json
+
+{
+  "danhGiaHaiLong": 5,
+  "gopYThem": "Xử lý rất nhanh, cảm ơn."
+}

@@ -1,5 +1,5 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +29,7 @@ public class ThongBao {
     //Thong bao gui cho ai?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_nguoi_nhan", referencedColumnName = "ma_tai_khoan")
+    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "nhanKhau", "matKhau", "hibernateLazyInitializer", "handler"})
     private TaiKhoan nguoiNhan;
 
 }

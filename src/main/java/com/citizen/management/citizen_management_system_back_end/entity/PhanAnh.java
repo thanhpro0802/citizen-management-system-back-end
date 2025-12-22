@@ -2,14 +2,14 @@ package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThai;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "phan_anh")
@@ -24,12 +24,17 @@ public class PhanAnh {
     @Column(name = "tieu_de")
     private String tieuDe;
 
+    @Column(name = "noi_dung", columnDefinition = "TEXT")
+    private String noiDung;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "trang_thai_hien_tai")
     private EnumTrangThai trangThaiHienTai;
 
     @Column(name = "linh_vuc")
     private String linhVuc;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "muc_do_khan_cap")
     private EnumMucDoKhanCap mucDoKhanCap;
 
@@ -43,15 +48,25 @@ public class PhanAnh {
     @Column(name = "gop_y")
     private String gopY;
 
-    //Quan he
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "hinh_anh")
+    private String hinhAnh;
+
+    @Column(name = "thoi_gian_tao")
+    private Date thoiGianTao;
+
+    @Temporal(TemporalType.TIMESTAMP) // Lưu cả ngày và giờ
+    @Column(name = "thoi_gian_hoan_thanh")
+    private Date thoiGianHoanThanh;
+
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ma_tai_khoan_gui", referencedColumnName = "ma_tai_khoan")
+    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "nhanKhau", "matKhau", "hibernateLazyInitializer", "handler"})
     private TaiKhoan nguoiGui;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_can_bo_phu_trach", referencedColumnName = "ma_tai_khoan")
+    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "nhanKhau", "matKhau", "hibernateLazyInitializer", "handler"})
     private TaiKhoan canBoPhuTrach;
 
     @JsonIgnore

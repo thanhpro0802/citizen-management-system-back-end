@@ -9,6 +9,7 @@ import com.citizen.management.citizen_management_system_back_end.repository.*;
 import com.citizen.management.citizen_management_system_back_end.service.IPhanAnhService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +36,13 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         pa.setLinhVuc(request.getLinhVuc());
         pa.setNguoiGui(nguoiGui);
 
+        pa.setNoiDung(request.getNoiDung());
+
         //Set trang thai dau
         pa.setTrangThaiHienTai(EnumTrangThai.CHO);
         pa.setMucDoKhanCap(EnumMucDoKhanCap.THAP);
+
+        pa.setThoiGianTao(new Date());
 
         //Luu de lay ID
         PhanAnh paDaLuu = phanAnhRepository.save(pa);
@@ -74,68 +79,103 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     @Transactional
     public PhanAnh phanCongXuLy(String maPhanAnh, PhanCongRequest request, TaiKhoan nguoiPhanCong) {
-        //1.Tim can bo nhan viec
-        TaiKhoan canBoDuocGiao = taiKhoanRepository.findById(request.getMaCanBoPhuTrach()).orElseThrow(() -> new EntityNotFoundException("Khong tim thay can bo voi ma: " + request.getMaCanBoPhuTrach()));
+        // 1. Tìm cán bộ nhận việc (Người cấp dưới)
+        TaiKhoan canBoDuocGiao = taiKhoanRepository.findById(request.getMaCanBoPhuTrach())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy cán bộ với mã: " + request.getMaCanBoPhuTrach()));
 
-        //2.Tim phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh voi ma: " + maPhanAnh));
+        // 2. Tìm phản ánh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy Phản ánh với mã: " + maPhanAnh));
 
-        //3.Cap nhat thong tin
+        // 3. Cập nhật thông tin phản ánh
         pa.setCanBoPhuTrach(canBoDuocGiao);
         pa.setThoiHanXuLy(request.getThoiHanXuLy());
-        pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
+        pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY); // Chuyển sang đang xử lý luôn
 
-        //4.Luu
+        // 4. Lưu phản ánh
         PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
 
-        //5.Tao lich su nhan viec
+        // 5. Ghi lịch sử (Như cũ)
         LichSuPhanAnh ls = new LichSuPhanAnh();
         ls.setPhanAnh(paDaCapNhat);
-        ls.setTaiKhoanThucHien(nguoiPhanCong);
+        ls.setTaiKhoanThucHien(nguoiPhanCong); // Người thực hiện là Sếp (người phân công)
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.PHAN_CONG);
         ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
+        String tenCanBo = "Cán bộ"; // Giá trị mặc định
 
-        // SỬA: Đổi getTenDangNhap() -> getCccd()
-        ls.setNoiDung("Phan cong cho can bo: " + canBoDuocGiao.getCccd());
+        // Kiểm tra xem Tài khoản có liên kết với Nhân khẩu không để tránh NullPointerException
+        if (canBoDuocGiao.getNhanKhau() != null && canBoDuocGiao.getNhanKhau().getHoTen() != null) {
+            tenCanBo = canBoDuocGiao.getNhanKhau().getHoTen();
+        }
 
+        // Format nội dung log: "Phân công cho cán bộ: Nguyễn Văn A (001...)"
+        String noiDungLog = String.format("Phân công cho cán bộ: %s (%s)",
+                tenCanBo,
+                canBoDuocGiao.getCccd());
+        ls.setNoiDung(noiDungLog);
         lichSuRepository.save(ls);
+
+        // --- 6. MỚI: TẠO THÔNG BÁO CHO CÁN BỘ ĐƯỢC GIAO ---
+        ThongBao tb = new ThongBao();
+
+        // Người nhận là Cán bộ cấp dưới (canBoDuocGiao)
+        tb.setNguoiNhan(canBoDuocGiao);
+
+        // Nội dung thông báo
+        tb.setNoiDung("Bạn vừa được phân công xử lý hồ sơ: " + pa.getTieuDe());
+
+        tb.setThoiGian(new Date());
+        tb.setDaXem(false);
+        tb.setMaPhanAnhLienQuan(pa.getMaPhanAnh()); // Để bấm vào thông báo thì nhảy tới hồ sơ
+
+        thongBaoRepository.save(tb);
+        // ---------------------------------------------------
+
         return paDaCapNhat;
     }
 
     @Override
     @Transactional
     public void capNhatXuLyNoiBo(String maPhanAnh, XuLyNoiBoRequest request, TaiKhoan canBoXuLy) {
-        //1.Tim phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
+        // 1. Tìm phản ánh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
 
+        // 2. CHECK QUYỀN: Đảm bảo đúng người mới được ghi nhật ký
+        if (pa.getCanBoPhuTrach() == null || !pa.getCanBoPhuTrach().getMaTaiKhoan().equals(canBoXuLy.getMaTaiKhoan())) {
+            throw new AccessDeniedException("Bạn không phải người phụ trách hồ sơ này!");
+        }
+
+        // 3. Cập nhật trạng thái nếu đang CHỜ
         if (pa.getTrangThaiHienTai() == EnumTrangThai.CHO) {
             pa.setTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
             phanAnhRepository.save(pa);
         }
 
-        //2.Tao lich su ghi nhan viec xu ly noi bo
+        // 4. Ghi lịch sử
         LichSuPhanAnh ls = new LichSuPhanAnh();
         ls.setPhanAnh(pa);
         ls.setTaiKhoanThucHien(canBoXuLy);
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.XU_LY);
-        ls.setNoiDung(request.getNoiDungCapNhat());
-        ls.setTrangThaiMoi(pa.getTrangThaiHienTai());
 
+        // ⚠️ QUAN TRỌNG: Lấy đúng trường "noiDung" (đã sửa ở bước 1)
+        ls.setNoiDung(request.getNoiDung());
+
+        ls.setTrangThaiMoi(pa.getTrangThaiHienTai());
         lichSuRepository.save(ls);
 
-        //3.Xu ly file dinh kem
+        // 5. Xử lý file đính kèm
         if (request.getDanhSachFileUrl() != null && !request.getDanhSachFileUrl().isEmpty()) {
             List<TepDinhKem> tepMoiList = new ArrayList<>();
             for (String fileUrl : request.getDanhSachFileUrl()) {
                 TepDinhKem tep = new TepDinhKem();
                 tep.setPhanAnh(pa);
                 tep.setUrl(fileUrl);
-                tep.setTenFileGoc("File_tu_can_bo_xu_ly.jpg"); //FE xu ly sau
+                tep.setTenFileGoc("File_tu_can_bo_xu_ly.jpg");
                 tepMoiList.add(tep);
             }
-            //Luu tat ca file vao CSDL
             tepDinhKemRepository.saveAll(tepMoiList);
         }
     }
@@ -148,6 +188,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         //2.Cap nhat trang thai
         pa.setTrangThaiHienTai(EnumTrangThai.DA_XU_LY);
+        pa.setThoiGianHoanThanh(new Date());
         PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
 
         //3.Tao lich su ghi nhan phan hoi
@@ -219,5 +260,19 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     public List<PhanAnh> layTatCaPhanAnh() {
         return phanAnhRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public PhanAnh capNhatMucDoKhanCap(String maPhanAnh, EnumMucDoKhanCap mucDoMoi) {
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException(("Không tìm thấy phản ánh: " + maPhanAnh)));
+
+        if (pa.getTrangThaiHienTai() ==  EnumTrangThai.DA_XU_LY) {
+            throw new RuntimeException("Hồ sơ đã đóng, không thể thay đổi mức độ khẩn cấp!");
+        }
+
+        pa.setMucDoKhanCap(mucDoMoi);
+        return phanAnhRepository.save(pa);
     }
 }

@@ -4,6 +4,7 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.*;
 import com.citizen.management.citizen_management_system_back_end.entity.LichSuPhanAnh;
 import com.citizen.management.citizen_management_system_back_end.entity.PhanAnh;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface IPhanAnhService {
     List<LichSuPhanAnh> layLichSuPhanAnh(String maPhanAnh);
 
     List<PhanAnh> layTatCaPhanAnh();
+
+    PhanAnh capNhatMucDoKhanCap(String maPhanAnh, EnumMucDoKhanCap mucDoMoi);
 }

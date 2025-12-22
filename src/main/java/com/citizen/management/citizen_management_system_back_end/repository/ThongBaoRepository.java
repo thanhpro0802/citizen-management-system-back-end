@@ -9,4 +9,5 @@ import java.util.List;
 public interface ThongBaoRepository extends JpaRepository<ThongBao, String> {
     //Lay danh sach thong bao cua user, moi nhat len dau
     List<ThongBao> findAllByNguoiNhanOrderByThoiGianDesc(TaiKhoan nguoiNhan);
+    long countByNguoiNhanAndDaXemFalse(TaiKhoan nguoiNhan);
 }
