@@ -71,13 +71,16 @@ public class HoKhauController {
 
     @GetMapping("/cua-toi")
     public ResponseEntity<?> xemHoKhauCuaToi(Principal principal) {
+        // --- THÊM DÒNG NÀY ---
+        System.out.println("DEBUG: Đã vào được hàm xemHoKhauCuaToi!");
+        System.out.println("DEBUG: User là " + (principal != null ? principal.getName() : "NULL"));
+        // ---------------------
+
         try {
-            // Lấy username từ token của người dùng đăng nhập
             String username = principal.getName();
             HoKhau hoKhau = hoKhauService.xemHoKhauCuaToi(username);
             return ResponseEntity.ok(hoKhau);
         } catch (RuntimeException e) {
-            // Trả về lỗi 404 hoặc 400 kèm message để Frontend hiển thị
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

@@ -4,6 +4,7 @@ import com.citizen.management.citizen_management_system_back_end.enums.EnumTrang
 import java.sql.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.List;
 @Table(name = "nhan_khau")
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class NhanKhau {
 
     @Id

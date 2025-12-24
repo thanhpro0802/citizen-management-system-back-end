@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // [Thêm import]
 @Table(name = "ho_khau") // Theo chuẩn đặt tên của db
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HoKhau {
 
     @Id

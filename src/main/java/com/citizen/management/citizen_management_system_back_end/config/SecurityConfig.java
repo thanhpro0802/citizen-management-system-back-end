@@ -1,6 +1,7 @@
 package com.citizen.management.citizen_management_system_back_end.config;
 
 import com.citizen.management.citizen_management_system_back_end.security.jwt.AuthTokenFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,11 +25,8 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Inject Filter do Spring quản lý (Đầy đủ các dependency bên trong)
     @Autowired
     private AuthTokenFilter authTokenFilter;
-
-    // [QUAN TRỌNG]: ĐÃ XÓA hàm authenticationJwtTokenFilter() tự tạo bằng new
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -49,12 +47,25 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/login/**").permitAll()
-                        // API xem hộ khẩu của tôi
-                        .requestMatchers("/api/ho-khau/cua-toi").authenticated()
-                        .anyRequest().authenticated()
-                );
 
-        // [SỬA LẠI]: Dùng trực tiếp biến authTokenFilter đã được Autowired ở trên
+                        // === QUAN TRỌNG: Đặt rule cụ thể CHO /cua-toi TRƯỚC /api/ho-khau/** ===
+                        .requestMatchers(HttpMethod.GET, "/api/ho-khau/cua-toi").authenticated()
+
+                        // Các API quản lý hộ khẩu (thêm, sửa, xóa, tách, nhập, đổi chủ hộ...) chỉ cho cán bộ
+                        .requestMatchers("/api/ho-khau/**").hasAnyAuthority("CAN_BO")
+
+                        // Các request còn lại cần đăng nhập
+                        .anyRequest().authenticated()
+                )
+                // Xử lý lỗi 403, 401 để dễ debug
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: " + authException.getMessage());
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden: " + accessDeniedException.getMessage());
+                        }));
+
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -63,6 +74,7 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Cho phép frontend localhost:3000 gọi API
         configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(List.of("*"));
