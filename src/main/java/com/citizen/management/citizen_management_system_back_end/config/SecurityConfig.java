@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer; // Import mới
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +24,7 @@ import java.util.Arrays; // Import mới
 import java.util.List;   // Import mới
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired UserDetailsServiceImpl userDetailsService;
 
@@ -58,7 +60,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
+                        .requestMatchers("/api/ho-khau/cua-toi").authenticated()
+                        .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAnyAuthority("CAN_BO", "ADMIN")
                         .requestMatchers("/api/v1/phan-anh/*/phan-cong",
                                 "/api/v1/phan-anh/*/xu-ly-noi-bo",
                                 "/api/v1/phan-anh/*/phan-hoi").hasAuthority("CAN_BO")

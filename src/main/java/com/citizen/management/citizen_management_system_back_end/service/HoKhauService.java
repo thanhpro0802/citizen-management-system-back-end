@@ -4,6 +4,7 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.Doi
 import com.citizen.management.citizen_management_system_back_end.dto.request.NhapHoRequest;
 import com.citizen.management.citizen_management_system_back_end.dto.request.TachHoRequest;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
+import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
 import java.util.List;
 
 public interface HoKhauService {
@@ -15,4 +16,8 @@ public interface HoKhauService {
     HoKhau tachHo(String maHoCu, TachHoRequest request);
     HoKhau nhapHo(String maHoNhapVao, NhapHoRequest request);
     HoKhau doiChuHo(String maHoKhau, DoiChuHoRequest request);
+    
+    // Phương thức mới cho phân quyền
+    HoKhau layHoKhauCuaToi(TaiKhoan taiKhoan);
+    List<HoKhau> timKiemTheoDiaChi(String keyword);
 }

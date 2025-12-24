@@ -5,6 +5,7 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.Nha
 import com.citizen.management.citizen_management_system_back_end.dto.request.TachHoRequest;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
+import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
@@ -135,5 +136,31 @@ public class HoKhauServiceImpl implements HoKhauService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauMoi()));
         hk.setChuHo(chuHoMoi);
         return hoKhauRepository.save(hk);
+    }
+
+    @Override
+    public HoKhau layHoKhauCuaToi(TaiKhoan taiKhoan) {
+        if (taiKhoan == null || taiKhoan.getNhanKhau() == null) {
+            throw new RuntimeException("Tài khoản không hợp lệ hoặc chưa liên kết với nhân khẩu");
+        }
+        
+        String maNhanKhau = taiKhoan.getNhanKhau().getMaNhanKhau();
+        NhanKhau nhanKhau = nhanKhauRepository.findById(maNhanKhau)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + maNhanKhau));
+        
+        HoKhau hoKhau = nhanKhau.getHoKhau();
+        if (hoKhau == null) {
+            throw new RuntimeException("Nhân khẩu chưa thuộc hộ khẩu nào");
+        }
+        
+        return hoKhau;
+    }
+
+    @Override
+    public List<HoKhau> timKiemTheoDiaChi(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return hoKhauRepository.findByDiaChiContainingIgnoreCase(keyword.trim());
     }
 }
