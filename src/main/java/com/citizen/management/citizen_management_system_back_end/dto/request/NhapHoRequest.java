@@ -17,6 +17,10 @@ public class NhapHoRequest {
         this.maHoNhapVao = maHoNhapVao;
     }
 
+    private List<String> cccdNhapVao;
+    public List<String> getCccdNhapVao() {
+        return cccdNhapVao;
+    }
     public List<String> getMaNhanKhauNhapVao() {
         return maNhanKhauNhapVao;
     }
