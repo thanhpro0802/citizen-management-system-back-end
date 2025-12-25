@@ -160,7 +160,6 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         ls.setThoiGian(new Date());
         ls.setHanhDong(EnumHanhDong.XU_LY);
 
-        // ⚠️ QUAN TRỌNG: Lấy đúng trường "noiDung" (đã sửa ở bước 1)
         ls.setNoiDung(request.getNoiDung());
 
         ls.setTrangThaiMoi(pa.getTrangThaiHienTai());
