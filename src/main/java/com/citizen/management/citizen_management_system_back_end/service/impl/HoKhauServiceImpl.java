@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -73,38 +75,32 @@ public class HoKhauServiceImpl implements HoKhauService {
         HoKhau hkHienTai = hoKhauRepository.findById(maHoKhau)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoKhau));
 
+        // 1. Cập nhật thông tin cơ bản
         hkHienTai.setDiaChi(hoKhauSua.getDiaChi());
         hkHienTai.setNgayDangKy(hoKhauSua.getNgayDangKy());
 
-        // [LOGIC ĐỔI CHỦ HỘ BẰNG CCCD HOẶC ID]
+        // Danh sách các ID nhân khẩu sẽ ĐƯỢC GIỮ LẠI trong hộ này (bao gồm Chủ hộ + Thành viên)
+        Set<String> idNhanKhauGiuLai = new HashSet<>();
+
+        // 2. Xử lý Chủ Hộ
         if (hoKhauSua.getChuHo() != null) {
             String cccdMoi = hoKhauSua.getChuHo().getSoCCCD();
-            String idMoi = hoKhauSua.getChuHo().getMaNhanKhau();
+            // Tìm nhân khẩu chủ hộ mới
+            NhanKhau chuHoMoiDb = nhanKhauRepository.findBySoCCCD(cccdMoi)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy chủ hộ mới với CCCD: " + cccdMoi));
 
-            NhanKhau chuHoMoiDb = null;
-            if (idMoi != null && !idMoi.isEmpty()) {
-                chuHoMoiDb = nhanKhauRepository.findById(idMoi).orElse(null);
-            } else if (cccdMoi != null && !cccdMoi.isEmpty()) {
-                chuHoMoiDb = nhanKhauRepository.findBySoCCCD(cccdMoi).orElse(null);
+            // Set chủ hộ mới
+            if (!chuHoMoiDb.equals(hkHienTai.getChuHo())) {
+                chuHoMoiDb.setHoKhau(hkHienTai);
+                chuHoMoiDb.setQuanHeVoiChuHo("Chủ hộ");
+                nhanKhauRepository.save(chuHoMoiDb);
+                hkHienTai.setChuHo(chuHoMoiDb);
             }
-
-            if (chuHoMoiDb != null) {
-                // Nếu người này khác chủ hộ hiện tại
-                String currentOwnerId = hkHienTai.getChuHo() != null ? hkHienTai.getChuHo().getMaNhanKhau() : "";
-                if (!chuHoMoiDb.getMaNhanKhau().equals(currentOwnerId)) {
-                    // Set chủ hộ mới
-                    chuHoMoiDb.setHoKhau(hkHienTai);
-                    chuHoMoiDb.setQuanHeVoiChuHo("Chủ hộ");
-                    nhanKhauRepository.save(chuHoMoiDb);
-                    hkHienTai.setChuHo(chuHoMoiDb);
-                }
-            } else {
-                // Nếu frontend gửi lên mà không tìm thấy thì có thể ném lỗi hoặc bỏ qua tùy nghiệp vụ
-                // throw new RuntimeException("Không tìm thấy chủ hộ mới");
-            }
+            // Thêm ID chủ hộ vào danh sách giữ lại
+            idNhanKhauGiuLai.add(chuHoMoiDb.getMaNhanKhau());
         }
 
-        // Cập nhật danh sách thành viên
+        // 3. Xử lý Danh sách thành viên (Cập nhật quan hệ & Thu thập ID giữ lại)
         if (hoKhauSua.getDanhSachThanhVien() != null) {
             for (NhanKhau nkRequest : hoKhauSua.getDanhSachThanhVien()) {
                 NhanKhau thanhVienDb = nhanKhauRepository.findById(nkRequest.getMaNhanKhau()).orElse(null);
@@ -112,7 +108,23 @@ public class HoKhauServiceImpl implements HoKhauService {
                     thanhVienDb.setHoKhau(hkHienTai);
                     thanhVienDb.setQuanHeVoiChuHo(nkRequest.getQuanHeVoiChuHo());
                     nhanKhauRepository.save(thanhVienDb);
+
+                    // Thêm ID này vào danh sách giữ lại
+                    idNhanKhauGiuLai.add(thanhVienDb.getMaNhanKhau());
                 }
+            }
+        }
+
+        // 4. [QUAN TRỌNG] XÓA NHỮNG NGƯỜI KHÔNG CÒN TRONG DANH SÁCH
+        // Lấy danh sách thành viên hiện tại trong DB ra để kiểm tra
+        // Lưu ý: hkHienTai.getDanhSachThanhVien() lấy từ DB lên
+        List<NhanKhau> thanhVienCu = hkHienTai.getDanhSachThanhVien();
+        for (NhanKhau nk : thanhVienCu) {
+            // Nếu người này KHÔNG nằm trong danh sách giữ lại (tức là đã bị xóa ở Frontend)
+            if (!idNhanKhauGiuLai.contains(nk.getMaNhanKhau())) {
+                nk.setHoKhau(null); // Xóa khỏi hộ
+                nk.setQuanHeVoiChuHo(null); // Reset quan hệ
+                nhanKhauRepository.save(nk);
             }
         }
 
