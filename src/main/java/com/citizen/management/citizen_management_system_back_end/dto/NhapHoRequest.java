@@ -3,13 +3,10 @@ package com.citizen.management.citizen_management_system_back_end.dto;
 import java.util.List;
 
 public class NhapHoRequest {
-    // Mã hộ nhập (hộ đang vào) - kiểu String UUID
-    private String maHoNhapVao;
+    private String maHoNhapVao; // Vẫn giữ ID hộ khẩu đích
+    private List<String> cccdNhanKhauNhapVao; // Thay list UUID bằng list CCCD
+    private String quanHeVoiChuHo;
 
-    // Danh sách nhân khẩu nhập vào - kiểu String UUID
-    private List<String> maNhanKhauNhapVao;
-
-    // Getters và setters
     public String getMaHoNhapVao() {
         return maHoNhapVao;
     }
@@ -17,10 +14,17 @@ public class NhapHoRequest {
         this.maHoNhapVao = maHoNhapVao;
     }
 
-    public List<String> getMaNhanKhauNhapVao() {
-        return maNhanKhauNhapVao;
+    public List<String> getCccdNhanKhauNhapVao() {
+        return cccdNhanKhauNhapVao;
     }
-    public void setMaNhanKhauNhapVao(List<String> maNhanKhauNhapVao) {
-        this.maNhanKhauNhapVao = maNhanKhauNhapVao;
+    public void setCccdNhanKhauNhapVao(List<String> cccdNhanKhauNhapVao) {
+        this.cccdNhanKhauNhapVao = cccdNhanKhauNhapVao;
+    }
+
+    public String getQuanHeVoiChuHo() {
+        return quanHeVoiChuHo;
+    }
+    public void setQuanHeVoiChuHo(String quanHeVoiChuHo) {
+        this.quanHeVoiChuHo = quanHeVoiChuHo;
     }
 }

@@ -1,6 +1,5 @@
 package com.citizen.management.citizen_management_system_back_end.service;
 
-import com.citizen.management.citizen_management_system_back_end.dto.DoiChuHoRequest;
 import com.citizen.management.citizen_management_system_back_end.dto.NhapHoRequest;
 import com.citizen.management.citizen_management_system_back_end.dto.TachHoRequest;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
@@ -9,7 +8,7 @@ import java.util.List;
 public interface HoKhauService {
     HoKhau taoMoi(HoKhau hoKhau);
 
-    HoKhau capNhat(String maHoKhau, HoKhau hoKhauSua); // dùng String cho id
+    HoKhau capNhat(String maHoKhau, HoKhau hoKhauSua);
 
     void xoa(String maHoKhau);
 
@@ -21,7 +20,7 @@ public interface HoKhauService {
 
     HoKhau nhapHo(String maHoNhapVao, NhapHoRequest request);
 
-    HoKhau doiChuHo(String maHoKhau, DoiChuHoRequest request);
+    // Đã xóa doiChuHo vì gộp vào capNhat
 
     Long getCountHoKhau(String diaChi);
 
