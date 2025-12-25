@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/thong-bao")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class ThongBaoController {
     private final ThongBaoRepository thongBaoRepository;
     private final TaiKhoanRepository taiKhoanRepository;

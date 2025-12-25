@@ -22,7 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.criteria.Predicate;
 import java.time.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -349,5 +352,50 @@ public class NhanKhauServiceImpl implements NhanKhauService {
         Long count = tamVangRepository.count();
         int nextNumber = count.intValue() + 1;
         return String.format("TV%03d", nextNumber);
+    }
+
+    /**
+     * Lấy thông tin nhân khẩu và danh sách thành viên cùng hộ khẩu
+     * Dùng cho công dân xem thông tin của mình và hộ khẩu
+     */
+    @Override
+    public Map<String, Object> layThongTinNhanKhauVaHoKhau(String maNhanKhau) {
+        // Lấy thông tin nhân khẩu
+        NhanKhau nhanKhau = nhanKhauRepository.findById(maNhanKhau)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã " + maNhanKhau));
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("nhanKhau", convertToDto(nhanKhau));
+        
+        // Lấy thông tin hộ khẩu và thành viên
+        if (nhanKhau.getHoKhau() != null) {
+            HoKhau hoKhau = nhanKhau.getHoKhau();
+            
+            // Thông tin hộ khẩu
+            Map<String, Object> hoKhauInfo = new HashMap<>();
+            hoKhauInfo.put("maHoKhau", hoKhau.getMaHoKhau());
+            hoKhauInfo.put("diaChi", hoKhau.getDiaChi());
+            hoKhauInfo.put("ngayDangKy", hoKhau.getNgayDangKy());
+            
+            // Thông tin chủ hộ
+            if (hoKhau.getChuHo() != null) {
+                hoKhauInfo.put("chuHo", convertToDto(hoKhau.getChuHo()));
+            }
+            
+            result.put("hoKhau", hoKhauInfo);
+            
+            // Danh sách thành viên cùng hộ khẩu (không bao gồm bản thân)
+            List<NhanKhauDto> thanhVienCungHo = hoKhau.getDanhSachThanhVien().stream()
+                    .filter(tv -> !tv.getMaNhanKhau().equals(maNhanKhau))
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+            
+            result.put("thanhVienCungHo", thanhVienCungHo);
+        } else {
+            result.put("hoKhau", null);
+            result.put("thanhVienCungHo", new ArrayList<>());
+        }
+        
+        return result;
     }
 }
