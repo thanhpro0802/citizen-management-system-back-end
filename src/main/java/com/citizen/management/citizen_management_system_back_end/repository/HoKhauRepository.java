@@ -5,7 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface HoKhauRepository extends JpaRepository<HoKhau, String> {
     // Custom query nếu cần
-
-    Long countByDiaChi(String diaChi);
-
 }
