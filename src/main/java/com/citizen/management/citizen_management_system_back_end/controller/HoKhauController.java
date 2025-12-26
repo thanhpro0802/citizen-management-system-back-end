@@ -1,7 +1,8 @@
 package com.citizen.management.citizen_management_system_back_end.controller;
 
-import com.citizen.management.citizen_management_system_back_end.dto.NhapHoRequest;
-import com.citizen.management.citizen_management_system_back_end.dto.TachHoRequest;
+
+import com.citizen.management.citizen_management_system_back_end.dto.request.NhapHoRequest;
+import com.citizen.management.citizen_management_system_back_end.dto.request.TachHoRequest;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
 import lombok.RequiredArgsConstructor;
