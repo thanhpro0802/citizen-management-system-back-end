@@ -10,5 +10,6 @@ public class JwtResponse {
     private String token;
     private String id;
     private String cccd;
+    private String soDienThoai;
     private List<String> roles;
 }
