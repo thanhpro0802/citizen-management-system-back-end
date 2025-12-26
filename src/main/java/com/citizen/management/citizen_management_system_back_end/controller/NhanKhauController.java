@@ -19,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/nhan-khau")
 @RequiredArgsConstructor
+@CrossOrigin("*") // Cho phép gọi API từ mọi nguồn (Frontend)
 public class NhanKhauController {
 
     private final NhanKhauService nhanKhauService;
@@ -36,10 +37,6 @@ public class NhanKhauController {
     }
 
     // === API MỚI CHO CÔNG DÂN: Xem thông tin nhân khẩu của bản thân và hộ khẩu ===
-    /**
-     * API lấy thông tin nhân khẩu của công dân đang đăng nhập
-     * Trả về: Thông tin nhân khẩu của bản thân + danh sách thành viên cùng hộ khẩu
-     */
     @GetMapping("/cua-toi")
     public ResponseEntity<?> layThongTinNhanKhauCuaToi() {
         TaiKhoan taiKhoan = getTaiKhoanHienTai();
@@ -49,11 +46,12 @@ public class NhanKhauController {
             return ResponseEntity.ok().body(new java.util.HashMap<String, Object>() {{
                 put("message", "Tài khoản chưa được liên kết với nhân khẩu");
                 put("nhanKhau", null);
+                put("hoKhau", null);
                 put("thanhVienCungHo", new java.util.ArrayList<>());
             }});
         }
         
-        // Lấy thông tin nhân khẩu và thành viên cùng hộ
+        // Gọi Service để lấy thông tin chi tiết
         return ResponseEntity.ok(nhanKhauService.layThongTinNhanKhauVaHoKhau(taiKhoan.getNhanKhau().getMaNhanKhau()));
     }
 
@@ -89,8 +87,7 @@ public class NhanKhauController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "maNhanKhau") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
-    ) {
+            @RequestParam(defaultValue = "asc") String sortDir) {
         SearchNhanKhauCriteria criteria = new SearchNhanKhauCriteria();
         criteria.setQ(q);
         criteria.setGioiTinh(gioiTinh);
@@ -116,7 +113,8 @@ public class NhanKhauController {
 
     // TamVang
     @PostMapping("/{ma}/tam-vang")
-    public ResponseEntity<TamVangDto> registerTamVang(@PathVariable("ma") String ma, @Valid @RequestBody TamVangDto dto) {
+    public ResponseEntity<TamVangDto> registerTamVang(@PathVariable("ma") String ma,
+            @Valid @RequestBody TamVangDto dto) {
         dto.setMaNhanKhau(ma);
         return ResponseEntity.ok(nhanKhauService.registerTamVang(dto));
     }

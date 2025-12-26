@@ -3,21 +3,25 @@ package com.citizen.management.citizen_management_system_back_end.dto.request;
 import java.util.List;
 
 public class TachHoRequest {
-    // ID chủ hộ mới (kiểu String UUID)
-    private String maNhanKhauChuHoMoi;
+    // Thay UUID bằng CCCD
+    private String cccdChuHoMoi;
+    private List<String> cccdNhanKhauTachRa;
 
-    // Danh sách mã nhân khẩu tạo hộ mới (UUID)
-    private List<String> maNhanKhauTachRa;
-
-    // thông tin bổ sung
     private String diaChiMoi;
-    private String ngayDangKyMoi; // Nếu muốn thông tin ngày đăng ký hộ mới
+    private String ngayDangKyMoi;
 
-    public String getMaNhanKhauChuHoMoi() {
-        return maNhanKhauChuHoMoi;
+    public String getCccdChuHoMoi() {
+        return cccdChuHoMoi;
     }
-    public void setMaNhanKhauChuHoMoi(String maNhanKhauChuHoMoi) {
-        this.maNhanKhauChuHoMoi = maNhanKhauChuHoMoi;
+    public void setCccdChuHoMoi(String cccdChuHoMoi) {
+        this.cccdChuHoMoi = cccdChuHoMoi;
+    }
+
+    public List<String> getCccdNhanKhauTachRa() {
+        return cccdNhanKhauTachRa;
+    }
+    public void setCccdNhanKhauTachRa(List<String> cccdNhanKhauTachRa) {
+        this.cccdNhanKhauTachRa = cccdNhanKhauTachRa;
     }
 
     public String getDiaChiMoi() {
@@ -25,13 +29,6 @@ public class TachHoRequest {
     }
     public void setDiaChiMoi(String diaChiMoi) {
         this.diaChiMoi = diaChiMoi;
-    }
-
-    public List<String> getMaNhanKhauTachRa() {
-        return maNhanKhauTachRa;
-    }
-    public void setMaNhanKhauTachRa(List<String> maNhanKhauTachRa) {
-        this.maNhanKhauTachRa = maNhanKhauTachRa;
     }
 
     public String getNgayDangKyMoi() {
