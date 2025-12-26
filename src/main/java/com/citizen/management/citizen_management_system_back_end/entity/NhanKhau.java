@@ -1,8 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.entity;
 
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
-import java.sql.Date;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -20,7 +18,6 @@ import java.util.Date;
 @Table(name = "nhan_khau")
 @Getter
 @Setter
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class NhanKhau {
 
     @Id
@@ -53,21 +50,25 @@ public class NhanKhau {
     @Column(name = "trang_thai", nullable = false)
     private EnumTrangThaiNhanKhau trangThai;
 
+    // SỬA: Khi lấy NhanKhau -> Load HoKhau nhưng bỏ qua danhSachThanhVien của hộ đó để tránh loop
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_ho_khau")
-    @JsonIgnore // [THÊM DÒNG NÀY]: Ngắt vòng lặp khi xem NhanKhau sẽ không load lại HoKhau
+    @JsonIgnoreProperties({"danhSachThanhVien", "chuHo", "hibernateLazyInitializer", "handler"})
     private HoKhau hoKhau;
 
+    // SỬA: Bỏ qua danh sách này khi load nhân khẩu để tránh quá tải
     @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
-    @JsonIgnore // [THÊM DÒNG NÀY]: Nên ẩn danh sách tạm trú khi load nhân khẩu để tránh nặng
+    @JsonIgnore
     private List<TamTru> danhSachTamTru;
 
+    // SỬA: Bỏ qua danh sách này khi load nhân khẩu
     @OneToMany(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
-    @JsonIgnore // [THÊM DÒNG NÀY]: Nên ẩn danh sách tạm vắng khi load nhân khẩu để tránh nặng
+    @JsonIgnore
     private List<TamVang> danhSachTamVang;
 
+    // SỬA: Bỏ qua tài khoản để tránh loop NhanKhau <-> TaiKhoan
     @OneToOne(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
-    @JsonIgnore // [THÊM DÒNG NÀY]: Nên ẩn thông tin tài khoản khi load nhân khẩu để tránh lộ thông tin nhạy cảm
+    @JsonIgnore
     private TaiKhoan taiKhoan;
 
 }

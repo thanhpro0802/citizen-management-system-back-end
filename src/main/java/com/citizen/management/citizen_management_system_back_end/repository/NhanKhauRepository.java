@@ -11,8 +11,4 @@ public interface NhanKhauRepository extends JpaRepository<NhanKhau, String>, Jpa
     boolean existsBySoCCCD(String soCCCD);
 
     Optional<NhanKhau> findBySoCCCD(String soCCCD);
-
-    Optional<NhanKhau> findByTaiKhoan_Cccd(String cccd);
-
-    long countByHoKhau(com.citizen.management.citizen_management_system_back_end.entity.HoKhau hoKhau);
 }
