@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer; // Import mới
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +22,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.web.cors.CorsConfiguration; // Import mới
+import org.springframework.web.cors.CorsConfigurationSource; // Import mới
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // Import mới
+
+import java.util.Arrays; // Import mới
+import java.util.List;   // Import mới
 
 @Configuration
 @EnableWebSecurity
@@ -43,6 +51,11 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                // 1. Bật cấu hình CORS tại đây
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -55,6 +68,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/ho-khau/**").hasAnyAuthority("CAN_BO")
 
                         // Các request còn lại cần đăng nhập
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
+                        .requestMatchers("/api/v1/phan-anh/*/phan-cong",
+                                "/api/v1/phan-anh/*/xu-ly-noi-bo",
+                                "/api/v1/phan-anh/*/phan-hoi").hasAuthority("CAN_BO")
                         .anyRequest().authenticated()
                 )
                 // Xử lý lỗi 403, 401 để dễ debug
@@ -79,6 +97,25 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}
+
+    // 2. Thêm Bean cấu hình CORS global
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Cho phép frontend từ localhost:3000
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        // Cho phép các phương thức
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Cho phép tất cả các headers (Authorization, Content-Type, v.v.)
+        configuration.setAllowedHeaders(List.of("*"));
+        // Cho phép gửi credentials (nếu cần thiết sau này)
+        configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
