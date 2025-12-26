@@ -23,6 +23,6 @@ public class NhanKhauDto {
     private String danToc;
     private String quanHeVoiChuHo;
     private String maHoKhau; // id ho khau nếu có
-    private String status; // THUONG_TRU, TAM_TRU, TAM_VANG, KHAI_TU
+    private EnumTrangThaiNhanKhau trangThai; // Enum thay vì String
 
 }

@@ -11,6 +11,11 @@ import lombok.Setter;
 
 import java.util.List;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.Date;
+
 @Entity
 @Table(name = "nhan_khau")
 @Getter
@@ -19,7 +24,6 @@ import java.util.List;
 public class NhanKhau {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_nhan_khau")
     private String maNhanKhau;
 
@@ -45,7 +49,8 @@ public class NhanKhau {
     private String quanHeVoiChuHo;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trang_thai")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "trang_thai", nullable = false)
     private EnumTrangThaiNhanKhau trangThai;
 
     @ManyToOne(fetch = FetchType.LAZY)

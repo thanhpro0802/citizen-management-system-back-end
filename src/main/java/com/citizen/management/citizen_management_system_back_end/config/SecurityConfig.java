@@ -42,52 +42,57 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Cấu hình CORS và CSRF
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+            // 1. Cấu hình CORS và CSRF
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
 
-                // 2. Thiết lập Session là STATELESS (vì dùng JWT)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // 2. Thiết lập Session là STATELESS (vì dùng JWT)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // 3. Phân quyền truy cập (Authorize)
-                .authorizeHttpRequests(auth -> auth
-                        // Cho phép phương thức OPTIONS (để trình duyệt pre-flight check CORS)
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            // 3. Phân quyền truy cập (Authorize)
+            .authorizeHttpRequests(auth -> auth
+                // --- A. PUBLIC ENDPOINTS ---
+                // Cho phép phương thức OPTIONS (pre-flight check CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // API Đăng nhập, Đăng ký
+                .requestMatchers("/api/auth/**", "/api/login/**").permitAll()
 
-                        // Các API Public (Đăng nhập, Đăng ký)
-                        .requestMatchers("/api/auth/**", "/api/login/**").permitAll()
+                // --- B. USER SPECIFIC (CÔNG DÂN & CÁN BỘ ĐỀU DÙNG ĐƯỢC) ---
+                // Rule này phải đặt TRƯỚC các rule chặn quyền CAN_BO
+                .requestMatchers(HttpMethod.GET, "/api/ho-khau/cua-toi").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/nhan-khau/cua-toi").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/v1/phan-anh/cua-toi").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/v1/phan-anh").authenticated() // Ai cũng được gửi phản ánh
 
-                        // === QUAN TRỌNG: Rule cụ thể phải đặt TRƯỚC rule tổng quát ===
+                // --- C. MANAGEMENT ENDPOINTS (CHỈ CÁN BỘ) ---
+                // Quản lý Hộ khẩu & Nhân khẩu (trừ các API /cua-toi đã khai báo ở trên)
+                .requestMatchers("/api/ho-khau/**").hasAuthority("CAN_BO")
+                .requestMatchers("/api/nhan-khau/**").hasAuthority("CAN_BO")
 
-                        // [Riêng] Xem hộ khẩu của chính mình -> Đăng nhập là xem được (USER/CAN_BO đều được)
-                        .requestMatchers(HttpMethod.GET, "/api/ho-khau/cua-toi").authenticated()
+                // Các chức năng xử lý Phản ánh (Phân công, Xử lý nội bộ, Phản hồi)
+                .requestMatchers(
+                        "/api/v1/phan-anh/*/phan-cong",
+                        "/api/v1/phan-anh/*/xu-ly-noi-bo",
+                        "/api/v1/phan-anh/*/phan-hoi",
+                        "/api/v1/phan-anh/*/danh-gia" // Ví dụ
+                ).hasAuthority("CAN_BO")
 
-                        // [Chung] Các API quản lý Hộ khẩu/Nhân khẩu khác -> Chỉ CÁN BỘ
-                        .requestMatchers("/api/ho-khau/**").hasAuthority("CAN_BO")
-                        .requestMatchers("/api/nhan-khau/**").hasAuthority("CAN_BO")
+                // --- D. DEFAULT ---
+                // Tất cả các request còn lại yêu cầu phải đăng nhập
+                .anyRequest().authenticated()
+            )
 
-                        // Các API xử lý Phản ánh (Phân công, Xử lý, Phản hồi) -> Chỉ CÁN BỘ
-                        .requestMatchers(
-                                "/api/v1/phan-anh/*/phan-cong",
-                                "/api/v1/phan-anh/*/xu-ly-noi-bo",
-                                "/api/v1/phan-anh/*/phan-hoi"
-                        ).hasAuthority("CAN_BO")
+            // 4. Xử lý Exception
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Error: Forbidden");
+                })
+            );
 
-                        // Tất cả các request còn lại -> Chỉ cần Đăng nhập
-                        .anyRequest().authenticated()
-                )
-
-                // 4. Xử lý Exception (401 Unauthorized, 403 Forbidden)
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Error: Forbidden");
-                        })
-                );
-
-        // 5. Thêm Filter kiểm tra Token trước
+        // 5. Thêm Filter kiểm tra Token
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -96,13 +101,19 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Cho phép frontend localhost:3000 gọi API
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        // Cho phép đầy đủ các method
+        
+        // Cho phép frontend localhost:3000 và 5173
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:3000",
+            "http://localhost:5173"
+        ));
+        
+        // Cho phép đầy đủ method
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        // Cho phép mọi header
+        
+        // Cho phép đầy đủ header
         configuration.setAllowedHeaders(List.of("*"));
-        // Cho phép gửi credentials (nếu cần cookie/auth header)
+        
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

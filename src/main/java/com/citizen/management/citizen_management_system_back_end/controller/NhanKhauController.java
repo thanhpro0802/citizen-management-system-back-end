@@ -1,23 +1,59 @@
 package com.citizen.management.citizen_management_system_back_end.controller;
 
 import com.citizen.management.citizen_management_system_back_end.dto.*;
+import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
+import com.citizen.management.citizen_management_system_back_end.security.services.UserDetailsImpl;
 import com.citizen.management.citizen_management_system_back_end.service.NhanKhauService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // [Thêm import này]
+import java.util.List;
 
-@RequiredArgsConstructor
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/nhan-khau")
-
+@RequiredArgsConstructor
+@CrossOrigin("*") // Cho phép gọi API từ mọi nguồn (Frontend)
 public class NhanKhauController {
 
     private final NhanKhauService nhanKhauService;
+    private final TaiKhoanRepository taiKhoanRepository;
+
+    // --- Helper Method: Lấy User hiện tại ---
+    private TaiKhoan getTaiKhoanHienTai() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new RuntimeException("Người dùng chưa đăng nhập!");
+        }
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        return taiKhoanRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tài khoản"));
+    }
+
+    // === API MỚI CHO CÔNG DÂN: Xem thông tin nhân khẩu của bản thân và hộ khẩu ===
+    @GetMapping("/cua-toi")
+    public ResponseEntity<?> layThongTinNhanKhauCuaToi() {
+        TaiKhoan taiKhoan = getTaiKhoanHienTai();
+        
+        // Kiểm tra tài khoản có liên kết với nhân khẩu không
+        if (taiKhoan.getNhanKhau() == null) {
+            return ResponseEntity.ok().body(new java.util.HashMap<String, Object>() {{
+                put("message", "Tài khoản chưa được liên kết với nhân khẩu");
+                put("nhanKhau", null);
+                put("hoKhau", null);
+                put("thanhVienCungHo", new java.util.ArrayList<>());
+            }});
+        }
+        
+        // Gọi Service để lấy thông tin chi tiết
+        return ResponseEntity.ok(nhanKhauService.layThongTinNhanKhauVaHoKhau(taiKhoan.getNhanKhau().getMaNhanKhau()));
+    }
 
     @PostMapping
     public ResponseEntity<NhanKhauDto> create(@Valid @RequestBody NhanKhauDto dto) {
