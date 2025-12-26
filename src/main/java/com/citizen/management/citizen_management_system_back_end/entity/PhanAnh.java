@@ -66,7 +66,7 @@ public class PhanAnh {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_can_bo_phu_trach", referencedColumnName = "ma_tai_khoan")
-    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "nhanKhau", "matKhau", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties(value = {"phanAnhDaGui", "phanAnhDaXuLy", "lichSuDaThucHien", "matKhau", "hibernateLazyInitializer", "handler"})
     private TaiKhoan canBoPhuTrach;
 
     @JsonIgnore
