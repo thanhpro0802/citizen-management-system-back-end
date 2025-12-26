@@ -13,7 +13,6 @@ import java.util.Date;
 public class TamTru {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "ma_tam_tru")
     private String maTamTru;
 

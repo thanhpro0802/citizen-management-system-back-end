@@ -23,7 +23,6 @@ import java.util.Map; // Import Map để hứng JSON
 @RestController
 @RequestMapping("/api/v1/phan-anh")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class PhanAnhController {
     private final IPhanAnhService phanAnhService;
     private final TaiKhoanRepository taiKhoanRepository;
