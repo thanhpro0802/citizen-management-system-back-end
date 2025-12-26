@@ -187,35 +187,68 @@ public class HoKhauServiceImpl implements HoKhauService {
     @Override
     @Transactional
     public HoKhau nhapHo(String maHoNhapVao, NhapHoRequest request) {
+        // 1. Lấy hộ khẩu đích (Hộ B)
         HoKhau hoNhapVao = hoKhauRepository.findById(maHoNhapVao)
-                .orElseThrow(() -> new RuntimeException("Hộ khẩu không tồn tại"));
+                .orElseThrow(() -> new RuntimeException("Hộ khẩu nhập vào không tồn tại"));
 
-        // [LOGIC MỚI] Duyệt qua danh sách đối tượng (CCCD + Quan hệ)
+        // Set lưu ID các hộ cũ bị ảnh hưởng
+        Set<String> danhSachMaHoCu = new HashSet<>();
+
         if (request.getDanhSachNhanKhau() != null) {
             for (NhapHoRequest.ThanhVienNhapHo item : request.getDanhSachNhanKhau()) {
                 String cccd = item.getCccd();
                 String quanHe = item.getQuanHeVoiChuHo();
 
+                // Tìm nhân khẩu
                 NhanKhau nk = nhanKhauRepository.findBySoCCCD(cccd)
                         .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu (CCCD: " + cccd + ")"));
 
-                nk.setHoKhau(hoNhapVao);
+                HoKhau hoKhauCu = nk.getHoKhau();
 
-                // Set quan hệ riêng cho từng người
-                if (quanHe != null && !quanHe.trim().isEmpty()) {
-                    nk.setQuanHeVoiChuHo(quanHe);
-                } else {
-                    nk.setQuanHeVoiChuHo("Thành viên"); // Mặc định nếu không nhập
+                // --- XỬ LÝ HỘ CŨ (HỘ A) TRƯỚC KHI CHUYỂN ---
+                if (hoKhauCu != null && !hoKhauCu.getMaHoKhau().equals(maHoNhapVao)) {
+                    danhSachMaHoCu.add(hoKhauCu.getMaHoKhau());
+
+                    // Nếu là chủ hộ cũ -> Gỡ chức chủ hộ ngay
+                    if (hoKhauCu.getChuHo() != null && hoKhauCu.getChuHo().getMaNhanKhau().equals(nk.getMaNhanKhau())) {
+                        hoKhauCu.setChuHo(null);
+                        hoKhauRepository.save(hoKhauCu);
+                    }
                 }
 
+                // --- CHUYỂN SANG HỘ MỚI ---
+                nk.setHoKhau(hoNhapVao);
+                nk.setQuanHeVoiChuHo( (quanHe != null && !quanHe.isBlank()) ? quanHe : "Thành viên" );
+
                 nhanKhauRepository.save(nk);
+
+                // Quan trọng: Thêm vào list Java của hộ mới để đồng bộ
                 hoNhapVao.addThanhVien(nk);
             }
         }
 
-        return hoKhauRepository.save(hoNhapVao);
-    }
+        // Lưu hộ mới
+        HoKhau hoSauKhiNhap = hoKhauRepository.save(hoNhapVao);
 
+        // --- BƯỚC QUAN TRỌNG: FLUSH VÀ XÓA HỘ CŨ ---
+        // Ép Hibernate đẩy mọi thay đổi xuống DB để lệnh count bên dưới chính xác
+        nhanKhauRepository.flush();
+
+        for (String maHoCu : danhSachMaHoCu) {
+            HoKhau hkCu = hoKhauRepository.findById(maHoCu).orElse(null);
+            if (hkCu != null) {
+                // Hỏi trực tiếp Database: Hộ này còn bao nhiêu người?
+                long soThanhVienConLai = nhanKhauRepository.countByHoKhau(hkCu);
+
+                // Nếu không còn chủ hộ VÀ Database bảo là 0 người -> XÓA
+                if (hkCu.getChuHo() == null && soThanhVienConLai == 0) {
+                    hoKhauRepository.delete(hkCu);
+                }
+            }
+        }
+
+        return hoSauKhiNhap;
+    }
     @Override
     public void xoa(String maHoKhau) {
         hoKhauRepository.deleteById(maHoKhau);
