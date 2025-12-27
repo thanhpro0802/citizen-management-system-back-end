@@ -26,6 +26,10 @@ public class ThongBao {
 
     @Column(name = "ma_phan_anh_lien_quan")
     private String maPhanAnhLienQuan;
+    
+    @Column(name = "ma_yeu_cau_cu_tru_lien_quan")
+    private String maYeuCauCuTruLienQuan;
+    
     //Thong bao gui cho ai?
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_nguoi_nhan", referencedColumnName = "ma_tai_khoan")

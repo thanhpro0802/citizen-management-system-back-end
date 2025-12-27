@@ -109,11 +109,12 @@ INSERT INTO tam_vang (
 -- ===================================================================
 -- A. TẠO USER TEST
 -- Mật khẩu: "123456" (BCrypt hash)
+-- QUAN TRỌNG: Các tài khoản được liên kết với nhân khẩu để có thể load thông tin cá nhân
 -- ===================================================================
-INSERT INTO tai_khoan (ma_tai_khoan, so_cccd, mat_khau, vai_tro) VALUES
-    ('user_congdan', '001095034567', '$2a$10$7EqJtq98hPqEX7fNZaFWoOaZ2vR3oC6GqZ0zQ0p4aZC7fQpF0M9p6', 'CONG_DAN'),
-    ('user_canbo', '001080012345',  '$2a$10$7EqJtq98hPqEX7fNZaFWoOaZ2vR3oC6GqZ0zQ0p4aZC7fQpF0M9p6', 'CAN_BO'),
-    ('user_admin', '001090089012',  '$2a$10$7EqJtq98hPqEX7fNZaFWoOaZ2vR3oC6GqZ0zQ0p4aZC7fQpF0M9p6', 'ADMIN');
+INSERT INTO tai_khoan (ma_tai_khoan, so_cccd, mat_khau, so_dien_thoai, vai_tro, nhan_khau_id) VALUES
+    ('user_congdan', '001095034567', '$2a$10$YDB3ULisq.dbvNBoZ/NB.OKoAmEsvi6s22R3dA3J2enm/kVHZJdTW', '0901234567', 'CONG_DAN', 'NK013'),  -- Phan Văn Sơn
+    ('user_canbo',   '001080012345', '$2a$10$YDB3ULisq.dbvNBoZ/NB.OKoAmEsvi6s22R3dA3J2enm/kVHZJdTW', '0912345678', 'CAN_BO',   'NK001'),  -- Nguyễn Văn An (Chủ hộ HK001)
+    ('user_admin',   '001090089012', '$2a$10$YDB3ULisq.dbvNBoZ/NB.OKoAmEsvi6s22R3dA3J2enm/kVHZJdTW', '0923456789', 'ADMIN',    'NK008');  -- Trần Văn Nam (Chủ hộ HK003)
 
 -- B. TẠO PHẢN ÁNH (25 Bản ghi)
 

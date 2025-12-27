@@ -23,25 +23,25 @@ import java.util.stream.Collectors;
 @Service
 public class AuthenticationService {
 
-    @Autowired
-    private TaiKhoanRepository taiKhoanRepository;
+@Autowired
+private TaiKhoanRepository taiKhoanRepository;
 
-    @Autowired
-    private NhanKhauRepository nhanKhauRepository;
+@Autowired
+private NhanKhauRepository nhanKhauRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+@Autowired
+private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+@Autowired
+private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtUtils jwtUtils;
+@Autowired
+private JwtUtils jwtUtils;
 
-    public JwtResponse registerUser(RegisterRequest registerRequest) {
+public JwtResponse registerUser(RegisterRequest registerRequest) {
         // 1. Kiểm tra tồn tại tài khoản
         if (taiKhoanRepository.existsByCccd(registerRequest.getCccd())) {
-            throw new RuntimeException("Tài khoản với số CCCD này đã tồn tại!");
+        throw new RuntimeException("Tài khoản với số CCCD này đã tồn tại!");
         }
 
         // 2. Kiểm tra tồn tại công dân
@@ -72,9 +72,9 @@ public class AuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return createJwtResponse(authentication);
-    }
+}
 
-    public JwtResponse loginUser(LoginRequest loginRequest) {
+public JwtResponse loginUser(LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -85,10 +85,10 @@ public class AuthenticationService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return createJwtResponse(authentication);
-    }
+}
 
-    // --- HÀM NÀY LÀ TRỌNG TÂM CẦN SỬA ---
-    private JwtResponse createJwtResponse(Authentication authentication) {
+// --- HÀM NÀY LÀ TRỌNG TÂM CẦN SỬA ---
+private JwtResponse createJwtResponse(Authentication authentication) {
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
@@ -104,5 +104,5 @@ public class AuthenticationService {
                 userDetails.getSoDienThoai(),  // <--- QUAN TRỌNG: Thêm dòng này để trả về SĐT
                 roles
         );
-    }
+}
 }
