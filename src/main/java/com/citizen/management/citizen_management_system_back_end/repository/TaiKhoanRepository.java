@@ -3,6 +3,8 @@ package com.citizen.management.citizen_management_system_back_end.repository;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumVaiTro;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.List;
 

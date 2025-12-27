@@ -165,3 +165,42 @@ INSERT INTO thong_bao (ma_thong_bao, noi_dung, thoi_gian, da_xem, ma_phan_anh_li
 INSERT INTO lich_su_phan_anh (ma_lich_su, ma_phan_anh, ma_tai_khoan_thuc_hien, hanh_dong, trang_thai_moi, noi_dung, thoi_gian) VALUES
     ('LS-01', 'PA-OVER-01', 'user_congdan', 'TAO_MOI', 'CHO', 'Công dân gửi phản ánh', CURRENT_TIMESTAMP - INTERVAL '10 days'),
     ('LS-02', 'PA-OVER-01', 'user_admin', 'PHAN_CONG', 'DANG_XU_LY', 'Phân công cho cán bộ xử lý', CURRENT_TIMESTAMP - INTERVAL '9 days');
+
+-- =============================================
+-- DỮ LIỆU TEST THỐNG KÊ THEO QUÝ VÀ NĂM
+-- =============================================
+
+-- 1. DỮ LIỆU NĂM 2024 (Để test khi chọn lọc Năm 2024)
+-- Q1 2024 (Tháng 1, 2, 3)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
+                                                                                                                                           ('PA-2024-Q1-01', 'Ồn ào dịp Tết 2024', 'Hát karaoke quá giờ quy định.', 'AN_NINH_TRAT_TU', 'DA_XU_LY', 'TRUNG_BINH', '2024-01-15 20:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2024-Q1-02', 'Xả rác lễ hội đầu năm', 'Rác thải bừa bãi sau lễ hội.', 'MOI_TRUONG', 'DA_XU_LY', 'THAP', '2024-02-20 09:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2024-Q1-03', 'Đèn đường hỏng tháng 3', 'Đèn không sáng.', 'HA_TANG_DO_THI', 'DA_XU_LY', 'THAP', '2024-03-10 18:00:00', 'user_congdan');
+
+-- Q2 2024 (Tháng 4, 5, 6)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
+                                                                                                                                           ('PA-2024-Q2-01', 'Nắng nóng mất nước', 'Khu vực A mất nước 2 ngày.', 'HA_TANG_DO_THI', 'DA_XU_LY', 'CAO', '2024-05-15 10:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2024-Q2-02', 'Trẻ em đá bóng dưới lòng đường', 'Gây nguy hiểm giao thông.', 'AN_NINH_TRAT_TU', 'CHO', 'THAP', '2024-06-01 16:30:00', 'user_congdan');
+
+-- Q3 2024 (Tháng 7, 8, 9)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
+                                                                                                                                           ('PA-2024-Q3-01', 'Ngập lụt mùa mưa', 'Đường ngập sâu sau bão.', 'GIAO_THONG', 'DANG_XU_LY', 'CAO', '2024-08-10 07:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2024-Q3-02', 'Cây đổ chắn ngang đường', 'Cần xử lý gấp.', 'HA_TANG_DO_THI', 'DA_XU_LY', 'CAO', '2024-09-05 08:00:00', 'user_congdan');
+
+-- Q4 2024 (Tháng 10, 11, 12)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
+                                                                                                                                           ('PA-2024-Q4-01', 'Bụi công trình cuối năm', 'Công trình thi công không che chắn.', 'MOI_TRUONG', 'DANG_XU_LY', 'TRUNG_BINH', '2024-11-20 14:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2024-Q4-02', 'Lấn chiếm vỉa hè bán Tết', 'Không có lối đi bộ.', 'TRAT_TU_DO_THI', 'CHO', 'TRUNG_BINH', '2024-12-25 09:00:00', 'user_congdan');
+
+
+-- 2. DỮ LIỆU NĂM 2025 (Để test bộ lọc Quý hiện tại)
+-- Q1 2025 (Tháng 1, 2, 3)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
+                                                                                                                                           ('PA-2025-Q1-01', 'Kẹt xe đầu năm 2025', 'Ùn tắc cục bộ ngã tư.', 'GIAO_THONG', 'CHO', 'THAP', '2025-01-05 08:30:00', 'user_congdan'),
+                                                                                                                                           ('PA-2025-Q1-02', 'Thủ tục hành chính chậm', 'Chờ kết quả quá lâu.', 'HANH_CHINH_CONG', 'DANG_XU_LY', 'TRUNG_BINH', '2025-02-14 10:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2025-Q1-03', 'Hỏi về bảo hiểm y tế', 'Cần hướng dẫn gia hạn.', 'Y_TE', 'DA_XU_LY', 'THAP', '2025-03-01 15:00:00', 'user_congdan');
+
+-- Q2 2025 (Giả lập dữ liệu tương lai để test chart)
+INSERT INTO phan_anh (ma_phan_anh, tieu_de, noi_dung, linh_vuc, trang_thai_hien_tai, muc_do_khan_cap, thoi_gian_tao, ma_tai_khoan_gui) VALUES
+                                                                                                                                           ('PA-2025-Q2-01', 'Dự báo mất điện', 'Thông báo lịch cắt điện.', 'HA_TANG_DO_THI', 'CHO', 'TRUNG_BINH', '2025-04-10 08:00:00', 'user_congdan'),
+                                                                                                                                           ('PA-2025-Q2-02', 'Ve sầu kêu ồn ào', 'Tiếng ồn tự nhiên nhưng quá lớn.', 'MOI_TRUONG', 'DA_XU_LY', 'THAP', '2025-05-20 12:00:00', 'user_congdan');

@@ -63,6 +63,7 @@ public class SecurityConfig {
                 // 3. Phân quyền
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/v1/tai-khoan/**").hasAnyAuthority("CAN_BO", "QUAN_TRI", "ADMIN")
                         
                         // === [CÔNG DÂN] Các API xem thông tin cá nhân (đặt trước rule của cán bộ) ===
                         .requestMatchers("/api/ho-khau/cua-toi").authenticated()
