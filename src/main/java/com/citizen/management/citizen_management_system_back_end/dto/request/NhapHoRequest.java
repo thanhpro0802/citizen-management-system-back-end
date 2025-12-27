@@ -1,4 +1,4 @@
-package com.citizen.management.citizen_management_system_back_end.dto;
+package com.citizen.management.citizen_management_system_back_end.dto.request;
 
 import java.util.List;
 
@@ -17,6 +17,10 @@ public class NhapHoRequest {
         this.maHoNhapVao = maHoNhapVao;
     }
 
+    private List<String> cccdNhapVao;
+    public List<String> getCccdNhapVao() {
+        return cccdNhapVao;
+    }
     public List<String> getMaNhanKhauNhapVao() {
         return maNhanKhauNhapVao;
     }

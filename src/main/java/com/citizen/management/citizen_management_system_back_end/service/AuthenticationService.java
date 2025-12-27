@@ -53,8 +53,9 @@ public class AuthenticationService {
         taiKhoan.setCccd(registerRequest.getCccd());
         taiKhoan.setMatKhau(passwordEncoder.encode(registerRequest.getPassword()));
 
-        // --- THÊM DÒNG NÀY: Lưu số điện thoại ---
+        // Lưu số điện thoại vào database khi đăng ký
         taiKhoan.setSoDienThoai(registerRequest.getSoDienThoai());
+
 
         taiKhoan.setVaiTro(registerRequest.getVaiTro());
 
@@ -74,6 +75,7 @@ public class AuthenticationService {
     }
 
     public JwtResponse loginUser(LoginRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getCccd(),
@@ -85,6 +87,7 @@ public class AuthenticationService {
         return createJwtResponse(authentication);
     }
 
+    // --- HÀM NÀY LÀ TRỌNG TÂM CẦN SỬA ---
     private JwtResponse createJwtResponse(Authentication authentication) {
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
@@ -92,6 +95,14 @@ public class AuthenticationService {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles);
+        // ĐÃ SỬA: Truyền đầy đủ tham số vào constructor của JwtResponse
+        // Đảm bảo UserDetailsImpl đã có các hàm getHoTen(), getEmail(), getSoDienThoai()
+        return new JwtResponse(
+                jwt,
+                userDetails.getId(),
+                userDetails.getUsername(), // cccd
+                userDetails.getSoDienThoai(),  // <--- QUAN TRỌNG: Thêm dòng này để trả về SĐT
+                roles
+        );
     }
 }
