@@ -24,6 +24,10 @@ public class NhanKhau {
     @Column(name = "ma_nhan_khau")
     private String maNhanKhau;
 
+    // Household code for this citizen
+    @Column(name = "ma_ho_khau", insertable = false, updatable = false)
+    private String maHoKhau;
+
     @Column(name = "ho_ten")
     private String hoTen;
 
@@ -47,7 +51,7 @@ public class NhanKhau {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "trang_thai", nullable = false)
+    @Column(name = "trang_thai", nullable = true)
     private EnumTrangThaiNhanKhau trangThai;
 
     // SỬA: Khi lấy NhanKhau -> Load HoKhau nhưng bỏ qua danhSachThanhVien của hộ đó để tránh loop
@@ -70,5 +74,13 @@ public class NhanKhau {
     @OneToOne(mappedBy = "nhanKhau", fetch = FetchType.LAZY)
     @JsonIgnore
     private TaiKhoan taiKhoan;
+
+    public String getMaHoKhau() {
+        return maHoKhau;
+    }
+
+    public void setMaHoKhau(String maHoKhau) {
+        this.maHoKhau = maHoKhau;
+    }
 
 }

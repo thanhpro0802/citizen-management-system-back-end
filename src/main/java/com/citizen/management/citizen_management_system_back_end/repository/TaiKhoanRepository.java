@@ -1,8 +1,10 @@
 package com.citizen.management.citizen_management_system_back_end.repository;
 
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.enums.EnumVaiTro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
+import java.util.List;
 
 public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, String> {
     // SỬA: Tìm theo cccd (khớp với field 'cccd' trong Entity TaiKhoan)
@@ -10,4 +12,7 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, String> {
 
     // SỬA: Kiểm tra tồn tại theo cccd
     Boolean existsByCccd(String cccd);
+    
+    // Tìm tất cả tài khoản theo vai trò
+    List<TaiKhoan> findByVaiTro(EnumVaiTro vaiTro);
 }
