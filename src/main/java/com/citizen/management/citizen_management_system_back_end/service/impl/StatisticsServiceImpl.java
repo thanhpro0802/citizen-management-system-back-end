@@ -43,7 +43,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         // Phản ánh đã hoàn thành
         long phanAnhHoanThanh = phanAnhRepository.countByTrangThaiHienTai(EnumTrangThai.DA_XU_LY);
         
-        // Phản ánh quá hạn (trang thái != DA_XU_LY và thời hạn xử lý < ngày hiện tại)
+        // Phản ánh quá hạn (trạng thái != DA_XU_LY và thời hạn xử lý < ngày hiện tại)
         long phanAnhQuaHan = phanAnhRepository.countByTrangThaiHienTaiNotAndThoiHanXuLyBefore(
             EnumTrangThai.DA_XU_LY, 
             new Date()
