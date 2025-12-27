@@ -42,7 +42,7 @@ public class YeuCauCuTruController {
      * Tạo yêu cầu cư trú mới (CONG_DAN)
      */
     @PostMapping
-    @PreAuthorize("hasAuthority('CONG_DAN')")
+    @PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
     public ResponseEntity<?> taoYeuCau(@Valid @RequestBody YeuCauCuTruRequest request) {
         try {
             TaiKhoan taiKhoan = getTaiKhoanHienTai();
@@ -57,7 +57,7 @@ public class YeuCauCuTruController {
      * Lấy danh sách yêu cầu của tôi (CONG_DAN)
      */
     @GetMapping("/cua-toi")
-    @PreAuthorize("hasAuthority('CONG_DAN')")
+    @PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
     public ResponseEntity<?> layYeuCauCuaToi() {
         try {
             TaiKhoan taiKhoan = getTaiKhoanHienTai();
