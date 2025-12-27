@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/ho-khau/cua-toi").authenticated()
                         .requestMatchers("/api/nhan-khau/cua-toi").authenticated()
                         .requestMatchers("/api/v1/phan-anh/cua-toi").authenticated()
+                        .requestMatchers("/api/chat/**").authenticated()
                         
                         // === [CÁN BỘ] Các API quản lý ===
                         .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
