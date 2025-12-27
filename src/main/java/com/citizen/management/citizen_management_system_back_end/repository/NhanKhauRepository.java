@@ -1,6 +1,7 @@
 package com.citizen.management.citizen_management_system_back_end.repository;
 
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
+import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -14,4 +15,6 @@ public interface NhanKhauRepository extends JpaRepository<NhanKhau, String>, Jpa
     
     // Đếm theo giới tính
     long countByGioiTinh(String gioiTinh);
+
+    long countByTrangThai(EnumTrangThaiNhanKhau trangThai);
 }

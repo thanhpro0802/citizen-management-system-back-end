@@ -24,8 +24,11 @@ public interface HoKhauRepository extends JpaRepository<HoKhau, String> {
             "LOWER(h.chuHo.hoTen) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "h.chuHo.soCCCD LIKE CONCAT('%', :keyword, '%')")
     List<HoKhau> findByChuHoContaining(String keyword);
-    
-    // Đếm theo tháng đăng ký
-    @Query("SELECT FUNCTION('MONTH', h.ngayDangKy) as month, COUNT(h) FROM HoKhau h WHERE FUNCTION('YEAR', h.ngayDangKy) = :year GROUP BY FUNCTION('MONTH', h.ngayDangKy)")
+
+    // Đếm theo tháng đăng ký (FIXED FOR POSTGRESQL)
+    @Query("SELECT CAST(EXTRACT(MONTH FROM h.ngayDangKy) as int) as month, COUNT(h) " +
+            "FROM HoKhau h " +
+            "WHERE EXTRACT(YEAR FROM h.ngayDangKy) = :year " +
+            "GROUP BY CAST(EXTRACT(MONTH FROM h.ngayDangKy) as int)")
     List<Object[]> countByMonth(@Param("year") int year);
 }

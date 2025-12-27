@@ -16,4 +16,6 @@ public class StatisticsDTO {
     private Long phanAnhDangXuLy;
     private Long phanAnhHoanThanh;
     private Long phanAnhQuaHan;
+    private Long tongTamTru;
+    private Long tongTamVang;
 }
