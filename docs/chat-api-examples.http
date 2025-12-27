@@ -1,0 +1,68 @@
+### Gemini AI Chatbot API Testing
+
+# Biến môi trường
+@baseUrl = http://localhost:8080
+@token = YOUR_JWT_TOKEN_HERE
+
+### 1. Test Chat Message - Valid Request
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "Làm thế nào để đăng ký hộ khẩu mới?",
+  "conversationId": "test-conversation-1"
+}
+
+### 2. Test Chat Message - Without Conversation ID
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "Hướng dẫn tôi cách đăng ký tạm trú"
+}
+
+### 3. Test Chat Message - Administrative Question
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "Các bước để tách hộ khẩu là gì?"
+}
+
+### 4. Test Chat Message - System Usage Question
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "Làm sao để xem thông tin cá nhân của tôi trong hệ thống?"
+}
+
+### 5. Test Chat Message - Empty Message (Should Fail)
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": ""
+}
+
+### 6. Test Chat Message - Very Long Message (Should Fail if > 5000 chars)
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "message": "Lorem ipsum dolor sit amet... (text longer than 5000 characters)"
+}
+
+### 7. Test Chat Message - Without Authentication (Should Fail with 401)
+POST {{baseUrl}}/api/chat/message
+Content-Type: application/json
+
+{
+  "message": "Test without auth"
+}
