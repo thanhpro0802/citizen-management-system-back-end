@@ -44,8 +44,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         // Phản ánh quá hạn
         long phanAnhQuaHan = phanAnhRepository.countByTrangThaiHienTaiNotAndThoiHanXuLyBefore(
                 EnumTrangThai.DA_XU_LY,
-                new Date()
-        );
+                new Date());
         dto.setPhanAnhQuaHan(phanAnhQuaHan);
 
         // 3. Số liệu Tạm trú / Tạm vắng
@@ -145,10 +144,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         Date startDate = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Date endDate = Date.from(endLocalDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
 
-        // 3. Gọi Repository với khoảng thời gian đã tính (Cần đảm bảo Repository đã có hàm này)
-        long cho = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.CHO, startDate, endDate);
-        long dangXuLy = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.DANG_XU_LY, startDate, endDate);
-        long daXuLy = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.DA_XU_LY, startDate, endDate);
+        // 3. Gọi Repository với khoảng thời gian đã tính (Cần đảm bảo Repository đã có
+        // hàm này)
+        long cho = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.CHO, startDate,
+                endDate);
+        long dangXuLy = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.DANG_XU_LY,
+                startDate, endDate);
+        long daXuLy = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.DA_XU_LY, startDate,
+                endDate);
 
         result.put("CHO", cho);
         result.put("DANG_XU_LY", dangXuLy);
@@ -167,8 +170,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .filter(pa -> pa.getLinhVuc() != null && !pa.getLinhVuc().trim().isEmpty())
                 .collect(Collectors.groupingBy(
                         PhanAnh::getLinhVuc,
-                        Collectors.counting()
-                ));
+                        Collectors.counting()));
 
         grouped.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())

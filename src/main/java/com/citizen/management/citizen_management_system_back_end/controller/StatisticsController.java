@@ -37,8 +37,7 @@ public class StatisticsController {
     @GetMapping("/phan-anh/trang-thai")
     public ResponseEntity<Map<String, Long>> getPhanAnhByTrangThai(
             @RequestParam(defaultValue = "2025") int year,
-            @RequestParam(defaultValue = "1") int quarter
-    ) {
+            @RequestParam(defaultValue = "1") int quarter) {
         // Truyền tham số xuống Service
         Map<String, Long> statistics = statisticsService.getPhanAnhByTrangThai(year, quarter);
         return ResponseEntity.ok(statistics);

@@ -25,7 +25,8 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Autowired UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -56,33 +57,34 @@ public class SecurityConfig {
                 // 1. Bật cấu hình CORS và tắt CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                
+
                 // 2. Thiết lập Session STATELESS
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                
+
                 // 3. Phân quyền
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/v1/tai-khoan/**").hasAnyAuthority("CAN_BO", "QUAN_TRI", "ADMIN")
-                        
+
+                        .requestMatchers("/api/thong-ke/**").permitAll()
+
                         // === [CÔNG DÂN] Các API xem thông tin cá nhân (đặt trước rule của cán bộ) ===
                         .requestMatchers("/api/ho-khau/cua-toi").authenticated()
                         .requestMatchers("/api/nhan-khau/cua-toi").authenticated()
                         .requestMatchers("/api/v1/phan-anh/cua-toi").authenticated()
                         .requestMatchers("/api/chat/**").authenticated()
-                        
+
                         // === [CÁN BỘ] Các API quản lý ===
                         .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
                         .requestMatchers("/api/statistics/**").hasAnyAuthority("CAN_BO", "ADMIN")
                         .requestMatchers(
                                 "/api/v1/phan-anh/*/phan-cong",
                                 "/api/v1/phan-anh/*/xu-ly-noi-bo",
-                                "/api/v1/phan-anh/*/phan-hoi"
-                        ).hasAuthority("CAN_BO")
-                        
+                                "/api/v1/phan-anh/*/phan-hoi")
+                        .hasAuthority("CAN_BO")
+
                         // Các request còn lại phải đăng nhập
-                        .anyRequest().authenticated()
-                );
+                        .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -97,21 +99,19 @@ public class SecurityConfig {
 
         // Cho phép các origin cụ thể (KHÔNG DÙNG "*" KHI allowCredentials=true)
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173"
-        ));
+                "http://localhost:3000",
+                "http://localhost:5173"));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        
+
         // Liệt kê cụ thể các headers được phép
         configuration.setAllowedHeaders(List.of(
-            "Authorization",
-            "Content-Type",
-            "Accept",
-            "Origin",
-            "X-Requested-With"
-        ));
-        
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With"));
+
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
