@@ -71,6 +71,7 @@ public class SecurityConfig {
                         
                         // === [CÁN BỘ] Các API quản lý ===
                         .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
+                        .requestMatchers("/api/statistics/**").hasAnyAuthority("CAN_BO", "ADMIN")
                         .requestMatchers(
                                 "/api/v1/phan-anh/*/phan-cong",
                                 "/api/v1/phan-anh/*/xu-ly-noi-bo",

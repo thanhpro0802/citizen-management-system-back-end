@@ -11,4 +11,7 @@ public interface NhanKhauRepository extends JpaRepository<NhanKhau, String>, Jpa
     boolean existsBySoCCCD(String soCCCD);
 
     Optional<NhanKhau> findBySoCCCD(String soCCCD);
+    
+    // Đếm theo giới tính
+    long countByGioiTinh(String gioiTinh);
 }
