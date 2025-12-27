@@ -5,7 +5,6 @@ import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau
 import com.citizen.management.citizen_management_system_back_end.entity.PhanAnh;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumMucDoKhanCap;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThai;
-// Thêm import này để dùng enum trạng thái nhân khẩu
 import com.citizen.management.citizen_management_system_back_end.enums.EnumTrangThaiNhanKhau;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime; // Cần thêm import này
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.*;
@@ -48,8 +48,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         );
         dto.setPhanAnhQuaHan(phanAnhQuaHan);
 
-        // 3. Số liệu Tạm trú / Tạm vắng (MỚI THÊM)
-        // Cần đảm bảo bạn đã thêm hàm countByTrangThai vào NhanKhauRepository
+        // 3. Số liệu Tạm trú / Tạm vắng
         long tongTamTru = nhanKhauRepository.countByTrangThai(EnumTrangThaiNhanKhau.TAM_TRU);
         long tongTamVang = nhanKhauRepository.countByTrangThai(EnumTrangThaiNhanKhau.TAM_VANG);
 
@@ -63,11 +62,9 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getNhanKhauByGioiTinh() {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Đếm số lượng theo từng giới tính (nên dùng IgnoreCase như đã trao đổi để an toàn dữ liệu)
         long nam = nhanKhauRepository.countByGioiTinh("Nam");
         long nu = nhanKhauRepository.countByGioiTinh("Nữ");
-        // Có thể thêm logic đếm "Khác" nếu cần thiết
-        long khac = nhanKhauRepository.count() - (nam + nu); // Hoặc query cụ thể
+        long khac = nhanKhauRepository.count() - (nam + nu);
 
         result.put("Nam", nam);
         result.put("Nữ", nu);
@@ -80,14 +77,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getNhanKhauByDoTuoi() {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Khởi tạo các nhóm tuổi
         result.put("0-18", 0L);
         result.put("19-35", 0L);
         result.put("36-50", 0L);
         result.put("51-65", 0L);
         result.put(">65", 0L);
 
-        // Lấy tất cả nhân khẩu để tính độ tuổi
         List<NhanKhau> allNhanKhau = nhanKhauRepository.findAll();
         LocalDate now = LocalDate.now();
 
@@ -116,14 +111,44 @@ public class StatisticsServiceImpl implements StatisticsService {
         return result;
     }
 
+    // --- CẬP NHẬT: Thêm tham số year và quarter ---
     @Override
-    public Map<String, Long> getPhanAnhByTrangThai() {
+    public Map<String, Long> getPhanAnhByTrangThai(int year, int quarter) {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Đếm theo từng trạng thái
-        long cho = phanAnhRepository.countByTrangThaiHienTai(EnumTrangThai.CHO);
-        long dangXuLy = phanAnhRepository.countByTrangThaiHienTai(EnumTrangThai.DANG_XU_LY);
-        long daXuLy = phanAnhRepository.countByTrangThaiHienTai(EnumTrangThai.DA_XU_LY);
+        // 1. Tính toán ngày bắt đầu và kết thúc dựa trên Quý và Năm
+        LocalDate startLocalDate;
+        LocalDate endLocalDate;
+
+        switch (quarter) {
+            case 1: // Quý 1: Tháng 1-3
+                startLocalDate = LocalDate.of(year, 1, 1);
+                endLocalDate = LocalDate.of(year, 3, 31);
+                break;
+            case 2: // Quý 2: Tháng 4-6
+                startLocalDate = LocalDate.of(year, 4, 1);
+                endLocalDate = LocalDate.of(year, 6, 30);
+                break;
+            case 3: // Quý 3: Tháng 7-9
+                startLocalDate = LocalDate.of(year, 7, 1);
+                endLocalDate = LocalDate.of(year, 9, 30);
+                break;
+            case 4: // Quý 4: Tháng 10-12
+                startLocalDate = LocalDate.of(year, 10, 1);
+                endLocalDate = LocalDate.of(year, 12, 31);
+                break;
+            default:
+                throw new IllegalArgumentException("Quý không hợp lệ: " + quarter);
+        }
+
+        // 2. Chuyển đổi LocalDate sang java.util.Date (Start of Day & End of Day)
+        Date startDate = Date.from(startLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endLocalDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
+
+        // 3. Gọi Repository với khoảng thời gian đã tính (Cần đảm bảo Repository đã có hàm này)
+        long cho = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.CHO, startDate, endDate);
+        long dangXuLy = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.DANG_XU_LY, startDate, endDate);
+        long daXuLy = phanAnhRepository.countByTrangThaiHienTaiAndThoiGianTaoBetween(EnumTrangThai.DA_XU_LY, startDate, endDate);
 
         result.put("CHO", cho);
         result.put("DANG_XU_LY", dangXuLy);
@@ -136,7 +161,6 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getPhanAnhByLinhVuc() {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Lấy tất cả phản ánh để nhóm theo lĩnh vực
         List<PhanAnh> allPhanAnh = phanAnhRepository.findAll();
 
         Map<String, Long> grouped = allPhanAnh.stream()
@@ -146,7 +170,6 @@ public class StatisticsServiceImpl implements StatisticsService {
                         Collectors.counting()
                 ));
 
-        // Sắp xếp theo số lượng giảm dần
         grouped.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                 .forEachOrdered(e -> result.put(e.getKey(), e.getValue()));
@@ -158,7 +181,6 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getPhanAnhByMucDoKhanCap() {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Đếm theo từng mức độ khẩn cấp
         long thap = phanAnhRepository.countByMucDoKhanCap(EnumMucDoKhanCap.THAP);
         long trungBinh = phanAnhRepository.countByMucDoKhanCap(EnumMucDoKhanCap.TRUNG_BINH);
         long cao = phanAnhRepository.countByMucDoKhanCap(EnumMucDoKhanCap.CAO);
@@ -174,17 +196,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getPhanAnhByMonth(int year) {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Khởi tạo tất cả 12 tháng với giá trị 0
         for (int i = 1; i <= 12; i++) {
             result.put(String.valueOf(i), 0L);
         }
 
-        // Lấy dữ liệu từ database
         List<Object[]> data = phanAnhRepository.countByMonth(year);
 
-        // Điền dữ liệu vào map
         for (Object[] row : data) {
-            // Ép kiểu cẩn thận vì JDBC có thể trả về các kiểu số khác nhau
             int month = ((Number) row[0]).intValue();
             long count = ((Number) row[1]).longValue();
             result.put(String.valueOf(month), count);
@@ -197,15 +215,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getHoKhauByMonth(int year) {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Khởi tạo tất cả 12 tháng với giá trị 0
         for (int i = 1; i <= 12; i++) {
             result.put(String.valueOf(i), 0L);
         }
 
-        // Lấy dữ liệu từ database
         List<Object[]> data = hoKhauRepository.countByMonth(year);
 
-        // Điền dữ liệu vào map
         for (Object[] row : data) {
             int month = ((Number) row[0]).intValue();
             long count = ((Number) row[1]).longValue();
