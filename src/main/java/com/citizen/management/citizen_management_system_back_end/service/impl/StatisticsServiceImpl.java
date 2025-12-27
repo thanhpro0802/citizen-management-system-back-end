@@ -44,8 +44,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         // Phản ánh quá hạn
         long phanAnhQuaHan = phanAnhRepository.countByTrangThaiHienTaiNotAndThoiHanXuLyBefore(
                 EnumTrangThai.DA_XU_LY,
-                new Date()
-        );
+                new Date());
         dto.setPhanAnhQuaHan(phanAnhQuaHan);
 
         // 3. Số liệu Tạm trú / Tạm vắng (MỚI THÊM)
@@ -63,7 +62,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Map<String, Long> getNhanKhauByGioiTinh() {
         Map<String, Long> result = new LinkedHashMap<>();
 
-        // Đếm số lượng theo từng giới tính (nên dùng IgnoreCase như đã trao đổi để an toàn dữ liệu)
+        // Đếm số lượng theo từng giới tính (nên dùng IgnoreCase như đã trao đổi để an
+        // toàn dữ liệu)
         long nam = nhanKhauRepository.countByGioiTinh("Nam");
         long nu = nhanKhauRepository.countByGioiTinh("Nữ");
         // Có thể thêm logic đếm "Khác" nếu cần thiết
@@ -143,8 +143,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .filter(pa -> pa.getLinhVuc() != null && !pa.getLinhVuc().trim().isEmpty())
                 .collect(Collectors.groupingBy(
                         PhanAnh::getLinhVuc,
-                        Collectors.counting()
-                ));
+                        Collectors.counting()));
 
         // Sắp xếp theo số lượng giảm dần
         grouped.entrySet().stream()
