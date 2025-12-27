@@ -30,13 +30,6 @@ public class ChatController {
         try {
             logger.info("Nhận tin nhắn từ người dùng: {}", request.getMessage());
             
-            // Validate input
-            if (request.getMessage().length() > 5000) {
-                Map<String, String> error = new HashMap<>();
-                error.put("message", "Tin nhắn quá dài. Vui lòng nhập tin nhắn ngắn hơn 5000 ký tự");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-            }
-            
             // Get response from Gemini
             String reply = geminiService.sendMessage(request.getMessage());
             

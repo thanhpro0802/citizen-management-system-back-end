@@ -7,6 +7,13 @@ Hệ thống đã được tích hợp với Google Gemini AI để cung cấp t
 - Cung cấp thông tin về dịch vụ công
 - Trả lời bằng tiếng Việt một cách lịch sự và chuyên nghiệp
 
+## Kiến trúc
+
+Tích hợp này sử dụng:
+- **Spring RestTemplate** để gọi Gemini API REST endpoint
+- **Không cần thêm dependencies** bên ngoài - chỉ sử dụng Spring Boot Web có sẵn
+- **Environment variables** để quản lý API key an toàn
+
 ## Cấu hình
 
 ### 1. Lấy API Key từ Google

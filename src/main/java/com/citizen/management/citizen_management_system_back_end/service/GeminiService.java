@@ -40,6 +40,7 @@ public class GeminiService {
         this.restTemplate = new RestTemplate();
     }
     
+    @SuppressWarnings("unchecked")
     public String sendMessage(String userMessage) {
         try {
             String apiKey = geminiConfig.getApiKey();
@@ -95,20 +96,34 @@ public class GeminiService {
                 Map.class
             );
             
-            // Parse response
+            // Parse response with proper null checks
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 Map<String, Object> responseBody = response.getBody();
-                List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
+                Object candidatesObj = responseBody.get("candidates");
                 
-                if (candidates != null && !candidates.isEmpty()) {
-                    Map<String, Object> candidate = candidates.get(0);
-                    Map<String, Object> contentResponse = (Map<String, Object>) candidate.get("content");
-                    List<Map<String, String>> partsResponse = (List<Map<String, String>>) contentResponse.get("parts");
+                if (candidatesObj instanceof List) {
+                    List<Map<String, Object>> candidates = (List<Map<String, Object>>) candidatesObj;
                     
-                    if (partsResponse != null && !partsResponse.isEmpty()) {
-                        String reply = partsResponse.get(0).get("text");
-                        logger.info("Gemini API trả về thành công");
-                        return reply;
+                    if (!candidates.isEmpty()) {
+                        Map<String, Object> candidate = candidates.get(0);
+                        Object contentObj = candidate.get("content");
+                        
+                        if (contentObj instanceof Map) {
+                            Map<String, Object> contentResponse = (Map<String, Object>) contentObj;
+                            Object partsObj = contentResponse.get("parts");
+                            
+                            if (partsObj instanceof List) {
+                                List<Map<String, String>> partsResponse = (List<Map<String, String>>) partsObj;
+                                
+                                if (!partsResponse.isEmpty()) {
+                                    String reply = partsResponse.get(0).get("text");
+                                    if (reply != null) {
+                                        logger.info("Gemini API trả về thành công");
+                                        return reply;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
