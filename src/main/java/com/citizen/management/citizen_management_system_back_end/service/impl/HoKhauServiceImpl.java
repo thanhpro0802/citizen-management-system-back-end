@@ -127,7 +127,25 @@ public class HoKhauServiceImpl implements HoKhauService {
     @Override
     @Transactional
     public void xoa(String maHoKhau) {
-        hoKhauRepository.deleteById(maHoKhau);
+
+        HoKhau hoKhau = hoKhauRepository.findById(maHoKhau)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy hộ khẩu: " + maHoKhau)
+                );
+
+        // Gỡ chủ hộ
+        hoKhau.setChuHo(null);
+
+        // Gỡ liên kết nhân khẩu
+        for (NhanKhau nk : hoKhau.getDanhSachThanhVien()) {
+            nk.setHoKhau(null);
+            nk.setQuanHeVoiChuHo(null);
+            nhanKhauRepository.save(nk);
+        }
+
+        hoKhau.getDanhSachThanhVien().clear();
+
+        hoKhauRepository.delete(hoKhau);
     }
 
     @Override
