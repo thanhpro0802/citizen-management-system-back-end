@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException; // Import lỗi 403
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +55,7 @@ public class PhanAnhController {
 
     // --- SỬA 1: Đổi thành PUT và đường dẫn ngắn gọn để khớp Frontend ---
     @PutMapping("/{id}/xu-ly")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAN_BO_PHAN_ANH', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<Void> capNhatXuLyNoiBo(@PathVariable String id, @RequestBody XuLyNoiBoRequest request) {
         TaiKhoan canBoXuLy = getTaiKhoanHienTai();
         phanAnhService.capNhatXuLyNoiBo(id, request, canBoXuLy);
@@ -62,6 +64,7 @@ public class PhanAnhController {
 
     // --- SỬA 2: Đổi thành PUT cho đồng bộ ---
     @PutMapping("/{id}/phan-hoi")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAN_BO_PHAN_ANH', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<PhanAnh> phanHoiCongDan(@PathVariable String id, @RequestBody PhanHoiRequest request) {
         TaiKhoan canBoPhanHoi = getTaiKhoanHienTai();
         PhanAnh paCapNhat = phanAnhService.phanHoiCongDan(id, request, canBoPhanHoi);
@@ -122,6 +125,7 @@ public class PhanAnhController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'CAN_BO_PHAN_ANH', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<List<PhanAnh>> layTatCa() {
         return ResponseEntity.ok(phanAnhService.layTatCaPhanAnh());
     }

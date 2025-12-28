@@ -42,7 +42,8 @@ public class YeuCauCuTruController {
      * Tạo yêu cầu cư trú mới (CONG_DAN)
      */
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
+
+    //@PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
     public ResponseEntity<?> taoYeuCau(@Valid @RequestBody YeuCauCuTruRequest request) {
         try {
             TaiKhoan taiKhoan = getTaiKhoanHienTai();
@@ -57,7 +58,7 @@ public class YeuCauCuTruController {
      * Lấy danh sách yêu cầu của tôi (CONG_DAN)
      */
     @GetMapping("/cua-toi")
-    @PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
+    //@PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
     public ResponseEntity<?> layYeuCauCuaToi() {
         try {
             TaiKhoan taiKhoan = getTaiKhoanHienTai();
@@ -88,7 +89,7 @@ public class YeuCauCuTruController {
      * Hủy yêu cầu (CONG_DAN - chỉ khi đang chờ xử lý)
      */
     @PutMapping("/{maYeuCau}/huy")
-    @PreAuthorize("hasAuthority('CONG_DAN')")
+    //@PreAuthorize("hasAuthority('CONG_DAN')")
     public ResponseEntity<?> huyYeuCau(@PathVariable String maYeuCau) {
         try {
             TaiKhoan taiKhoan = getTaiKhoanHienTai();
@@ -105,7 +106,7 @@ public class YeuCauCuTruController {
      * Lấy tất cả yêu cầu (CAN_BO, ADMIN)
      */
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> layTatCaYeuCau(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -122,7 +123,7 @@ public class YeuCauCuTruController {
      * Tìm kiếm yêu cầu theo tiêu chí (CAN_BO, ADMIN)
      */
     @GetMapping("/tim-kiem")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> timKiemYeuCau(
             @RequestParam(required = false) EnumTrangThaiYeuCau trangThai,
             @RequestParam(required = false) EnumLoaiYeuCauCuTru loaiYeuCau,
@@ -141,7 +142,7 @@ public class YeuCauCuTruController {
      * Xử lý yêu cầu (CAN_BO, ADMIN)
      */
     @PutMapping("/{maYeuCau}/xu-ly")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> xuLyYeuCau(
             @PathVariable String maYeuCau,
             @Valid @RequestBody XuLyYeuCauCuTruRequest request) {
@@ -160,7 +161,7 @@ public class YeuCauCuTruController {
      * Phê duyệt yêu cầu (CAN_BO, ADMIN)
      */
     @PutMapping("/{maYeuCau}/phe-duyet")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> pheDuyetYeuCau(
             @PathVariable String maYeuCau,
             @RequestParam(required = false) String ghiChu) {
@@ -179,7 +180,7 @@ public class YeuCauCuTruController {
      * Nhận xử lý yêu cầu (CAN_BO, ADMIN) - Chuyển trạng thái từ CHO_XU_LY -> DANG_XU_LY
      */
     @PutMapping("/{maYeuCau}/nhan-xu-ly")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> nhanXuLyYeuCau(@PathVariable String maYeuCau) {
         try {
             TaiKhoan canBo = getTaiKhoanHienTai();
@@ -196,7 +197,7 @@ public class YeuCauCuTruController {
      * Từ chối yêu cầu (CAN_BO, ADMIN)
      */
     @PutMapping("/{maYeuCau}/tu-choi")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> tuChoiYeuCau(
             @PathVariable String maYeuCau,
             @RequestParam String lyDoTuChoi) {
@@ -215,7 +216,7 @@ public class YeuCauCuTruController {
      * Thống kê số lượng yêu cầu theo trạng thái (CAN_BO, ADMIN)
      */
     @GetMapping("/thong-ke")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> thongKeYeuCau() {
         try {
             long choXuLy = yeuCauService.demYeuCauTheoTrangThai(EnumTrangThaiYeuCau.CHO_XU_LY);
@@ -234,7 +235,7 @@ public class YeuCauCuTruController {
      * Đếm số yêu cầu chờ xử lý (CAN_BO, ADMIN) - Dùng cho badge sidebar
      */
     @GetMapping("/dem-cho-xu-ly")
-    @PreAuthorize("hasAnyAuthority('CAN_BO', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('CAN_BO_HO_KHAU', 'ADMIN', 'TO_TRUONG', 'TO_PHO')")
     public ResponseEntity<?> demYeuCauChoXuLy() {
         try {
             long count = yeuCauService.demYeuCauTheoTrangThai(EnumTrangThaiYeuCau.CHO_XU_LY);

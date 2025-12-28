@@ -88,7 +88,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
                 yeuCau.setPhanCanDieuChinh(request.getPhanCanDieuChinh());
                 yeuCau.setLyDo(request.getLyDo());
                 break;
-                
             case XOA_DANG_KY:
                 yeuCau.setLyDo(request.getLyDo());
                 break;
@@ -101,20 +100,33 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
 
         // Lưu yêu cầu trước
         YeuCauCuTru saved = yeuCauRepository.save(yeuCau);
-        
-        // Tạo thông báo cho TẤT CẢ cán bộ
-        List<TaiKhoan> danhSachCanBo = taiKhoanRepository.findByVaiTro(EnumVaiTro.CAN_BO);
-        for (TaiKhoan canBo : danhSachCanBo) {
+
+        // --- CẬP NHẬT LOGIC GỬI THÔNG BÁO ---
+        // Gửi cho Cán bộ hộ khẩu, Tổ trưởng, Tổ phó, Admin
+        List<EnumVaiTro> rolesCanNotification = Arrays.asList(
+                EnumVaiTro.CAN_BO_HO_KHAU,
+                EnumVaiTro.TO_TRUONG,
+                EnumVaiTro.TO_PHO,
+                EnumVaiTro.ADMIN
+        );
+
+        // Tìm tất cả tài khoản có vai trò phù hợp
+        // Lưu ý: Nếu Repo chưa có findByVaiTroIn thì có thể phải loop hoặc thêm method vào Repo
+        List<TaiKhoan> danhSachNhanThongBao = new ArrayList<>();
+        for (EnumVaiTro role : rolesCanNotification) {
+            danhSachNhanThongBao.addAll(taiKhoanRepository.findByVaiTro(role));
+        }
+
+        for (TaiKhoan canBo : danhSachNhanThongBao) {
             ThongBao tb = new ThongBao();
             tb.setNguoiNhan(canBo);
-            tb.setNoiDung("Yêu cầu mới từ " + nhanKhau.getHoTen() + ": " + 
-                saved.getLoaiYeuCau().getTenHienThi() + " - Mã: " + saved.getMaYeuCau());
+            tb.setNoiDung("Yêu cầu cư trú mới từ " + nhanKhau.getHoTen() + ": " +
+                    saved.getLoaiYeuCau().getTenHienThi() + " - Mã: " + saved.getMaYeuCau());
             tb.setThoiGian(new Date());
             tb.setDaXem(false);
             tb.setMaYeuCauCuTruLienQuan(saved.getMaYeuCau());
             thongBaoRepository.save(tb);
         }
-        
         return convertToResponse(saved);
     }
 
@@ -178,7 +190,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
             EnumTrangThaiYeuCau trangThai,
             EnumLoaiYeuCauCuTru loaiYeuCau,
             Pageable pageable) {
-        
         Page<YeuCauCuTru> yeuCauPage = yeuCauRepository.searchYeuCau(trangThai, loaiYeuCau, null, pageable);
         return yeuCauPage.map(this::convertToResponse);
     }
@@ -198,7 +209,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         yeuCau.setTrangThai(request.getTrangThaiMoi());
         yeuCau.setCanBoXuLy(canBo.getNhanKhau());
         yeuCau.setGhiChu(request.getGhiChu());
-        
         if (request.getTrangThaiMoi() == EnumTrangThaiYeuCau.TU_CHOI) {
             yeuCau.setLyDoTuChoi(request.getLyDoTuChoi());
         }
@@ -221,21 +231,20 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         request.setTrangThaiMoi(EnumTrangThaiYeuCau.DA_PHE_DUYET);
         request.setGhiChu(ghiChu);
         YeuCauCuTruResponse response = xuLyYeuCau(maYeuCau, request, canBo);
-        
+
         // Tạo thông báo cho công dân
         YeuCauCuTru yeuCau = yeuCauRepository.findById(maYeuCau)
-            .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
-        
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
+
         ThongBao tb = new ThongBao();
         tb.setNguoiNhan(yeuCau.getNguoiTao().getTaiKhoan());
-        tb.setNoiDung("Đã phê duyệt: " + yeuCau.getLoaiYeuCau().getTenHienThi() + 
-            " - Mã: " + yeuCau.getMaYeuCau() + 
-            (ghiChu != null && !ghiChu.isEmpty() ? " - Ghi chú: " + ghiChu : ""));
+        tb.setNoiDung("Đã phê duyệt: " + yeuCau.getLoaiYeuCau().getTenHienThi() +
+                " - Mã: " + yeuCau.getMaYeuCau() +
+                (ghiChu != null && !ghiChu.isEmpty() ? " - Ghi chú: " + ghiChu : ""));
         tb.setThoiGian(new Date());
         tb.setDaXem(false);
         tb.setMaYeuCauCuTruLienQuan(yeuCau.getMaYeuCau());
         thongBaoRepository.save(tb);
-        
         return response;
     }
 
@@ -244,6 +253,11 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
     public YeuCauCuTruResponse nhanXuLyYeuCau(String maYeuCau, TaiKhoan canBo) {
         YeuCauCuTru yeuCau = yeuCauRepository.findById(maYeuCau)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
+
+        // Kiểm tra quyền xử lý
+        if (!isCanBo(canBo)) {
+            throw new RuntimeException("Bạn không có quyền nhận xử lý yêu cầu này");
+        }
 
         // Kiểm tra trạng thái hiện tại
         if (yeuCau.getTrangThai() != EnumTrangThaiYeuCau.CHO_XU_LY) {
@@ -266,7 +280,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         tb.setDaXem(false);
         tb.setMaYeuCauCuTruLienQuan(yeuCau.getMaYeuCau());
         thongBaoRepository.save(tb);
-        
         return convertToResponse(updated);
     }
 
@@ -291,7 +304,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         tb.setDaXem(false);
         tb.setMaYeuCauCuTruLienQuan(yeuCau.getMaYeuCau());
         thongBaoRepository.save(tb);
-        
         return response;
     }
 
@@ -383,7 +395,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
                         }
                     }
                 } else if (yeuCau.getLoaiHinhDangKy() == EnumLoaiHinhDangKy.LAP_HO_MOI) {
-                    // Tạo hộ khẩu mới
                     HoKhau hoKhauMoi = new HoKhau();
                     hoKhauMoi.setMaHoKhau("HK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
                     hoKhauMoi.setChuHo(nguoiDeNghi);
@@ -438,8 +449,15 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         return false;
     }
 
+    // --- CẬP NHẬT: CHECK QUYỀN CÁN BỘ DỰA TRÊN ENUM MỚI ---
     private boolean isCanBo(TaiKhoan taiKhoan) {
-        return taiKhoan.getVaiTro() == EnumVaiTro.CAN_BO || taiKhoan.getVaiTro() == EnumVaiTro.ADMIN;
+        EnumVaiTro vaiTro = taiKhoan.getVaiTro();
+        return vaiTro == EnumVaiTro.ADMIN ||
+                vaiTro == EnumVaiTro.TO_TRUONG ||
+                vaiTro == EnumVaiTro.TO_PHO ||
+                vaiTro == EnumVaiTro.CAN_BO_HO_KHAU ||
+                vaiTro == EnumVaiTro.CAN_BO_NHAN_KHAU ||
+                vaiTro == EnumVaiTro.CAN_BO_PHAN_ANH;
     }
 
     private YeuCauCuTruResponse convertToResponse(YeuCauCuTru entity) {

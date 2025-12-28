@@ -15,7 +15,11 @@ public enum EnumVaiTro {
      * Cán bộ: Có các quyền nghiệp vụ như xử lý
      * phản ánh, cập nhật nhân khẩu, hộ khẩu...
      */
-    CAN_BO,
+    CAN_BO_HO_KHAU,
+    CAN_BO_NHAN_KHAU,
+    CAN_BO_PHAN_ANH,
+    TO_TRUONG,
+    TO_PHO,
 
     /**
      * Quản trị viên: Quyền cao nhất, quản lý tài

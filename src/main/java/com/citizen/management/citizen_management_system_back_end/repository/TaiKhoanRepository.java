@@ -17,4 +17,7 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, String> {
     
     // Tìm tất cả tài khoản theo vai trò
     List<TaiKhoan> findByVaiTro(EnumVaiTro vaiTro);
+
+    // THÊM HÀM NÀY:
+    List<TaiKhoan> findByVaiTroIn(List<EnumVaiTro> roles);
 }
