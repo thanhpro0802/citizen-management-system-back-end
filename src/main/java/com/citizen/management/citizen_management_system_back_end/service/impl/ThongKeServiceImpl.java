@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 
 import com.citizen.management.citizen_management_system_back_end.dto.projection.KeyValueProjection;
 import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiProjection;
-import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiTheoNamProjection;
+import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiTheoThangProjection;
+import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiTheoQuyProjection;
+import com.citizen.management.citizen_management_system_back_end.dto.projection.TTTVTheoNamProjection;
 import com.citizen.management.citizen_management_system_back_end.dto.projection.TamTruTamVangProjection;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.enums.EnumThongKe;
@@ -224,8 +226,8 @@ public class ThongKeServiceImpl implements ThongKeService {
 
     private Map<String, Object> thongKePhanAnhTheoTuan(LocalDate startDate) {
         LocalDate monday = startDate.with(DayOfWeek.MONDAY);
-        LocalDateTime start = monday.atStartOfDay();
-        LocalDateTime end = start.plusDays(7);
+        LocalDate start = monday;
+        LocalDate end = start.plusDays(7);
 
         Map<LocalDate, PhanAnhTrangThaiProjection> raw = new HashMap<>();
 
@@ -279,9 +281,9 @@ public class ThongKeServiceImpl implements ThongKeService {
     }
 
     @Override
-    public Map<String, Object> thongKePhanAnhTheoNam(int year) {
+    public Map<String, Object> thongKePhanAnhTheoThang(int year) {
 
-        Map<Integer, PhanAnhTrangThaiTheoNamProjection> raw = new HashMap<>();
+        Map<Integer, PhanAnhTrangThaiTheoThangProjection> raw = new HashMap<>();
 
         thongKeRepository.thongKeTheoThang(year)
                 .forEach(item -> raw.put(item.getThang().intValue(), item));
@@ -294,7 +296,60 @@ public class ThongKeServiceImpl implements ThongKeService {
         for (int month = 1; month <= 12; month++) {
             labels.add(Month.of(month).getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
 
-            PhanAnhTrangThaiTheoNamProjection p = raw.get(month);
+            PhanAnhTrangThaiTheoThangProjection p = raw.get(month);
+
+            choXuLyData.add(p != null ? p.getChoXuLy() : 0);
+            dangXuLyData.add(p != null ? p.getDangXuLy() : 0);
+            daXuLyData.add(p != null ? p.getDaXuLy() : 0);
+        }
+
+        List<Map<String, Object>> datasets = new ArrayList<>();
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Chờ xử lý");
+                put("data", choXuLyData);
+            }
+        });
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Đang xử lý");
+                put("data", dangXuLyData);
+            }
+        });
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Đã xử lý");
+                put("data", daXuLyData);
+            }
+        });
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("datasets", datasets);
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> thongKePhanAnhTheoQuy(int year) {
+
+        Map<Integer, PhanAnhTrangThaiTheoQuyProjection> raw = new HashMap<>();
+
+        thongKeRepository.thongKeTheoQuy(year)
+                .forEach(item -> raw.put(item.getQuy(), item));
+
+        List<String> labels = new ArrayList<>();
+        List<Long> choXuLyData = new ArrayList<>();
+        List<Long> dangXuLyData = new ArrayList<>();
+        List<Long> daXuLyData = new ArrayList<>();
+
+        for (int quy = 1; quy <= 4; quy++) {
+            labels.add("Q" + quy);
+
+            PhanAnhTrangThaiTheoQuyProjection p = raw.get(quy);
 
             choXuLyData.add(p != null ? p.getChoXuLy() : 0);
             dangXuLyData.add(p != null ? p.getDangXuLy() : 0);
@@ -437,6 +492,104 @@ public class ThongKeServiceImpl implements ThongKeService {
             labels.add(date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
 
             TamTruTamVangProjection p = raw.get(date);
+
+            batDauData.add(p != null ? p.getBatDau() : 0);
+            ketThucData.add(p != null ? p.getKetThuc() : 0);
+        }
+
+        List<Map<String, Object>> datasets = new ArrayList<>();
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Bắt đầu");
+                put("data", batDauData);
+            }
+        });
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Kết thúc");
+                put("data", ketThucData);
+            }
+        });
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("datasets", datasets);
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> thongKeTamTruTheoNam(int year) {
+
+        LocalDateTime start = LocalDate.of(year, 1, 1).atStartOfDay();
+        LocalDateTime end = LocalDate.of(year, 12, 31).plusDays(1).atStartOfDay();
+
+        Map<Integer, TTTVTheoNamProjection> raw = new HashMap<>();
+
+        thongKeRepository.thongKeTamTruTheoThang(start, end)
+                .forEach(item -> raw.put(item.getThang(), item));
+
+        List<String> labels = new ArrayList<>();
+        List<Long> batDauData = new ArrayList<>();
+        List<Long> ketThucData = new ArrayList<>();
+
+        for (int month = 1; month <= 12; month++) {
+
+            Month m = Month.of(month);
+            labels.add(m.getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
+
+            TTTVTheoNamProjection p = raw.get(month);
+
+            batDauData.add(p != null ? p.getBatDau() : 0);
+            ketThucData.add(p != null ? p.getKetThuc() : 0);
+        }
+
+        List<Map<String, Object>> datasets = new ArrayList<>();
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Bắt đầu");
+                put("data", batDauData);
+            }
+        });
+
+        datasets.add(new LinkedHashMap<>() {
+            {
+                put("label", "Kết thúc");
+                put("data", ketThucData);
+            }
+        });
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("labels", labels);
+        result.put("datasets", datasets);
+
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> thongKeTamVangTheoNam(int year) {
+
+        LocalDateTime start = LocalDate.of(year, 1, 1).atStartOfDay();
+        LocalDateTime end = LocalDate.of(year, 12, 31).plusDays(1).atStartOfDay();
+
+        Map<Integer, TTTVTheoNamProjection> raw = new HashMap<>();
+
+        thongKeRepository.thongKeTamVangTheoThang(start, end)
+                .forEach(item -> raw.put(item.getThang(), item));
+
+        List<String> labels = new ArrayList<>();
+        List<Long> batDauData = new ArrayList<>();
+        List<Long> ketThucData = new ArrayList<>();
+
+        for (int month = 1; month <= 12; month++) {
+
+            Month m = Month.of(month);
+            labels.add(m.getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
+
+            TTTVTheoNamProjection p = raw.get(month);
 
             batDauData.add(p != null ? p.getBatDau() : 0);
             ketThucData.add(p != null ? p.getKetThuc() : 0);

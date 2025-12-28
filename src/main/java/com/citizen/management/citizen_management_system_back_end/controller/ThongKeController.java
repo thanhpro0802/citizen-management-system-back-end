@@ -41,10 +41,16 @@ public class ThongKeController {
         return ResponseEntity.ok(thongKeService.thongKePhanAnh(types, LocalDate.parse(startDate)));
     }
 
-    @GetMapping("/phan-anh/nam")
-    public ResponseEntity<Map<String, Object>> thongKePhanAnhTheoNam(
+    @GetMapping("/phan-anh/thang")
+    public ResponseEntity<Map<String, Object>> thongKePhanAnhTheoThang(
             @RequestParam int year) {
-        return ResponseEntity.ok(thongKeService.thongKePhanAnhTheoNam(year));
+        return ResponseEntity.ok(thongKeService.thongKePhanAnhTheoThang(year));
+    }
+
+    @GetMapping("/phan-anh/quy")
+    public ResponseEntity<Map<String, Object>> thongKePhanAnhTheoQuy(
+            @RequestParam int year) {
+        return ResponseEntity.ok(thongKeService.thongKePhanAnhTheoQuy(year));
     }
 
     @GetMapping("/tam-tru-tam-vang")
@@ -59,5 +65,17 @@ public class ThongKeController {
             @RequestParam List<EnumThongKe> types,
             @RequestParam String startDate) {
         return ResponseEntity.ok(thongKeService.thongKeTamTruTamVangTheoTuan(types, LocalDate.parse(startDate)));
+    }
+
+    @GetMapping("/tam-tru/thang")
+    public ResponseEntity<Map<String, Object>> thongKeTamTruTheoNam(
+            @RequestParam int year) {
+        return ResponseEntity.ok(thongKeService.thongKeTamTruTheoNam(year));
+    }
+
+    @GetMapping("/tam-vang/thang")
+    public ResponseEntity<Map<String, Object>> thongKeTamVangTheoNam(
+            @RequestParam int year) {
+        return ResponseEntity.ok(thongKeService.thongKeTamVangTheoNam(year));
     }
 }

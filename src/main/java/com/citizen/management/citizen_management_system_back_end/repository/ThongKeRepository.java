@@ -1,5 +1,6 @@
 package com.citizen.management.citizen_management_system_back_end.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,7 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 import com.citizen.management.citizen_management_system_back_end.dto.projection.KeyValueProjection;
 import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiProjection;
-import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiTheoNamProjection;
+import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiTheoThangProjection;
+import com.citizen.management.citizen_management_system_back_end.dto.projection.PhanAnhTrangThaiTheoQuyProjection;
+import com.citizen.management.citizen_management_system_back_end.dto.projection.TTTVTheoNamProjection;
 import com.citizen.management.citizen_management_system_back_end.dto.projection.TamTruTamVangProjection;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 
@@ -56,7 +59,7 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
 
     @Query("""
                 SELECT
-                    FUNCTION('DATE', lspa.thoiGian) AS ngay,
+                    pa.thoiHanXuLy AS ngay,
 
                     COALESCE(SUM(
                         CASE WHEN pa.trangThaiHienTai = 'CHO' THEN 1 ELSE 0 END
@@ -70,19 +73,18 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
                         CASE WHEN pa.trangThaiHienTai = 'DA_XU_LY' THEN 1 ELSE 0 END
                     ), 0) AS daXuLy
 
-                FROM LichSuPhanAnh lspa
-                JOIN lspa.phanAnh pa
-                WHERE lspa.thoiGian BETWEEN :start AND :end
-                GROUP BY FUNCTION('DATE', lspa.thoiGian)
-                ORDER BY FUNCTION('DATE', lspa.thoiGian)
+                FROM PhanAnh pa
+                WHERE pa.thoiHanXuLy BETWEEN :start AND :end
+                GROUP BY pa.thoiHanXuLy
+                ORDER BY pa.thoiHanXuLy
             """)
     List<PhanAnhTrangThaiProjection> thongKeTheoNgay(
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end);
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end);
 
     @Query("""
                 SELECT
-                    EXTRACT(MONTH FROM lspa.thoiGian) AS thang,
+                    EXTRACT(MONTH FROM pa.thoiHanXuLy) AS thang,
 
                     COALESCE(SUM(
                         CASE WHEN pa.trangThaiHienTai = 'CHO' THEN 1 ELSE 0 END
@@ -96,14 +98,27 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
                         CASE WHEN pa.trangThaiHienTai = 'DA_XU_LY' THEN 1 ELSE 0 END
                     ), 0) AS daXuLy
 
-                FROM LichSuPhanAnh lspa
-                JOIN lspa.phanAnh pa
-                WHERE EXTRACT(YEAR FROM lspa.thoiGian) = :year
-                GROUP BY EXTRACT(MONTH FROM lspa.thoiGian)
-                ORDER BY EXTRACT(MONTH FROM lspa.thoiGian)
+                FROM PhanAnh pa
+                WHERE EXTRACT(YEAR FROM pa.thoiHanXuLy) = :year
+                GROUP BY EXTRACT(MONTH FROM pa.thoiHanXuLy)
+                ORDER BY EXTRACT(MONTH FROM pa.thoiHanXuLy)
             """)
-    List<PhanAnhTrangThaiTheoNamProjection> thongKeTheoThang(
-            @Param("year") int year);
+    List<PhanAnhTrangThaiTheoThangProjection> thongKeTheoThang(@Param("year") int year);
+
+    @Query("""
+                SELECT
+                    EXTRACT(QUARTER FROM pa.thoiHanXuLy) AS quy,
+
+                    COALESCE(SUM(CASE WHEN pa.trangThaiHienTai = 'CHO_XU_LY' THEN 1 ELSE 0 END), 0) AS choXuLy,
+                    COALESCE(SUM(CASE WHEN pa.trangThaiHienTai = 'DANG_XU_LY' THEN 1 ELSE 0 END), 0) AS dangXuLy,
+                    COALESCE(SUM(CASE WHEN pa.trangThaiHienTai = 'DA_XU_LY' THEN 1 ELSE 0 END), 0) AS daXuLy
+
+                FROM PhanAnh pa
+                WHERE EXTRACT(YEAR FROM pa.thoiHanXuLy) = :year
+                GROUP BY EXTRACT(QUARTER FROM pa.thoiHanXuLy)
+                ORDER BY EXTRACT(QUARTER FROM pa.thoiHanXuLy)
+            """)
+    List<PhanAnhTrangThaiTheoQuyProjection> thongKeTheoQuy(@Param("year") int year);
 
     @Query("""
                 SELECT COUNT(tt)
@@ -176,6 +191,66 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
                 ORDER BY ngay
             """, nativeQuery = true)
     List<TamTruTamVangProjection> thongKeTamVangTheoNgay(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    @Query("""
+                SELECT
+                    EXTRACT(MONTH FROM tt.ngayBatDau) AS thang,
+
+                    SUM(
+                        CASE
+                            WHEN tt.ngayBatDau BETWEEN :start AND :end THEN 1
+                            ELSE 0
+                        END
+                    ) AS batDau,
+
+                    SUM(
+                        CASE
+                            WHEN tt.ngayKetThuc BETWEEN :start AND :end THEN 1
+                            ELSE 0
+                        END
+                    ) AS ketThuc
+
+                FROM TamTru tt
+                WHERE
+                    tt.ngayBatDau BETWEEN :start AND :end
+                    OR tt.ngayKetThuc BETWEEN :start AND :end
+
+                GROUP BY EXTRACT(MONTH FROM tt.ngayBatDau)
+                ORDER BY thang
+            """)
+    List<TTTVTheoNamProjection> thongKeTamTruTheoThang(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    @Query("""
+                SELECT
+                    EXTRACT(MONTH FROM tv.ngayBatDau) AS thang,
+
+                    SUM(
+                        CASE
+                            WHEN tv.ngayBatDau BETWEEN :start AND :end THEN 1
+                            ELSE 0
+                        END
+                    ) AS batDau,
+
+                    SUM(
+                        CASE
+                            WHEN tv.ngayKetThuc BETWEEN :start AND :end THEN 1
+                            ELSE 0
+                        END
+                    ) AS ketThuc
+
+                FROM TamVang tv
+                WHERE
+                    tv.ngayBatDau BETWEEN :start AND :end
+                    OR tv.ngayKetThuc BETWEEN :start AND :end
+
+                GROUP BY EXTRACT(MONTH FROM tv.ngayBatDau)
+                ORDER BY thang
+            """)
+    List<TTTVTheoNamProjection> thongKeTamVangTheoThang(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
 

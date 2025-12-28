@@ -14,9 +14,16 @@ public interface ThongKeService {
 
     Map<String, Object> thongKePhanAnh(List<EnumThongKe> types, LocalDate startDate);
 
-    Map<String, Object> thongKePhanAnhTheoNam(int year);
+    Map<String, Object> thongKePhanAnhTheoThang(int year);
+
+    Map<String, Object> thongKePhanAnhTheoQuy(int year);
 
     Map<String, Object> thongKeTamTruTamVang(List<EnumThongKe> types, LocalDate startDate);
 
     Map<String, Object> thongKeTamTruTamVangTheoTuan(List<EnumThongKe> types, LocalDate startDate);
+
+    Map<String, Object> thongKeTamTruTheoNam(int year);
+
+    Map<String, Object> thongKeTamVangTheoNam(int year);
+
 }
