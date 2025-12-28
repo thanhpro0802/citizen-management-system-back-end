@@ -7,8 +7,10 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.HoK
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.entity.TamTru;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
+import com.citizen.management.citizen_management_system_back_end.repository.TamTruRepository;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class HoKhauServiceImpl implements HoKhauService {
 
     private final HoKhauRepository hoKhauRepository;
     private final NhanKhauRepository nhanKhauRepository;
+    private final TamTruRepository tamTruRepository;
 
     @Override
     @Transactional
@@ -134,8 +137,32 @@ public class HoKhauServiceImpl implements HoKhauService {
     @Override
     @Transactional
     public void xoa(String maHoKhau) {
-        hoKhauRepository.deleteById(maHoKhau);
+
+        HoKhau hoKhau = hoKhauRepository.findById(maHoKhau)
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy hộ khẩu: " + maHoKhau)
+                );
+
+        // Gỡ chủ hộ
+        hoKhau.setChuHo(null);
+
+        // Gỡ liên kết nhân khẩu
+        for (NhanKhau nk : hoKhau.getDanhSachThanhVien()) {
+            nk.setHoKhau(null);
+            nk.setQuanHeVoiChuHo(null);
+            nhanKhauRepository.save(nk);
+        }
+
+        hoKhau.getDanhSachThanhVien().clear();
+
+        hoKhauRepository.delete(hoKhau);
     }
+
+
+
+
+
+
 
     @Override
     public List<HoKhau> layTatCa() {

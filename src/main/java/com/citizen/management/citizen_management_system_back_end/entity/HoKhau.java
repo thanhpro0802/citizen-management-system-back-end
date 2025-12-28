@@ -13,7 +13,6 @@ import java.util.List;
 @Table(name = "ho_khau")
 @Getter
 @Setter
-// --- THÊM DÒNG NÀY ĐỂ FIX LỖI "No serializer found for ByteBuddyInterceptor" ---
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HoKhau {
 
@@ -25,23 +24,21 @@ public class HoKhau {
     @Column(name = "dia_chi")
     private String diaChi;
 
-    @Column(name = "ngay_dang_ky")
     @Temporal(TemporalType.DATE)
+    @Column(name = "ngay_dang_ky")
     private Date ngayDangKy;
 
-    // Chủ hộ: FK đến NhanKhau (một nhân khẩu làm chủ hộ)
     @OneToOne
     @JoinColumn(name = "ma_nhan_khau_chu_ho")
-    // Dòng này chỉ fix cho trường chuHo, nhưng lỗi của bạn đang bị ở chính class HoKhau
-    @JsonIgnoreProperties({"hoKhau", "danhSachTamTru", "danhSachTamVang", "taiKhoan", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({
+            "hoKhau", "danhSachTamTru", "danhSachTamVang",
+            "taiKhoan", "hibernateLazyInitializer", "handler"
+    })
     private NhanKhau chuHo;
 
-    @OneToMany(mappedBy = "hoKhau", cascade = CascadeType.ALL)
+    // ✅ KHÔNG CASCADE
+    @OneToMany(mappedBy = "hoKhau", fetch = FetchType.LAZY)
     private List<NhanKhau> danhSachThanhVien = new ArrayList<>();
-
-    public List<NhanKhau> getDanhSachThanhVien() {
-        return new ArrayList<>(danhSachThanhVien);
-    }
 
     public void addThanhVien(NhanKhau nk) {
         if (!danhSachThanhVien.contains(nk)) {
@@ -53,17 +50,6 @@ public class HoKhau {
     public void removeThanhVien(NhanKhau nk) {
         if (danhSachThanhVien.remove(nk)) {
             nk.setHoKhau(null);
-        }
-    }
-
-    public void setDanhSachThanhVien(List<NhanKhau> newList) {
-        for (NhanKhau nk : new ArrayList<>(danhSachThanhVien)) {
-            removeThanhVien(nk);
-        }
-        if (newList != null) {
-            for (NhanKhau nk : newList) {
-                addThanhVien(nk);
-            }
         }
     }
 }
