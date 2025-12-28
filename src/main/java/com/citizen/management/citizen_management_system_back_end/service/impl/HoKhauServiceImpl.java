@@ -26,10 +26,7 @@ public class HoKhauServiceImpl implements HoKhauService {
 
     @Override
     @Transactional
-<<<<<<< Updated upstream
-    public HoKhau taoMoi(HoKhau hoKhau) {
-        return hoKhauRepository.save(hoKhau);
-=======
+
     public HoKhau taoMoi(HoKhauRequest request) { // <--- ĐÃ SỬA: Nhận HoKhauRequest
         HoKhau hoKhau = new HoKhau();
 
@@ -70,7 +67,6 @@ public class HoKhauServiceImpl implements HoKhauService {
         hoKhauMoi.addThanhVien(chuHo);
 
         return hoKhauRepository.save(hoKhauMoi);
->>>>>>> Stashed changes
     }
 
     @Override
