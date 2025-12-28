@@ -188,6 +188,7 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
             EnumTrangThaiYeuCau trangThai,
             EnumLoaiYeuCauCuTru loaiYeuCau,
             Pageable pageable) {
+
         Page<YeuCauCuTru> yeuCauPage = yeuCauRepository.searchYeuCau(trangThai, loaiYeuCau, null, pageable);
         return yeuCauPage.map(this::convertToResponse);
     }

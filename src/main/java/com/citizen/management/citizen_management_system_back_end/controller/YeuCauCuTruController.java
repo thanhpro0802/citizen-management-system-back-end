@@ -42,7 +42,6 @@ public class YeuCauCuTruController {
      * Tạo yêu cầu cư trú mới (CONG_DAN)
      */
     @PostMapping
-
     //@PreAuthorize("hasAnyAuthority('CONG_DAN', 'CAN_BO')")
     public ResponseEntity<?> taoYeuCau(@Valid @RequestBody YeuCauCuTruRequest request) {
         try {
