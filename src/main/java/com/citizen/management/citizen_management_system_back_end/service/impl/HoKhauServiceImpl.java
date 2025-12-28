@@ -28,8 +28,46 @@ public class HoKhauServiceImpl implements HoKhauService {
     @Override
     @Transactional
     public HoKhau taoMoi(HoKhau hoKhau) {
-        return hoKhauRepository.save(hoKhau);
+
+        if (hoKhau.getChuHo() == null || hoKhau.getChuHo().getSoCCCD() == null) {
+            throw new RuntimeException("Phải chọn chủ hộ khi tạo hộ khẩu");
+        }
+
+        // 1. Tìm chủ hộ bằng CCCD
+        NhanKhau chuHo = nhanKhauRepository
+                .findBySoCCCD(hoKhau.getChuHo().getSoCCCD().trim())
+                .orElseThrow(() ->
+                        new RuntimeException("Không tìm thấy nhân khẩu với CCCD đã nhập")
+                );
+
+        // 2. Kiểm tra chủ hộ đã có hộ khẩu chưa
+        if (chuHo.getHoKhau() != null) {
+            throw new RuntimeException("Nhân khẩu này đã thuộc một hộ khẩu khác");
+        }
+
+        // 3. Set thông tin hộ khẩu
+        hoKhau.setChuHo(chuHo);
+        hoKhau.setNgayDangKy(new Date());
+
+        // 4. Lưu hộ khẩu trước
+        HoKhau hoKhauDaLuu = hoKhauRepository.save(hoKhau);
+
+        // 5. Gán chủ hộ vào danh sách thành viên
+        if (hoKhauDaLuu.getDanhSachThanhVien() == null) {
+            hoKhauDaLuu.setDanhSachThanhVien(new ArrayList<>());
+        }
+
+        hoKhauDaLuu.addThanhVien(chuHo);
+
+        // 6. Set quan hệ cho chủ hộ
+        chuHo.setHoKhau(hoKhauDaLuu);
+        chuHo.setQuanHeVoiChuHo("CHU_HO");
+        nhanKhauRepository.save(chuHo);
+
+        return hoKhauDaLuu;
     }
+
+
 
     @Override
     @Transactional
