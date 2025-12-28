@@ -9,7 +9,7 @@ import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan
 import java.util.List;
 
 public interface HoKhauService {
-    HoKhau taoMoi(HoKhau hoKhau); // Bạn có thể muốn đổi cái này sang DTO sau này (ví dụ: create)
+    HoKhau taoMoi(HoKhauRequest request); // Bạn có thể muốn đổi cái này sang DTO sau này (ví dụ: create)
 
     HoKhau update(String maHoKhau, HoKhauRequest request);
 

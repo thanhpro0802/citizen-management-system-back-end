@@ -15,4 +15,7 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, String> {
     Boolean existsByCccd(String cccd);
 
     List<TaiKhoan> findByVaiTro(EnumVaiTro vaiTro);
+
+    // THÊM HÀM NÀY:
+    List<TaiKhoan> findByVaiTroIn(List<EnumVaiTro> roles);
 }
