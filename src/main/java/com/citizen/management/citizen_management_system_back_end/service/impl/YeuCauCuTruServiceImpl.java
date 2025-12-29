@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -246,9 +247,17 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
             tamTru.setMaTamTru(UUID.randomUUID().toString());
             tamTru.setNhanKhau(yeuCau.getNguoiTao());
 
-            // lấy thời gian từ yêu cầu cư trú
-            tamTru.setNgayBatDau(yeuCau.getThoiGianBatDau());
-            tamTru.setNgayKetThuc(yeuCau.getThoiGianKetThuc());
+            // ===== NGÀY BẮT ĐẦU = NGÀY TẠO YÊU CẦU =====
+            Date ngayBatDau = yeuCau.getNgayTao();
+            tamTru.setNgayBatDau(ngayBatDau);
+
+            // ===== NGÀY KẾT THÚC = SAU 12 THÁNG =====
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(ngayBatDau);
+            calendar.add(Calendar.MONTH, 12);
+            tamTru.setNgayKetThuc(calendar.getTime());
+
+            // ===== LÝ DO =====
             tamTru.setLyDo(yeuCau.getLyDo());
 
             tamTruRepository.save(tamTru);
