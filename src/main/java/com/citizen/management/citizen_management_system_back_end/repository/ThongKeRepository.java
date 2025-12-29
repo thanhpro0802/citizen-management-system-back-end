@@ -59,7 +59,7 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
 
     @Query("""
                 SELECT
-                    pa.thoiHanXuLy AS ngay,
+                    FUNCTION('DATE', pa.thoiGianTao) AS ngay,
 
                     COALESCE(SUM(
                         CASE WHEN pa.trangThaiHienTai = 'CHO' THEN 1 ELSE 0 END
@@ -74,17 +74,17 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
                     ), 0) AS daXuLy
 
                 FROM PhanAnh pa
-                WHERE pa.thoiHanXuLy BETWEEN :start AND :end
-                GROUP BY pa.thoiHanXuLy
-                ORDER BY pa.thoiHanXuLy
+                WHERE pa.thoiGianTao BETWEEN :start AND :end
+                GROUP BY FUNCTION('DATE', pa.thoiGianTao)
+                ORDER BY FUNCTION('DATE', pa.thoiGianTao)
             """)
     List<PhanAnhTrangThaiProjection> thongKeTheoNgay(
-            @Param("start") LocalDate start,
-            @Param("end") LocalDate end);
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
 
     @Query("""
                 SELECT
-                    EXTRACT(MONTH FROM pa.thoiHanXuLy) AS thang,
+                    MONTH(pa.thoiGianTao) AS thang,
 
                     COALESCE(SUM(
                         CASE WHEN pa.trangThaiHienTai = 'CHO' THEN 1 ELSE 0 END
@@ -99,26 +99,36 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
                     ), 0) AS daXuLy
 
                 FROM PhanAnh pa
-                WHERE EXTRACT(YEAR FROM pa.thoiHanXuLy) = :year
-                GROUP BY EXTRACT(MONTH FROM pa.thoiHanXuLy)
-                ORDER BY EXTRACT(MONTH FROM pa.thoiHanXuLy)
+                WHERE YEAR(pa.thoiGianTao) = :year
+                GROUP BY MONTH(pa.thoiGianTao)
+                ORDER BY MONTH(pa.thoiGianTao)
             """)
-    List<PhanAnhTrangThaiTheoThangProjection> thongKeTheoThang(@Param("year") int year);
+    List<PhanAnhTrangThaiTheoThangProjection> thongKeTheoThang(
+            @Param("year") int year);
 
     @Query("""
                 SELECT
-                    EXTRACT(QUARTER FROM pa.thoiHanXuLy) AS quy,
+                    ((MONTH(pa.thoiGianTao) - 1) / 3 + 1) AS quy,
 
-                    COALESCE(SUM(CASE WHEN pa.trangThaiHienTai = 'CHO_XU_LY' THEN 1 ELSE 0 END), 0) AS choXuLy,
-                    COALESCE(SUM(CASE WHEN pa.trangThaiHienTai = 'DANG_XU_LY' THEN 1 ELSE 0 END), 0) AS dangXuLy,
-                    COALESCE(SUM(CASE WHEN pa.trangThaiHienTai = 'DA_XU_LY' THEN 1 ELSE 0 END), 0) AS daXuLy
+                    COALESCE(SUM(
+                        CASE WHEN pa.trangThaiHienTai = 'CHO' THEN 1 ELSE 0 END
+                    ), 0) AS choXuLy,
+
+                    COALESCE(SUM(
+                        CASE WHEN pa.trangThaiHienTai = 'DANG_XU_LY' THEN 1 ELSE 0 END
+                    ), 0) AS dangXuLy,
+
+                    COALESCE(SUM(
+                        CASE WHEN pa.trangThaiHienTai = 'DA_XU_LY' THEN 1 ELSE 0 END
+                    ), 0) AS daXuLy
 
                 FROM PhanAnh pa
-                WHERE EXTRACT(YEAR FROM pa.thoiHanXuLy) = :year
-                GROUP BY EXTRACT(QUARTER FROM pa.thoiHanXuLy)
-                ORDER BY EXTRACT(QUARTER FROM pa.thoiHanXuLy)
+                WHERE YEAR(pa.thoiGianTao) = :year
+                GROUP BY ((MONTH(pa.thoiGianTao) - 1) / 3 + 1)
+                ORDER BY ((MONTH(pa.thoiGianTao) - 1) / 3 + 1)
             """)
-    List<PhanAnhTrangThaiTheoQuyProjection> thongKeTheoQuy(@Param("year") int year);
+    List<PhanAnhTrangThaiTheoQuyProjection> thongKeTheoQuy(
+            @Param("year") int year);
 
     @Query("""
                 SELECT COUNT(tt)

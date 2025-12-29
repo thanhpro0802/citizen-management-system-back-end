@@ -226,8 +226,9 @@ public class ThongKeServiceImpl implements ThongKeService {
 
     private Map<String, Object> thongKePhanAnhTheoTuan(LocalDate startDate) {
         LocalDate monday = startDate.with(DayOfWeek.MONDAY);
-        LocalDate start = monday;
-        LocalDate end = start.plusDays(7);
+
+        LocalDateTime start = monday.atStartOfDay();
+        LocalDateTime end = monday.plusDays(7).atStartOfDay();
 
         Map<LocalDate, PhanAnhTrangThaiProjection> raw = new HashMap<>();
 
