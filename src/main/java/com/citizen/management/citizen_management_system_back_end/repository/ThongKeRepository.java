@@ -108,7 +108,7 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
 
     @Query("""
                 SELECT
-                    ((MONTH(pa.thoiGianTao) - 1) / 3 + 1) AS quy,
+                    EXTRACT(QUARTER FROM pa.thoiGianTao) AS quy,
 
                     COALESCE(SUM(
                         CASE WHEN pa.trangThaiHienTai = 'CHO' THEN 1 ELSE 0 END
@@ -123,9 +123,9 @@ public interface ThongKeRepository extends JpaRepository<NhanKhau, String> {
                     ), 0) AS daXuLy
 
                 FROM PhanAnh pa
-                WHERE YEAR(pa.thoiGianTao) = :year
-                GROUP BY ((MONTH(pa.thoiGianTao) - 1) / 3 + 1)
-                ORDER BY ((MONTH(pa.thoiGianTao) - 1) / 3 + 1)
+                WHERE EXTRACT(YEAR FROM pa.thoiGianTao) = :year
+                GROUP BY EXTRACT(QUARTER FROM pa.thoiGianTao)
+                ORDER BY EXTRACT(QUARTER FROM pa.thoiGianTao)
             """)
     List<PhanAnhTrangThaiTheoQuyProjection> thongKeTheoQuy(
             @Param("year") int year);
