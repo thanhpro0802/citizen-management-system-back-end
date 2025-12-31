@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.util.Date;
+import java.sql.Date;
 
 @Entity
 @Table(name = "nhan_khau")
@@ -54,10 +54,11 @@ public class NhanKhau {
     @Column(name = "trang_thai", nullable = true)
     private EnumTrangThaiNhanKhau trangThai;
 
-    // SỬA: Khi lấy NhanKhau -> Load HoKhau nhưng bỏ qua danhSachThanhVien của hộ đó để tránh loop
+    // SỬA: Khi lấy NhanKhau -> Load HoKhau nhưng bỏ qua danhSachThanhVien của hộ đó
+    // để tránh loop
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_ho_khau")
-    @JsonIgnoreProperties({"danhSachThanhVien", "chuHo", "hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({ "danhSachThanhVien", "chuHo", "hibernateLazyInitializer", "handler" })
     private HoKhau hoKhau;
 
     // SỬA: Bỏ qua danh sách này khi load nhân khẩu để tránh quá tải

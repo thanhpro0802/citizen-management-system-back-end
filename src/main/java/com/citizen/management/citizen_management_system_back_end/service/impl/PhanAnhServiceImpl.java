@@ -29,8 +29,8 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     @Transactional
     public PhanAnh guiPhanAnh(GuiPhanAnhRequest request, TaiKhoan nguoiGui) {
-        //He thong tiep nhan
-        //1.Tao phan anh moi
+        // He thong tiep nhan
+        // 1.Tao phan anh moi
         PhanAnh pa = new PhanAnh();
         pa.setTieuDe(request.getTieuDe());
         pa.setLinhVuc(request.getLinhVuc());
@@ -38,16 +38,16 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         pa.setNoiDung(request.getNoiDung());
 
-        //Set trang thai dau
+        // Set trang thai dau
         pa.setTrangThaiHienTai(EnumTrangThai.CHO);
         pa.setMucDoKhanCap(EnumMucDoKhanCap.THAP);
 
         pa.setThoiGianTao(new Date());
 
-        //Luu de lay ID
+        // Luu de lay ID
         PhanAnh paDaLuu = phanAnhRepository.save(pa);
 
-        //2.Tao lich su dau tien
+        // 2.Tao lich su dau tien
         LichSuPhanAnh ls = new LichSuPhanAnh();
         ls.setPhanAnh(paDaLuu);
         ls.setTaiKhoanThucHien(nguoiGui);
@@ -57,7 +57,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         lichSuRepository.save(ls);
 
-        //3.Xu ly file dinh kem
+        // 3.Xu ly file dinh kem
         if (request.getDanhSachFileUrl() != null && !request.getDanhSachFileUrl().isEmpty()) {
             List<TepDinhKem> listTep = new ArrayList<>();
 
@@ -65,11 +65,11 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
                 TepDinhKem tep = new TepDinhKem();
                 tep.setPhanAnh(paDaLuu);
                 tep.setUrl(url);
-                tep.setTenFileGoc("Anh_dinh_kem_cong_dan"); //Temp co dinh
+                tep.setTenFileGoc("Anh_dinh_kem_cong_dan"); // Temp co dinh
                 listTep.add(tep);
             }
 
-            //Luu file vao tep_dinh_kem
+            // Luu file vao tep_dinh_kem
             tepDinhKemRepository.saveAll(listTep);
         }
 
@@ -81,7 +81,8 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     public PhanAnh phanCongXuLy(String maPhanAnh, PhanCongRequest request, TaiKhoan nguoiPhanCong) {
         // 1. Tìm cán bộ nhận việc (Người cấp dưới)
         TaiKhoan canBoDuocGiao = taiKhoanRepository.findById(request.getMaCanBoPhuTrach())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy cán bộ với mã: " + request.getMaCanBoPhuTrach()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Không tìm thấy cán bộ với mã: " + request.getMaCanBoPhuTrach()));
 
         // 2. Tìm phản ánh
         PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
@@ -104,7 +105,8 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         ls.setTrangThaiMoi(EnumTrangThai.DANG_XU_LY);
         String tenCanBo = "Cán bộ"; // Giá trị mặc định
 
-        // Kiểm tra xem Tài khoản có liên kết với Nhân khẩu không để tránh NullPointerException
+        // Kiểm tra xem Tài khoản có liên kết với Nhân khẩu không để tránh
+        // NullPointerException
         if (canBoDuocGiao.getNhanKhau() != null && canBoDuocGiao.getNhanKhau().getHoTen() != null) {
             tenCanBo = canBoDuocGiao.getNhanKhau().getHoTen();
         }
@@ -182,15 +184,16 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     @Transactional
     public PhanAnh phanHoiCongDan(String maPhanAnh, PhanHoiRequest request, TaiKhoan canBoPhanHoi) {
-        //1.Tim phan anh
-        PhanAnh pa = phanAnhRepository.findById((maPhanAnh)).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
+        // 1.Tim phan anh
+        PhanAnh pa = phanAnhRepository.findById((maPhanAnh))
+                .orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
 
-        //2.Cap nhat trang thai
+        // 2.Cap nhat trang thai
         pa.setTrangThaiHienTai(EnumTrangThai.DA_XU_LY);
         pa.setThoiGianHoanThanh(new Date());
         PhanAnh paDaCapNhat = phanAnhRepository.save(pa);
 
-        //3.Tao lich su ghi nhan phan hoi
+        // 3.Tao lich su ghi nhan phan hoi
         LichSuPhanAnh ls = new LichSuPhanAnh();
         ls.setPhanAnh(paDaCapNhat);
         ls.setTaiKhoanThucHien(canBoPhanHoi);
@@ -201,7 +204,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
 
         lichSuRepository.save(ls);
 
-        //4.Tao thong bao cho cong dan
+        // 4.Tao thong bao cho cong dan
         ThongBao tb = new ThongBao();
         tb.setNguoiNhan(pa.getNguoiGui()); // Gui cho nguoi tao phan anh
         tb.setNoiDung("Phản ánh: '" + pa.getTieuDe() + "' của bạn đã có kết quả xử lý.");
@@ -218,20 +221,21 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
     @Override
     @Transactional
     public PhanAnh danhGiaPhanHoi(String maPhanAnh, DanhGiaRequest request, TaiKhoan nguoiDanhGia) {
-        //1.TIm phan anh
-        PhanAnh pa = phanAnhRepository.findById(maPhanAnh).orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
+        // 1.TIm phan anh
+        PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
+                .orElseThrow(() -> new EntityNotFoundException("Khong tim thay Phan anh: " + maPhanAnh));
 
-        //2.Kiem tra bao mat
+        // 2.Kiem tra bao mat
         if (!pa.getNguoiGui().getMaTaiKhoan().equals(nguoiDanhGia.getMaTaiKhoan())) {
             throw new RuntimeException("Ban khong co quyen danh gia phan anh nay!");
         }
 
-        //3.Dam bao chi danh gia khi da xu ly xong
+        // 3.Dam bao chi danh gia khi da xu ly xong
         if (pa.getTrangThaiHienTai() != EnumTrangThai.DA_XU_LY) {
             throw new RuntimeException("Phan anh nay chua xu ly xong!");
         }
 
-        //4.Cap nhat danh gia
+        // 4.Cap nhat danh gia
         pa.setDanhGiaHaiLong(request.getDanhGiaHaiLong());
         pa.setGopY(request.getGopY());
 
@@ -267,7 +271,7 @@ public class PhanAnhServiceImpl implements IPhanAnhService {
         PhanAnh pa = phanAnhRepository.findById(maPhanAnh)
                 .orElseThrow(() -> new EntityNotFoundException(("Không tìm thấy phản ánh: " + maPhanAnh)));
 
-        if (pa.getTrangThaiHienTai() ==  EnumTrangThai.DA_XU_LY) {
+        if (pa.getTrangThaiHienTai() == EnumTrangThai.DA_XU_LY) {
             throw new RuntimeException("Hồ sơ đã đóng, không thể thay đổi mức độ khẩn cấp!");
         }
 

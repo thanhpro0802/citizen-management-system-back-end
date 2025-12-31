@@ -25,7 +25,8 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Autowired UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -56,10 +57,10 @@ public class SecurityConfig {
                 // 1. Bật cấu hình CORS và tắt CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                
+
                 // 2. Thiết lập Session STATELESS
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                
+
                 // 3. Phân quyền
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
@@ -70,7 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/nhan-khau/cua-toi").authenticated()
                         .requestMatchers("/api/v1/phan-anh/cua-toi").authenticated()
                         .requestMatchers("/api/chat/**").authenticated()
-                        
+
                         // === [CÁN BỘ] Các API quản lý ===
                         .requestMatchers("/api/nhan-khau/**").hasAnyAuthority("CAN_BO_NHAN_KHAU", "TO_TRUONG", "TO_PHO", "ADMIN")
                         .requestMatchers("/api/ho-khau/**").hasAnyAuthority("CAN_BO_HO_KHAU", "TO_TRUONG", "TO_PHO", "ADMIN")
@@ -82,8 +83,7 @@ public class SecurityConfig {
                         ).hasAnyAuthority("CAN_BO_PHAN_ANH", "TO_TRUONG", "TO_PHO", "ADMIN")
                         
                         // Các request còn lại phải đăng nhập
-                        .anyRequest().authenticated()
-                );
+                        .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -98,21 +98,19 @@ public class SecurityConfig {
 
         // Cho phép các origin cụ thể (KHÔNG DÙNG "*" KHI allowCredentials=true)
         configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173"
-        ));
+                "http://localhost:3000",
+                "http://localhost:5173"));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
-        
+
         // Liệt kê cụ thể các headers được phép
         configuration.setAllowedHeaders(List.of(
-            "Authorization",
-            "Content-Type",
-            "Accept",
-            "Origin",
-            "X-Requested-With"
-        ));
-        
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With"));
+
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
