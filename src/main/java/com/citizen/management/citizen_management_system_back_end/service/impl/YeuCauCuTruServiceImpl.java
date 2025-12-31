@@ -5,15 +5,13 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.XuL
 import com.citizen.management.citizen_management_system_back_end.dto.response.YeuCauCuTruResponse;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.entity.TamTru;
+import com.citizen.management.citizen_management_system_back_end.entity.TamVang;
 import com.citizen.management.citizen_management_system_back_end.entity.YeuCauCuTru;
 import com.citizen.management.citizen_management_system_back_end.entity.ThongBao;
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.enums.*;
-import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.YeuCauCuTruRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.ThongBaoRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.TaiKhoanRepository;
-import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
+import com.citizen.management.citizen_management_system_back_end.repository.*;
 import com.citizen.management.citizen_management_system_back_end.service.YeuCauCuTruService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,11 +31,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
 
+    private final TamVangRepository tamVangRepository;
+
+    private final TamTruRepository tamTruRepository;
+
     private final YeuCauCuTruRepository yeuCauRepository;
     private final NhanKhauRepository nhanKhauRepository;
     private final ThongBaoRepository thongBaoRepository;
     private final TaiKhoanRepository taiKhoanRepository;
     private final HoKhauRepository hoKhauRepository;
+
+    // Lombok's @RequiredArgsConstructor will generate the constructor for all final
+    // fields
+
+    // Lombok's @RequiredArgsConstructor will generate the constructor for all final
+    // fields
 
     @Override
     @Transactional
@@ -88,7 +97,7 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
                 yeuCau.setPhanCanDieuChinh(request.getPhanCanDieuChinh());
                 yeuCau.setLyDo(request.getLyDo());
                 break;
-                
+
             case XOA_DANG_KY:
                 yeuCau.setLyDo(request.getLyDo());
                 break;
@@ -101,20 +110,20 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
 
         // Lưu yêu cầu trước
         YeuCauCuTru saved = yeuCauRepository.save(yeuCau);
-        
+
         // Tạo thông báo cho TẤT CẢ cán bộ
         List<TaiKhoan> danhSachCanBo = taiKhoanRepository.findByVaiTro(EnumVaiTro.CAN_BO);
         for (TaiKhoan canBo : danhSachCanBo) {
             ThongBao tb = new ThongBao();
             tb.setNguoiNhan(canBo);
-            tb.setNoiDung("Yêu cầu mới từ " + nhanKhau.getHoTen() + ": " + 
-                saved.getLoaiYeuCau().getTenHienThi() + " - Mã: " + saved.getMaYeuCau());
+            tb.setNoiDung("Yêu cầu mới từ " + nhanKhau.getHoTen() + ": " +
+                    saved.getLoaiYeuCau().getTenHienThi() + " - Mã: " + saved.getMaYeuCau());
             tb.setThoiGian(new Date());
             tb.setDaXem(false);
             tb.setMaYeuCauCuTruLienQuan(saved.getMaYeuCau());
             thongBaoRepository.save(tb);
         }
-        
+
         return convertToResponse(saved);
     }
 
@@ -178,7 +187,7 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
             EnumTrangThaiYeuCau trangThai,
             EnumLoaiYeuCauCuTru loaiYeuCau,
             Pageable pageable) {
-        
+
         Page<YeuCauCuTru> yeuCauPage = yeuCauRepository.searchYeuCau(trangThai, loaiYeuCau, null, pageable);
         return yeuCauPage.map(this::convertToResponse);
     }
@@ -198,7 +207,7 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         yeuCau.setTrangThai(request.getTrangThaiMoi());
         yeuCau.setCanBoXuLy(canBo.getNhanKhau());
         yeuCau.setGhiChu(request.getGhiChu());
-        
+
         if (request.getTrangThaiMoi() == EnumTrangThaiYeuCau.TU_CHOI) {
             yeuCau.setLyDoTuChoi(request.getLyDoTuChoi());
         }
@@ -216,26 +225,73 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
 
     @Override
     @Transactional
-    public YeuCauCuTruResponse pheDuyetYeuCau(String maYeuCau, String ghiChu, TaiKhoan canBo) {
+    public YeuCauCuTruResponse pheDuyetYeuCau(
+            String maYeuCau,
+            String ghiChu,
+            TaiKhoan canBo) {
+        // 1. Xử lý phê duyệt yêu cầu
         XuLyYeuCauCuTruRequest request = new XuLyYeuCauCuTruRequest();
         request.setTrangThaiMoi(EnumTrangThaiYeuCau.DA_PHE_DUYET);
         request.setGhiChu(ghiChu);
+
         YeuCauCuTruResponse response = xuLyYeuCau(maYeuCau, request, canBo);
-        
-        // Tạo thông báo cho công dân
+
+        // 2. Lấy lại yêu cầu cư trú
         YeuCauCuTru yeuCau = yeuCauRepository.findById(maYeuCau)
-            .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
-        
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu: " + maYeuCau));
+
+        // 3. Nếu là ĐĂNG KÝ TẠM TRÚ → tạo bản ghi tam_tru
+        if (yeuCau.getLoaiYeuCau() == EnumLoaiYeuCauCuTru.DANG_KY_TAM_TRU) {
+
+            TamTru tamTru = new TamTru();
+            tamTru.setMaTamTru(UUID.randomUUID().toString());
+            tamTru.setNhanKhau(yeuCau.getNguoiTao());
+
+            // ===== NGÀY BẮT ĐẦU = NGÀY TẠO YÊU CẦU =====
+            Date ngayBatDau = yeuCau.getNgayTao();
+            tamTru.setNgayBatDau(ngayBatDau);
+
+            // ===== NGÀY KẾT THÚC = SAU 12 THÁNG =====
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(ngayBatDau);
+            calendar.add(Calendar.MONTH, 12);
+            tamTru.setNgayKetThuc(calendar.getTime());
+
+            // ===== LÝ DO =====
+            tamTru.setLyDo(yeuCau.getLyDo());
+
+            tamTruRepository.save(tamTru);
+        }
+
+        if (yeuCau.getLoaiYeuCau() == EnumLoaiYeuCauCuTru.KHAI_BAO_TAM_VANG) {
+
+            TamVang tamVang = new TamVang();
+            tamVang.setMaTamVang(UUID.randomUUID().toString());
+
+            tamVang.setNhanKhau(yeuCau.getNguoiTao());
+
+            tamVang.setNgayBatDau(yeuCau.getThoiGianBatDau());
+            tamVang.setNgayKetThuc(yeuCau.getThoiGianKetThuc());
+            tamVang.setLyDo(yeuCau.getLyDo());
+
+            tamVangRepository.save(tamVang);
+        }
+
+        // 4. Tạo thông báo cho công dân
         ThongBao tb = new ThongBao();
         tb.setNguoiNhan(yeuCau.getNguoiTao().getTaiKhoan());
-        tb.setNoiDung("Đã phê duyệt: " + yeuCau.getLoaiYeuCau().getTenHienThi() + 
-            " - Mã: " + yeuCau.getMaYeuCau() + 
-            (ghiChu != null && !ghiChu.isEmpty() ? " - Ghi chú: " + ghiChu : ""));
+        tb.setNoiDung(
+                "Đã phê duyệt: " + yeuCau.getLoaiYeuCau().getTenHienThi() +
+                        " - Mã: " + yeuCau.getMaYeuCau() +
+                        (ghiChu != null && !ghiChu.isEmpty()
+                                ? " - Ghi chú: " + ghiChu
+                                : ""));
         tb.setThoiGian(new Date());
         tb.setDaXem(false);
         tb.setMaYeuCauCuTruLienQuan(yeuCau.getMaYeuCau());
+
         thongBaoRepository.save(tb);
-        
+
         return response;
     }
 
@@ -256,17 +312,17 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         yeuCau.setNgayCapNhat(new Date());
 
         YeuCauCuTru updated = yeuCauRepository.save(yeuCau);
-        
+
         // Tạo thông báo cho công dân
         ThongBao tb = new ThongBao();
         tb.setNguoiNhan(yeuCau.getNguoiTao().getTaiKhoan());
-        tb.setNoiDung("Yêu cầu cư trú của bạn (đang xử lý): " + 
-            yeuCau.getLoaiYeuCau().getTenHienThi() + " - Mã: " + yeuCau.getMaYeuCau());
+        tb.setNoiDung("Yêu cầu cư trú của bạn (đang xử lý): " +
+                yeuCau.getLoaiYeuCau().getTenHienThi() + " - Mã: " + yeuCau.getMaYeuCau());
         tb.setThoiGian(new Date());
         tb.setDaXem(false);
         tb.setMaYeuCauCuTruLienQuan(yeuCau.getMaYeuCau());
         thongBaoRepository.save(tb);
-        
+
         return convertToResponse(updated);
     }
 
@@ -277,21 +333,21 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         request.setTrangThaiMoi(EnumTrangThaiYeuCau.TU_CHOI);
         request.setLyDoTuChoi(lyDoTuChoi);
         YeuCauCuTruResponse response = xuLyYeuCau(maYeuCau, request, canBo);
-        
+
         // Tạo thông báo cho công dân
         YeuCauCuTru yeuCau = yeuCauRepository.findById(maYeuCau)
-            .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
-        
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
+
         ThongBao tb = new ThongBao();
         tb.setNguoiNhan(yeuCau.getNguoiTao().getTaiKhoan());
-        tb.setNoiDung("Từ chối: " + yeuCau.getLoaiYeuCau().getTenHienThi() + 
-            " - Mã: " + yeuCau.getMaYeuCau() + 
-            " - Lý do: " + lyDoTuChoi);
+        tb.setNoiDung("Từ chối: " + yeuCau.getLoaiYeuCau().getTenHienThi() +
+                " - Mã: " + yeuCau.getMaYeuCau() +
+                " - Lý do: " + lyDoTuChoi);
         tb.setThoiGian(new Date());
         tb.setDaXem(false);
         tb.setMaYeuCauCuTruLienQuan(yeuCau.getMaYeuCau());
         thongBaoRepository.save(tb);
-        
+
         return response;
     }
 
@@ -350,11 +406,11 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
     private void thucHienNghiepVu(YeuCauCuTru yeuCau) {
         // Thực hiện nghiệp vụ khi phê duyệt yêu cầu - Cập nhật trạng thái nhân khẩu
         NhanKhau nguoiDeNghi = yeuCau.getNguoiTao();
-        
+
         if (nguoiDeNghi == null) {
             throw new RuntimeException("Không tìm thấy thông tin nhân khẩu");
         }
-        
+
         switch (yeuCau.getLoaiYeuCau()) {
             case DANG_KY_TAM_TRU:
                 // Cập nhật trạng thái nhân khẩu sang TẠM TRÚ
@@ -365,15 +421,16 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
             case DANG_KY_THUONG_TRU:
                 // Cập nhật trạng thái nhân khẩu sang THƯỜNG TRÚ
                 nguoiDeNghi.setTrangThai(EnumTrangThaiNhanKhau.THUONG_TRU);
-                
+
                 // CẬP NHẬT MÃ HỘ KHẨU
                 if (yeuCau.getLoaiHinhDangKy() == EnumLoaiHinhDangKy.VAO_HO_DA_CO) {
                     // Tìm hộ khẩu của chủ hộ theo CCCD
                     String cccdChuHo = yeuCau.getChuHoCccd();
                     if (cccdChuHo != null && !cccdChuHo.trim().isEmpty()) {
                         NhanKhau chuHo = nhanKhauRepository.findBySoCCCD(cccdChuHo)
-                            .orElseThrow(() -> new RuntimeException("Không tìm thấy chủ hộ với CCCD: " + cccdChuHo));
-                        
+                                .orElseThrow(
+                                        () -> new RuntimeException("Không tìm thấy chủ hộ với CCCD: " + cccdChuHo));
+
                         if (chuHo.getMaHoKhau() != null) {
                             // Cập nhật mã hộ khẩu của người đăng ký
                             nguoiDeNghi.setMaHoKhau(chuHo.getMaHoKhau());
@@ -390,12 +447,12 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
                     hoKhauMoi.setDiaChi(yeuCau.getDiaChiCuTru());
                     hoKhauMoi.setNgayDangKy(new Date());
                     hoKhauMoi = hoKhauRepository.save(hoKhauMoi);
-                    
+
                     // Cập nhật mã hộ khẩu cho người tạo
                     nguoiDeNghi.setMaHoKhau(hoKhauMoi.getMaHoKhau());
                     nguoiDeNghi.setQuanHeVoiChuHo("CHU_HO");
                 }
-                
+
                 nhanKhauRepository.save(nguoiDeNghi);
                 break;
 
@@ -444,11 +501,11 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
 
     private YeuCauCuTruResponse convertToResponse(YeuCauCuTru entity) {
         YeuCauCuTruResponse response = new YeuCauCuTruResponse();
-        
+
         response.setMaYeuCau(entity.getMaYeuCau());
         response.setLoaiYeuCau(entity.getLoaiYeuCau());
         response.setLoaiYeuCauText(getLoaiYeuCauText(entity.getLoaiYeuCau()));
-        
+
         // Thông tin người tạo
         if (entity.getNguoiTao() != null) {
             response.setNguoiTaoMa(entity.getNguoiTao().getMaNhanKhau());
@@ -504,23 +561,35 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
 
     private String getLoaiYeuCauText(EnumLoaiYeuCauCuTru loaiYeuCau) {
         switch (loaiYeuCau) {
-            case DANG_KY_TAM_TRU: return "Đăng ký tạm trú";
-            case DANG_KY_THUONG_TRU: return "Đăng ký thường trú";
-            case KHAI_BAO_TAM_VANG: return "Khai báo tạm vắng";
-            case DIEU_CHINH_THONG_TIN: return "Điều chỉnh thông tin cư trú";
-            case XOA_DANG_KY: return "Xóa đăng ký";
-            default: return "";
+            case DANG_KY_TAM_TRU:
+                return "Đăng ký tạm trú";
+            case DANG_KY_THUONG_TRU:
+                return "Đăng ký thường trú";
+            case KHAI_BAO_TAM_VANG:
+                return "Khai báo tạm vắng";
+            case DIEU_CHINH_THONG_TIN:
+                return "Điều chỉnh thông tin cư trú";
+            case XOA_DANG_KY:
+                return "Xóa đăng ký";
+            default:
+                return "";
         }
     }
 
     private String getTrangThaiText(EnumTrangThaiYeuCau trangThai) {
         switch (trangThai) {
-            case CHO_XU_LY: return "Chờ xử lý";
-            case DANG_XU_LY: return "Đang xử lý";
-            case DA_PHE_DUYET: return "Đã phê duyệt";
-            case TU_CHOI: return "Từ chối";
-            case HUY: return "Đã hủy";
-            default: return "";
+            case CHO_XU_LY:
+                return "Chờ xử lý";
+            case DANG_XU_LY:
+                return "Đang xử lý";
+            case DA_PHE_DUYET:
+                return "Đã phê duyệt";
+            case TU_CHOI:
+                return "Từ chối";
+            case HUY:
+                return "Đã hủy";
+            default:
+                return "";
         }
     }
 }
