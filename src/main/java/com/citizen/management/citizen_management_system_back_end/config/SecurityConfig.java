@@ -64,10 +64,8 @@ public class SecurityConfig {
                 // 3. Phân quyền
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/v1/tai-khoan/**").hasAnyAuthority("CAN_BO", "QUAN_TRI", "ADMIN")
-
-                        .requestMatchers("/api/thong-ke/**").permitAll()
-
+                        .requestMatchers("/api/v1/tai-khoan/**").hasAnyAuthority("CAN_BO_HO_KHAU", "CAN_BO_NHAN_KHAU", "CAN_BO_PHAN_ANH", "TO_TRUONG", "TO_PHO", "ADMIN")
+                        
                         // === [CÔNG DÂN] Các API xem thông tin cá nhân (đặt trước rule của cán bộ) ===
                         .requestMatchers("/api/ho-khau/cua-toi").authenticated()
                         .requestMatchers("/api/nhan-khau/cua-toi").authenticated()
@@ -75,14 +73,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").authenticated()
 
                         // === [CÁN BỘ] Các API quản lý ===
-                        .requestMatchers("/api/nhan-khau/**", "/api/ho-khau/**").hasAuthority("CAN_BO")
-                        .requestMatchers("/api/statistics/**").hasAnyAuthority("CAN_BO", "ADMIN")
+                        .requestMatchers("/api/nhan-khau/**").hasAnyAuthority("CAN_BO_NHAN_KHAU", "TO_TRUONG", "TO_PHO", "ADMIN")
+                        .requestMatchers("/api/ho-khau/**").hasAnyAuthority("CAN_BO_HO_KHAU", "TO_TRUONG", "TO_PHO", "ADMIN")
+                        .requestMatchers("/api/statistics/**").hasAnyAuthority("CAN_BO_HO_KHAU", "CAN_BO_NHAN_KHAU", "CAN_BO_PHAN_ANH", "TO_TRUONG", "TO_PHO", "ADMIN")
+                        .requestMatchers("/api/v1/phan-anh/*/phan-cong").hasAnyAuthority("TO_TRUONG", "TO_PHO", "ADMIN")
                         .requestMatchers(
-                                "/api/v1/phan-anh/*/phan-cong",
                                 "/api/v1/phan-anh/*/xu-ly-noi-bo",
-                                "/api/v1/phan-anh/*/phan-hoi")
-                        .hasAuthority("CAN_BO")
-
+                                "/api/v1/phan-anh/*/phan-hoi"
+                        ).hasAnyAuthority("CAN_BO_PHAN_ANH", "TO_TRUONG", "TO_PHO", "ADMIN")
+                        
                         // Các request còn lại phải đăng nhập
                         .anyRequest().authenticated());
 

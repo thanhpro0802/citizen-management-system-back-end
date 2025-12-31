@@ -111,12 +111,26 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         // Lưu yêu cầu trước
         YeuCauCuTru saved = yeuCauRepository.save(yeuCau);
 
-        // Tạo thông báo cho TẤT CẢ cán bộ
-        List<TaiKhoan> danhSachCanBo = taiKhoanRepository.findByVaiTro(EnumVaiTro.CAN_BO);
-        for (TaiKhoan canBo : danhSachCanBo) {
+        // --- CẬP NHẬT LOGIC GỬI THÔNG BÁO ---
+        // Gửi cho Cán bộ hộ khẩu, Tổ trưởng, Tổ phó, Admin
+        List<EnumVaiTro> rolesCanNotification = Arrays.asList(
+                EnumVaiTro.CAN_BO_HO_KHAU,
+                EnumVaiTro.TO_TRUONG,
+                EnumVaiTro.TO_PHO,
+                EnumVaiTro.ADMIN
+        );
+
+        // Tìm tất cả tài khoản có vai trò phù hợp
+        // Lưu ý: Nếu Repo chưa có findByVaiTroIn thì có thể phải loop hoặc thêm method vào Repo
+        List<TaiKhoan> danhSachNhanThongBao = new ArrayList<>();
+        for (EnumVaiTro role : rolesCanNotification) {
+            danhSachNhanThongBao.addAll(taiKhoanRepository.findByVaiTro(role));
+        }
+
+        for (TaiKhoan canBo : danhSachNhanThongBao) {
             ThongBao tb = new ThongBao();
             tb.setNguoiNhan(canBo);
-            tb.setNoiDung("Yêu cầu mới từ " + nhanKhau.getHoTen() + ": " +
+            tb.setNoiDung("Yêu cầu cư trú mới từ " + nhanKhau.getHoTen() + ": " +
                     saved.getLoaiYeuCau().getTenHienThi() + " - Mã: " + saved.getMaYeuCau());
             tb.setThoiGian(new Date());
             tb.setDaXem(false);
@@ -301,6 +315,11 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         YeuCauCuTru yeuCau = yeuCauRepository.findById(maYeuCau)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy yêu cầu với mã: " + maYeuCau));
 
+        // Kiểm tra quyền xử lý
+        if (!isCanBo(canBo)) {
+            throw new RuntimeException("Bạn không có quyền nhận xử lý yêu cầu này");
+        }
+
         // Kiểm tra trạng thái hiện tại
         if (yeuCau.getTrangThai() != EnumTrangThaiYeuCau.CHO_XU_LY) {
             throw new RuntimeException("Chỉ có thể nhận xử lý yêu cầu đang ở trạng thái CHỜ XỬ LÝ");
@@ -440,7 +459,6 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
                         }
                     }
                 } else if (yeuCau.getLoaiHinhDangKy() == EnumLoaiHinhDangKy.LAP_HO_MOI) {
-                    // Tạo hộ khẩu mới
                     HoKhau hoKhauMoi = new HoKhau();
                     hoKhauMoi.setMaHoKhau("HK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
                     hoKhauMoi.setChuHo(nguoiDeNghi);
@@ -495,8 +513,15 @@ public class YeuCauCuTruServiceImpl implements YeuCauCuTruService {
         return false;
     }
 
+    // --- CẬP NHẬT: CHECK QUYỀN CÁN BỘ DỰA TRÊN ENUM MỚI ---
     private boolean isCanBo(TaiKhoan taiKhoan) {
-        return taiKhoan.getVaiTro() == EnumVaiTro.CAN_BO || taiKhoan.getVaiTro() == EnumVaiTro.ADMIN;
+        EnumVaiTro vaiTro = taiKhoan.getVaiTro();
+        return vaiTro == EnumVaiTro.ADMIN ||
+                vaiTro == EnumVaiTro.TO_TRUONG ||
+                vaiTro == EnumVaiTro.TO_PHO ||
+                vaiTro == EnumVaiTro.CAN_BO_HO_KHAU ||
+                vaiTro == EnumVaiTro.CAN_BO_NHAN_KHAU ||
+                vaiTro == EnumVaiTro.CAN_BO_PHAN_ANH;
     }
 
     private YeuCauCuTruResponse convertToResponse(YeuCauCuTru entity) {

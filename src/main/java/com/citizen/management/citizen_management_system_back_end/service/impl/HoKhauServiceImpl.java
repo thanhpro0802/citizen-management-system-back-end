@@ -7,8 +7,10 @@ import com.citizen.management.citizen_management_system_back_end.dto.request.HoK
 import com.citizen.management.citizen_management_system_back_end.entity.HoKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.NhanKhau;
 import com.citizen.management.citizen_management_system_back_end.entity.TaiKhoan;
+import com.citizen.management.citizen_management_system_back_end.entity.TamTru;
 import com.citizen.management.citizen_management_system_back_end.repository.HoKhauRepository;
 import com.citizen.management.citizen_management_system_back_end.repository.NhanKhauRepository;
+import com.citizen.management.citizen_management_system_back_end.repository.TamTruRepository;
 import com.citizen.management.citizen_management_system_back_end.service.HoKhauService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,6 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,47 +25,50 @@ public class HoKhauServiceImpl implements HoKhauService {
 
     private final HoKhauRepository hoKhauRepository;
     private final NhanKhauRepository nhanKhauRepository;
+    private final TamTruRepository tamTruRepository;
 
     @Override
     @Transactional
-    public HoKhau taoMoi(HoKhau hoKhau) {
+    public HoKhau taoMoi(HoKhauRequest request) { // <--- ĐÃ SỬA: Nhận HoKhauRequest
+        HoKhau hoKhau = new HoKhau();
 
-        if (hoKhau.getChuHo() == null || hoKhau.getChuHo().getSoCCCD() == null) {
-            throw new RuntimeException("Phải chọn chủ hộ khi tạo hộ khẩu");
+        // 1. Set thông tin cơ bản
+        if (request.getDiaChi() == null || request.getDiaChi().trim().isEmpty()) {
+            throw new RuntimeException("Địa chỉ không được để trống");
         }
-
-        // 1. Tìm chủ hộ bằng CCCD
-        NhanKhau chuHo = nhanKhauRepository
-                .findBySoCCCD(hoKhau.getChuHo().getSoCCCD().trim())
-                .orElseThrow(() ->
-                        new RuntimeException("Không tìm thấy nhân khẩu với CCCD đã nhập")
-                );
-
-        // 2. Kiểm tra chủ hộ đã có hộ khẩu chưa
-        if (chuHo.getHoKhau() != null) {
-            throw new RuntimeException("Nhân khẩu này đã thuộc một hộ khẩu khác");
-        }
-
-        // 3. Set thông tin hộ khẩu
-        hoKhau.setChuHo(chuHo);
+        hoKhau.setDiaChi(request.getDiaChi());
         hoKhau.setNgayDangKy(new Date());
 
-        // 4. Lưu hộ khẩu trước
-        HoKhau hoKhauDaLuu = hoKhauRepository.save(hoKhau);
-
-        // 5. Gán chủ hộ vào danh sách thành viên
-        if (hoKhauDaLuu.getDanhSachThanhVien() == null) {
-            hoKhauDaLuu.setDanhSachThanhVien(new ArrayList<>());
+        // 2. Xử lý Chủ Hộ (Tìm theo CCCD)
+        if (request.getChuHo() == null || request.getChuHo().getSoCCCD() == null) {
+            throw new RuntimeException("Vui lòng nhập số CCCD của chủ hộ!");
         }
 
-        hoKhauDaLuu.addThanhVien(chuHo);
+        String cccd = request.getChuHo().getSoCCCD().trim();
 
-        // 6. Set quan hệ cho chủ hộ
-        chuHo.setHoKhau(hoKhauDaLuu);
-        chuHo.setQuanHeVoiChuHo("CHU_HO");
-        nhanKhauRepository.save(chuHo);
+        // Tìm nhân khẩu trong DB
+        NhanKhau chuHo = nhanKhauRepository.findBySoCCCD(cccd)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với CCCD: " + cccd));
 
-        return hoKhauDaLuu;
+        // Kiểm tra: Người này đã có hộ khẩu chưa?
+        if (chuHo.getHoKhau() != null) {
+            throw new RuntimeException("Công dân " + chuHo.getHoTen() + " hiện đã thuộc một hộ khẩu khác!");
+        }
+
+        // 3. Gán quan hệ 2 chiều
+        hoKhau.setChuHo(chuHo);
+
+        // Lưu hộ khẩu trước để có ID
+        HoKhau hoKhauMoi = hoKhauRepository.save(hoKhau);
+
+        // Cập nhật thông tin nhân khẩu
+        chuHo.setQuanHeVoiChuHo("Chủ hộ"); // Sửa thành tiếng Việt có dấu hoặc CHU_HO tùy quy ước enum của bạn
+        chuHo.setHoKhau(hoKhauMoi);
+
+        // Thêm chủ hộ vào danh sách thành viên của hộ
+        hoKhauMoi.addThanhVien(chuHo);
+
+        return hoKhauRepository.save(hoKhauMoi);
     }
 
 
@@ -84,16 +88,27 @@ public class HoKhauServiceImpl implements HoKhauService {
         // 3. Cập nhật Chủ hộ (Xử lý đổi người đứng tên)
         if (request.getChuHo() != null && request.getChuHo().getSoCCCD() != null) {
             String newCCCD = request.getChuHo().getSoCCCD().trim();
+            // Nếu CCCD khác với chủ hộ hiện tại (hoặc chưa có chủ hộ)
             if (hoKhau.getChuHo() == null || !hoKhau.getChuHo().getSoCCCD().equals(newCCCD)) {
                 NhanKhau chuHoMoi = nhanKhauRepository.findBySoCCCD(newCCCD)
                         .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với CCCD: " + newCCCD));
 
-                hoKhau.setChuHo(chuHoMoi); // Gán object chủ hộ mới vào hộ khẩu
-                // (Chưa save vội, để bước 4 xử lý luôn thể)
+                // Xử lý chủ hộ cũ (nếu có) -> Chuyển thành thành viên thường
+                if (hoKhau.getChuHo() != null) {
+                    hoKhau.getChuHo().setQuanHeVoiChuHo("Thành viên");
+                }
+
+                hoKhau.setChuHo(chuHoMoi);
+                // Cập nhật chủ hộ mới
+                chuHoMoi.setQuanHeVoiChuHo("Chủ hộ");
+                chuHoMoi.setHoKhau(hoKhau);
+
+                // Đảm bảo chủ hộ mới có trong danh sách thành viên
+                hoKhau.addThanhVien(chuHoMoi);
             }
         }
 
-        // 4. Cập nhật Quan hệ thành viên (LOGIC ĐÃ SỬA)
+        // 4. Cập nhật Quan hệ thành viên
         if (request.getDanhSachThanhVien() != null) {
             for (HoKhauRequest.ThanhVienRequest tvReq : request.getDanhSachThanhVien()) {
                 if (tvReq.getMaNhanKhau() == null || tvReq.getQuanHeVoiChuHo() == null) continue;
@@ -104,18 +119,13 @@ public class HoKhauServiceImpl implements HoKhauService {
                 if (nk != null && nk.getHoKhau() != null && nk.getHoKhau().getMaHoKhau().equals(maHoKhau)) {
 
                     // --- KIỂM TRA QUAN TRỌNG ---
-                    // Kiểm tra xem người này CÓ PHẢI LÀ CHỦ HỘ MỚI (được set ở bước 3) hay không?
                     boolean laChuHoMoi = hoKhau.getChuHo().getMaNhanKhau().equals(nk.getMaNhanKhau());
 
                     if (laChuHoMoi) {
-                        // Nếu là chủ hộ mới -> Bắt buộc quan hệ là CHU_HO
-                        nk.setQuanHeVoiChuHo("CHU_HO");
+                        nk.setQuanHeVoiChuHo("Chủ hộ");
                     } else {
-                        // Nếu KHÔNG phải chủ hộ mới -> Cho phép cập nhật quan hệ theo ý người dùng
-                        // (Kể cả người này trước đây là Chủ hộ cũ, giờ sẽ bị cập nhật thành quan hệ mới)
                         nk.setQuanHeVoiChuHo(tvReq.getQuanHeVoiChuHo());
                     }
-
                     nhanKhauRepository.save(nk);
                 }
             }
@@ -148,6 +158,12 @@ public class HoKhauServiceImpl implements HoKhauService {
         hoKhauRepository.delete(hoKhau);
     }
 
+
+
+
+
+
+
     @Override
     public List<HoKhau> layTatCa() {
         return hoKhauRepository.findAll();
@@ -174,33 +190,36 @@ public class HoKhauServiceImpl implements HoKhauService {
 
         hoMoi.setChuHo(chuHoMoi);
         hoMoi.setDiaChi(request.getDiaChiMoi());
-        hoMoi.setNgayDangKy(new java.util.Date()); // Lấy ngày hiện tại
+        hoMoi.setNgayDangKy(new java.util.Date());
 
-        // Lưu hộ mới trước để có ID (nếu cần thiết với JPA)
+        // Lưu hộ mới trước
         hoMoi = hoKhauRepository.save(hoMoi);
 
         // 3. Lấy danh sách nhân khẩu cần tách
         List<NhanKhau> nhanKhausTachRa = nhanKhauRepository.findAllById(tachRaIds);
 
-        // Kiểm tra xem các nhân khẩu này có thuộc hộ cũ không (Optional)
         for (NhanKhau nk : nhanKhausTachRa) {
+            // Chỉ tách nếu đang thuộc hộ cũ
             if (nk.getHoKhau() != null && !nk.getHoKhau().getMaHoKhau().equals(maHoCu)) {
-                // Có thể bỏ qua hoặc throw exception tùy nghiệp vụ
                 continue;
             }
 
-            // QUAN TRỌNG: Thực hiện chuyển đổi dứt khoát
-            // Bước A: Gỡ khỏi hộ cũ (Hàm này sẽ set hoKhau = null và xóa khỏi list của hoCu)
+            // Gỡ khỏi hộ cũ
             hoCu.removeThanhVien(nk);
 
-            // Bước B: Thêm vào hộ mới (Hàm này set hoKhau = hoMoi và thêm vào list của hoMoi)
+            // Thêm vào hộ mới
             hoMoi.addThanhVien(nk);
 
-            // Bước C: Lưu nhân khẩu để cập nhật khóa ngoại (Foreign Key) ngay lập tức
+            // Cập nhật quan hệ (nếu là chủ hộ mới thì set Chủ hộ, còn lại là Thành viên)
+            if(nk.getMaNhanKhau().equals(chuHoMoi.getMaNhanKhau())) {
+                nk.setQuanHeVoiChuHo("Chủ hộ");
+            } else {
+                nk.setQuanHeVoiChuHo("Thành viên");
+            }
+
             nhanKhauRepository.save(nk);
         }
 
-        // 4. Lưu lại trạng thái 2 hộ khẩu
         hoKhauRepository.save(hoCu);
         return hoKhauRepository.save(hoMoi);
     }
@@ -213,12 +232,21 @@ public class HoKhauServiceImpl implements HoKhauService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hộ khẩu với mã: " + maHoKhau));
         NhanKhau chuHoMoi = nhanKhauRepository.findById(request.getMaNhanKhauMoi())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân khẩu với mã: " + request.getMaNhanKhauMoi()));
+
+        // Chủ cũ thành thành viên
+        if(hk.getChuHo() != null) {
+            hk.getChuHo().setQuanHeVoiChuHo("Thành viên");
+        }
+
+        // Chủ mới
         hk.setChuHo(chuHoMoi);
+        chuHoMoi.setQuanHeVoiChuHo("Chủ hộ");
+
         return hoKhauRepository.save(hk);
     }
 
     @Override
-    @Transactional // <--- QUAN TRỌNG: Giữ session để load danh sách thành viên (tránh lỗi Lazy)
+    @Transactional
     public HoKhau layHoKhauCuaToi(TaiKhoan taiKhoan) {
         if (taiKhoan == null || taiKhoan.getNhanKhau() == null) {
             throw new RuntimeException("Tài khoản không hợp lệ hoặc chưa liên kết với nhân khẩu");
@@ -230,12 +258,11 @@ public class HoKhauServiceImpl implements HoKhauService {
 
         HoKhau hoKhau = nhanKhau.getHoKhau();
 
-        // SỬA LỖI Ở ĐÂY: Trả về null thay vì ném Exception
         if (hoKhau == null) {
             return null;
         }
 
-        // Mẹo: Gọi .size() để Hibernate tải dữ liệu danh sách thành viên ngay lập tức
+        // Trigger lazy load
         if (hoKhau.getDanhSachThanhVien() != null) {
             hoKhau.getDanhSachThanhVien().size();
         }
@@ -275,39 +302,33 @@ public class HoKhauServiceImpl implements HoKhauService {
 
         List<NhanKhau> nhanKhauList = new ArrayList<>();
 
-        // (Logic tìm nhân khẩu giữ nguyên như cũ...)
         if (request.getCccdNhapVao() != null && !request.getCccdNhapVao().isEmpty()) {
             for (String cccd : request.getCccdNhapVao()) {
                 nhanKhauRepository.findBySoCCCD(cccd.trim()).ifPresent(nhanKhauList::add);
             }
         }
 
-        // Dùng Set để lưu danh sách các Hộ khẩu cũ bị ảnh hưởng (để kiểm tra xóa sau này)
         Set<HoKhau> cacHoKhauBiAnhHuong = new HashSet<>();
 
         for (NhanKhau nk : nhanKhauList) {
             if (nk.getHoKhau() != null) {
-                // Lưu lại hộ cũ trước khi remove
                 cacHoKhauBiAnhHuong.add(nk.getHoKhau());
-
-                // Gỡ khỏi hộ cũ
                 nk.getHoKhau().removeThanhVien(nk);
             }
 
-            // Gán vào hộ mới
             nk.setHoKhau(hoNhapVao);
+            // Quan hệ khi nhập hộ mặc định là thành viên
+            nk.setQuanHeVoiChuHo("Thành viên");
             hoNhapVao.addThanhVien(nk);
             nhanKhauRepository.save(nk);
         }
 
-        // --- LOGIC MỚI: QUÉT CÁC HỘ CŨ ---
         for (HoKhau hoCu : cacHoKhauBiAnhHuong) {
-            // Cẩn thận: Đừng xóa chính cái hộ đang nhập vào (nếu có trường hợp nhập nội bộ)
             if (!hoCu.getMaHoKhau().equals(maHoNhapVao)) {
                 if (hoCu.getDanhSachThanhVien().isEmpty()) {
-                    hoKhauRepository.delete(hoCu); // Xóa nếu rỗng
+                    hoKhauRepository.delete(hoCu);
                 } else {
-                    hoKhauRepository.save(hoCu);   // Lưu nếu còn người
+                    hoKhauRepository.save(hoCu);
                 }
             }
         }
